@@ -53,11 +53,7 @@ install: ## Install operator-sdk, ansible-operator, and helm-operator.
 .PHONY: build
 build: ## Build operator-sdk, ansible-operator, and helm-operator.
 	@mkdir -p $(BUILD_DIR)
-	go build $(GO_BUILD_ARGS) -o $(BUILD_DIR) ./cmd
-
-.PHONY: build/openvino-operator
-build/openvino-operator:
-	go build $(GO_BUILD_ARGS) -o $(BUILD_DIR)/$(@F) ./cmd/$(@F)
+	go build $(GO_BUILD_ARGS) -o $(BUILD_DIR)/openvino-operator ./cmd
 
 # Build scorecard binaries.
 .PHONY: build/scorecard-test build/scorecard-test-kuttl build/custom-scorecard-tests
