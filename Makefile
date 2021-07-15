@@ -6,8 +6,8 @@ SHELL = /bin/bash
 # version is moved to a separate repo and release process.
 export IMAGE_VERSION = v1.9.0
 # Build-time variables to inject into binaries
-export SIMPLE_VERSION = $(shell (test "$(shell git describe)" = "$(shell git describe --abbrev=0)" && echo $(shell git describe)) || echo $(shell git describe --abbrev=0)+git)
-export GIT_VERSION = $(shell git describe --dirty --tags --always)
+export SIMPLE_VERSION = v1.0.0
+export GIT_VERSION = v1.0.0
 export GIT_COMMIT = $(shell git rev-parse HEAD)
 export K8S_VERSION = 1.20.2
 
@@ -19,27 +19,15 @@ BUILD_DIR = build
 GO_ASMFLAGS = -asmflags "all=-trimpath=$(shell dirname $(PWD))"
 GO_GCFLAGS = -gcflags "all=-trimpath=$(shell dirname $(PWD))"
 GO_BUILD_ARGS = \
-  $(GO_GCFLAGS) $(GO_ASMFLAGS) \
-  -ldflags " \
-    -X '$(REPO)/internal/version.Version=$(SIMPLE_VERSION)' \
-    -X '$(REPO)/internal/version.GitVersion=$(GIT_VERSION)' \
-    -X '$(REPO)/internal/version.GitCommit=$(GIT_COMMIT)' \
-    -X '$(REPO)/internal/version.KubernetesVersion=v$(K8S_VERSION)' \
-    -X '$(REPO)/internal/version.ImageVersion=$(IMAGE_VERSION)' \
-  " \
+  $(GO_GCFLAGS) $(GO_ASMFLAGS)
 
 export GO111MODULE = on
 export CGO_ENABLED = 0
-export PATH := $(PWD)/$(BUILD_DIR):$(PWD)/$(TOOLS_DIR):$(PATH)
+export PATH := $(PWD)/$(BUILD_DIR):$(PATH)
 
 ##@ Development
 
-.PHONY: generate
-generate: build # Generate CLI docs and samples
-	go run ./hack/generate/cncf-maintainers/main.go
-	go run ./hack/generate/cli-doc/gen-cli-doc.go
-	go run ./hack/generate/samples/generate_testdata.go
-	go generate ./...
+
 
 .PHONY: bindata
 OLM_VERSIONS = 0.16.1 0.17.0 0.18.2
@@ -60,15 +48,15 @@ clean: ## Cleanup build artifacts and tool binaries.
 
 .PHONY: install
 install: ## Install operator-sdk, ansible-operator, and helm-operator.
-	go install $(GO_BUILD_ARGS) ./cmd}
+	go install $(GO_BUILD_ARGS) ./cmd
 
 .PHONY: build
 build: ## Build operator-sdk, ansible-operator, and helm-operator.
 	@mkdir -p $(BUILD_DIR)
-	go build $(GO_BUILD_ARGS) -o $(BUILD_DIR) ./cmd}
+	go build $(GO_BUILD_ARGS) -o $(BUILD_DIR) ./cmd
 
-.PHONY: build/operator-sdk build/ansible-operator build/helm-operator
-build/operator-sdk build/ansible-operator build/helm-operator:
+.PHONY: build/openvino-operator
+build/openvino-operator:
 	go build $(GO_BUILD_ARGS) -o $(BUILD_DIR)/$(@F) ./cmd/$(@F)
 
 # Build scorecard binaries.

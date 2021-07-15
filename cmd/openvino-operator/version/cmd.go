@@ -20,7 +20,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	ver "github.com/operator-framework/operator-sdk/internal/version"
+	ver "github.com/openvinotoolkit/openshift_operator/pkg/version"
 )
 
 func NewCmd() *cobra.Command {

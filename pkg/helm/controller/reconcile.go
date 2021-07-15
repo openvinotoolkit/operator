@@ -33,9 +33,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/operator-framework/operator-sdk/internal/helm/internal/diff"
-	"github.com/operator-framework/operator-sdk/internal/helm/internal/types"
-	"github.com/operator-framework/operator-sdk/internal/helm/release"
+	"github.com/openvinotoolkit/openshift_operator/pkg/helm/internal/diff"
+	"github.com/openvinotoolkit/openshift_operator/pkg/helm/internal/types"
+	"github.com/openvinotoolkit/openshift_operator/pkg/helm/release"
 )
 
 // blank assignment to verify that HelmOperatorReconciler implements reconcile.Reconciler

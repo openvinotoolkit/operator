@@ -1,4 +1,5 @@
-module github.com/operator-framework/operator-sdk
+// module github.com/operator-framework/operator-sdk
+module github.com/openvinotoolkit/openshift_operator
 
 go 1.16
 

@@ -12,33 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package metrics
-
-import (
-	"github.com/prometheus/client_golang/prometheus"
-
-	sdkVersion "github.com/openvinotoolkit/openshift_operator/pkg/version"
-)
+package k8sutil
 
 const (
-	subsystem = "helm_operator"
-)
+	// KubeConfigEnvVar defines the env variable KUBECONFIG which
+	// contains the kubeconfig file path.
+	KubeConfigEnvVar = "KUBECONFIG"
 
-var (
-	buildInfo = prometheus.NewGauge(
-		prometheus.GaugeOpts{
-			Subsystem: subsystem,
-			Name:      "build_info",
-			Help:      "Build information for the helm-operator binary",
-			ConstLabels: map[string]string{
-				"commit":  sdkVersion.GitCommit,
-				"version": sdkVersion.Version,
-			},
-		},
-	)
+	// WatchNamespaceEnvVar is the constant for env variable WATCH_NAMESPACE
+	// which is the namespace where the watch activity happens.
+	// this value is empty if the operator is running with clusterScope.
+	WatchNamespaceEnvVar = "WATCH_NAMESPACE"
 )
-
-func RegisterBuildInfo(r prometheus.Registerer) {
-	buildInfo.Set(1)
-	r.MustRegister(buildInfo)
-}
