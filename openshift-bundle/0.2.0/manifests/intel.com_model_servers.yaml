@@ -86,6 +86,9 @@ spec:
                       description: Model version policy
                       type: string
                       default: '{"latest": { "num_versions":1 }}'
+                    layout:
+                      description: Resets model layout
+                      type: string
                     nireq:
                       description: Size of inference request queue for model executions
                       type: integer
