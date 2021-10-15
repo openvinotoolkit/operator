@@ -31,7 +31,7 @@ spec:
   - AI Inference OpenVINO
   links:
   - name: OpenVINO Operator
-    url: https://github.com/openvinotoolkit/model_server/extras/openvino-operator-openshift
+    url: https://github.com/openvinotoolkit/model_server/tree/main/extras/openvino-operator-openshift
   maturity: alpha
   provider:
     name: Intel
