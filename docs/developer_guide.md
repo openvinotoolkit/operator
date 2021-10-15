@@ -1,21 +1,31 @@
-# Develper guide
+# Developer guide
+
 ## Building  the operator
 ```
 make build
 ```
 Results are stored in build folder.
 
-## Testing the operator integration with Kubernetes
+## Starting the operator process
 
 Start the operator
 ```bash
-./build/openvino-operator run --watches-file watches.yaml
+make run
 ```
 
 ## Build docker image
-
 ```bash
-build -f docker/Dockerfile .
+make docker-build IMG=registry.toolbox.iotg.sclab.intel.com/cpp/operator:latest
+```
+
+## Install CRD
+```bash
+make install
+```
+
+## Deploy the operator in K8S
+```bash
+make deploy IMG=registry.toolbox.iotg.sclab.intel.com/cpp/operator:latest
 ```
 
 

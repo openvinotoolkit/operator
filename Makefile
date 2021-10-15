@@ -1,13 +1,8 @@
 SHELL = /bin/bash
 
-# IMAGE_VERSION represents the ansible-operator, helm-operator, and scorecard subproject versions.
-# This value must be updated to the release tag of the most recent release, a change that must
-# occur in the release commit. IMAGE_VERSION will be removed once each subproject that uses this
-# version is moved to a separate repo and release process.
-export IMAGE_VERSION = v1.9.0
+IMG ?= controller:latest
+
 # Build-time variables to inject into binaries
-export SIMPLE_VERSION = v1.0.0
-export GIT_VERSION = v1.0.0
 export GIT_COMMIT = $(shell git rev-parse HEAD)
 export K8S_VERSION = 1.20.2
 
@@ -27,14 +22,6 @@ export PATH := $(PWD)/$(BUILD_DIR):$(PATH)
 
 ##@ Development
 
-
-
-.PHONY: bindata
-OLM_VERSIONS = 0.16.1 0.17.0 0.18.2
-bindata: ## Update project bindata
-	./hack/generate/olm_bindata.sh $(OLM_VERSIONS)
-	$(MAKE) fix
-
 .PHONY: fix
 fix: ## Fixup files in the repo.
 	go mod tidy
@@ -46,119 +33,54 @@ clean: ## Cleanup build artifacts and tool binaries.
 
 ##@ Build
 
-.PHONY: install
-install: ## Install operator-sdk, ansible-operator, and helm-operator.
-	go install $(GO_BUILD_ARGS) ./cmd
-
 .PHONY: build
 build: ## Build operator-sdk, ansible-operator, and helm-operator.
 	@mkdir -p $(BUILD_DIR)
 	go build $(GO_BUILD_ARGS) -o $(BUILD_DIR)/openvino-operator ./cmd
 
-# Build scorecard binaries.
-.PHONY: build/scorecard-test build/scorecard-test-kuttl build/custom-scorecard-tests
-build/scorecard-test build/scorecard-test-kuttl build/custom-scorecard-tests:
-	go build $(GO_GCFLAGS) $(GO_ASMFLAGS) -o $(BUILD_DIR)/$(@F) ./images/$(@F)
+run: build # Run against the configured Kubernetes cluster in ~/.kube/config
+	./$(BUILD_DIR)/openvino-operator run
 
-##@ Dev image build
+docker-build: ## Build docker image with the manager.
+	docker build -t ${IMG} -f docker/Dockerfile .
 
-# Convenience wrapper for building all remotely hosted images.
-.PHONY: image-build
-IMAGE_TARGET_LIST = operator-sdk helm-operator ansible-operator scorecard-test scorecard-test-kuttl
-image-build: $(foreach i,$(IMAGE_TARGET_LIST),image/$(i)) ## Build all images.
+docker-push: ## Push docker image with the manager.
+	docker push ${IMG}
 
-# Build an image.
-BUILD_IMAGE_REPO = quay.io/operator-framework
-# When running in a terminal, this will be false. If true (ex. CI), print plain progress.
-ifneq ($(shell test -t 0; echo $$?),0)
-DOCKER_PROGRESS = --progress plain
+##@ Deployment
+
+install: kustomize ## Install CRDs into the K8s cluster specified in ~/.kube/config.
+	$(KUSTOMIZE) build config/crd | kubectl apply -f -
+
+uninstall: kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube/config.
+	$(KUSTOMIZE) build config/crd | kubectl delete -f -
+
+deploy: kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	$(KUSTOMIZE) build config/default | kubectl apply -f -
+
+undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
+	$(KUSTOMIZE) build config/default | kubectl delete -f -
+
+OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
+ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
+
+.PHONY: kustomize
+KUSTOMIZE = $(shell pwd)/bin/kustomize
+kustomize: ## Download kustomize locally if necessary.
+ifeq (,$(wildcard $(KUSTOMIZE)))
+ifeq (,$(shell which kustomize 2>/dev/null))
+	@{ \
+	set -e ;\
+	mkdir -p $(dir $(KUSTOMIZE)) ;\
+	curl -sSLo - https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v3.5.4/kustomize_v3.5.4_$(OS)_$(ARCH).tar.gz | \
+	tar xzf - -C bin/ ;\
+	}
+else
+KUSTOMIZE = $(shell which kustomize)
 endif
-image/%: export DOCKER_CLI_EXPERIMENTAL = enabled
-image/%:
-	docker buildx build $(DOCKER_PROGRESS) -t $(BUILD_IMAGE_REPO)/$*:dev -f ./images/$*/Dockerfile --load .
-
-##@ Release
-
-.PHONY: release
-release: ## Release target. See 'make -f release/Makefile help' for more information.
-	$(MAKE) -f release/Makefile $@
-
-.PHONY: prerelease
-prerelease: ## Write release commit changes. See 'make -f release/Makefile help' for more information.
-ifneq ($(RELEASE_VERSION),$(IMAGE_VERSION))
-	$(error "IMAGE_VERSION "$(IMAGE_VERSION)" must be updated to match RELEASE_VERSION "$(RELEASE_VERSION)" prior to creating a release commit")
 endif
-	$(MAKE) -f release/Makefile $@
 
-.PHONY: tag
-tag: ## Tag a release commit. See 'make -f release/Makefile help' for more information.
-	$(MAKE) -f release/Makefile $@
-
-##@ Test
-
-.PHONY: test-all
-test-all: test-static test-e2e ## Run all tests
-
-.PHONY: test-static
-test-static: test-sanity test-unit test-docs ## Run all non-cluster-based tests
-
-.PHONY: test-sanity
-test-sanity: generate fix ## Test repo formatting, linting, etc.
-	git diff --exit-code # fast-fail if generate or fix produced changes
-	./hack/check-license.sh
-	./hack/check-error-log-msg-format.sh
-	go vet ./...
-	$(SCRIPTS_DIR)/fetch golangci-lint 1.31.0 && $(TOOLS_DIR)/golangci-lint run
-	git diff --exit-code # diff again to ensure other checks don't change repo
-
-.PHONY: test-docs
-test-docs: ## Test doc links
-	go run ./release/changelog/gen-changelog.go -validate-only
-	git submodule update --init --recursive website/
-	./hack/check-links.sh
-
-.PHONY: test-unit
-TEST_PKGS = $(shell go list ./... | grep -v -E 'github.com/operator-framework/operator-sdk/test/')
-test-unit: ## Run unit tests
-	go test -coverprofile=coverage.out -covermode=count -short $(TEST_PKGS)
-
-e2e_tests := test-e2e-go test-e2e-ansible test-e2e-ansible-molecule test-e2e-helm test-e2e-integration
-e2e_targets := test-e2e $(e2e_tests)
-.PHONY: $(e2e_targets)
-
-.PHONY: test-e2e-setup
-export KIND_CLUSTER := operator-sdk-e2e
-export KUBEBUILDER_ASSETS := $(PWD)/$(TOOLS_DIR)
-test-e2e-setup: build
-	$(SCRIPTS_DIR)/fetch kind 0.11.0
-	$(SCRIPTS_DIR)/fetch envtest 0.8.3
-	$(SCRIPTS_DIR)/fetch kubectl $(K8S_VERSION) # Install kubectl AFTER envtest because envtest includes its own kubectl binary
-	[[ "`$(TOOLS_DIR)/kind get clusters`" =~ "$(KIND_CLUSTER)" ]] || $(TOOLS_DIR)/kind create cluster --image="kindest/node:v$(K8S_VERSION)" --name $(KIND_CLUSTER)
-
-.PHONY: test-e2e-teardown
-test-e2e-teardown:
-	$(SCRIPTS_DIR)/fetch kind 0.11.0
-	$(TOOLS_DIR)/kind delete cluster --name $(KIND_CLUSTER)
-	rm -f $(KUBECONFIG)
-
-# Double colon rules allow repeated rule declarations.
-# Repeated rules are executed in the order they appear.
-$(e2e_targets):: test-e2e-setup image/scorecard-test
-
-test-e2e:: $(e2e_tests) ## Run e2e tests
-test-e2e-go:: image/custom-scorecard-tests ## Run Go e2e tests
-	go test ./test/e2e/go -v -ginkgo.v
-test-e2e-ansible:: image/ansible-operator ## Run Ansible e2e tests
-	go test -count=1 ./internal/ansible/proxy/...
-	go test ./test/e2e/ansible -v -ginkgo.v
-test-e2e-ansible-molecule:: image/ansible-operator ## Run molecule-based Ansible e2e tests
-	go run ./hack/generate/samples/molecule/generate.go
-	./hack/tests/e2e-ansible-molecule.sh
-test-e2e-helm:: image/helm-operator ## Run Helm e2e tests
-	go test ./test/e2e/helm -v -ginkgo.v
-test-e2e-integration:: ## Run integration tests
-	go test ./test/integration -v -ginkgo.v
-	./hack/tests/subcommand-olm-install.sh
 
 .DEFAULT_GOAL := help
 .PHONY: help

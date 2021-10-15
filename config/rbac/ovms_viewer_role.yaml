@@ -1,0 +1,22 @@
+# permissions for end users to view modelservers and notebooks.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ovms-viewer-role
+rules:
+- apiGroups:
+  - intel.com
+  resources:
+  - modelserver
+  - notebook
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - intel.com
+  resources:
+  - modelserver/status
+  - notebook/status
+  verbs:
+  - get
