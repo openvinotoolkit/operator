@@ -1,6 +1,6 @@
 SHELL = /bin/bash
 
-IMG ?= controller:latest
+IMG ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator
 
 # Build-time variables to inject into binaries
 export GIT_COMMIT = $(shell git rev-parse HEAD)
@@ -46,6 +46,26 @@ docker-build: ## Build docker image with the manager.
 
 docker-push: ## Push docker image with the manager.
 	docker push ${IMG}
+
+TAG ?= latest
+BUNDLE_REPOSITORY ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator-bundle
+CATALOG_REPOSITORY ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator-catalog
+
+bundle_build:
+	sed "s|registry.connect.redhat.com/intel/ovms-operator:0.2.0|$(IMG):$(TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+	docker build -t $(BUNDLE_REPOSITORY):$(TAG) -f bundle/Dockerfile bundle
+	sed "s|$(IMG):$(TAG)|$(REPOSITORY)/registry.connect.redhat.com/intel/ovms-operator:0.2.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+
+bundle_image_push:
+	docker push $(BUNDLE_REPOSITORY):$(TAG)
+
+openshift_catalog_build:
+	sudo opm index add --bundles $(BUNDLE_REPOSITORY):$(TAG) --from-index registry.redhat.io/redhat/community-operator-index:v4.8 -c docker --tag $(CATALOG_REPOSITORY)
+openshift_catalog_push:
+	docker push $(CATALOG_REPOSITORY):$(TAG)
+
+bundle_deploy:
+
 
 ##@ Deployment
 
