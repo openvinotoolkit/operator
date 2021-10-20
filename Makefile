@@ -51,23 +51,52 @@ TAG ?= latest
 BUNDLE_REPOSITORY ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator-bundle
 CATALOG_REPOSITORY ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator-catalog
 
-bundle_build:
-	sed "s|registry.connect.redhat.com/intel/ovms-operator:0.2.0|$(IMG):$(TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+bundle_k8s_build:
+	sed -i "s|registry.connect.redhat.com/intel/ovms-operator:0.2.0|$(IMG):$(TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+
 	docker build -t $(BUNDLE_REPOSITORY):$(TAG) -f bundle/Dockerfile bundle
-	sed "s|$(IMG):$(TAG)|$(REPOSITORY)/registry.connect.redhat.com/intel/ovms-operator:0.2.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+	sed -i "s|$(IMG):$(TAG)|$(REPOSITORY)/registry.connect.redhat.com/intel/ovms-operator:0.2.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+
+bundle_openshift_build:
+	sed -i "s|registry.connect.redhat.com/intel/ovms-operator:0.2.0|$(IMG):$(TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+	sed -i "s|gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0|registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.8.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+	docker build -t $(BUNDLE_REPOSITORY):$(TAG) -f bundle/Dockerfile bundle
+	sed -i "s|$(IMG):$(TAG)|$(REPOSITORY)/registry.connect.redhat.com/intel/ovms-operator:0.2.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+	sed -i "s|registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.8.0|gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 
 bundle_image_push:
 	docker push $(BUNDLE_REPOSITORY):$(TAG)
 
 openshift_catalog_build:
-	sudo opm index add --bundles $(BUNDLE_REPOSITORY):$(TAG) --from-index registry.redhat.io/redhat/community-operator-index:v4.8 -c docker --tag $(CATALOG_REPOSITORY)
+	sudo opm index add --bundles $(BUNDLE_REPOSITORY):$(TAG) --from-index registry.redhat.io/redhat/community-operator-index:v4.8 -c docker --tag $(CATALOG_REPOSITORY):$(TAG)
 openshift_catalog_push:
 	docker push $(CATALOG_REPOSITORY):$(TAG)
 
-bundle_deploy:
+k8s_catalog_build:
+	sudo opm index add --bundles $(BUNDLE_REPOSITORY):$(TAG) --from-index registry.redhat.io/redhat/community-operator-index:v4.8 -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(TAG)
+k8s_catalog_push:
+	docker push $(CATALOG_REPOSITORY)-k8s:$(TAG)
 
+bundle_deploy_k8s:
+	cat tests/catalog-source.yaml | sed "s|catalog:latest|$(CATALOG_REPOSITORY)-k8s:$(TAG)|" | kubectl apply -f -
+	sleep 30
+	kubectl create ns operator
+	kubectl apply -f tests/operator-group.yaml
+	kubectl apply -f tests/operator-subscription.yaml
+	sleep 15
+	kubectl get clusterserviceversion --all-namespaces
 
-##@ Deployment
+olm_install:
+	operator-sdk olm install
+
+olm_clean:
+	kubectl delete --ignore-not-found=true ns operator
+	kubectl get ns olm ; if [ $$? -eq 0 ]; then operator-sdk olm uninstall ; fi
+	
+catalog_deploy_openshift:
+	kubectl delete -n openshift-marketplace --ignore-not-found=true CatalogSource my-test-catalog
+	sleep 10
+	cat tests/catalog-source.yaml | sed "s|catalog:latest|$(CATALOG_REPOSITORY):$(TAG)|" | sed "s|olm|openshift-marketplace|"| kubectl apply -f -
 
 install: kustomize ## Install CRDs into the K8s cluster specified in ~/.kube/config.
 	$(KUSTOMIZE) build config/crd | kubectl apply -f -
