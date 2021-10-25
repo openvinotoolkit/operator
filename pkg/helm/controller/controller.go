@@ -53,6 +53,31 @@ type WatchOptions struct {
 	MaxConcurrentReconciles int
 }
 
+func ignoreHpaUpdates() predicate.Predicate {
+	return predicate.Funcs{
+		UpdateFunc: func(e event.UpdateEvent) bool {
+            log.Info("ignoreHpaUpdates","UpdateFunc",e)
+			// Ignore updates to CR status in which case metadata.Generation does not change
+			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
+		},
+		DeleteFunc: func(e event.DeleteEvent) bool {
+            log.Info("ignoreHpaUpdates","DeleteFunc",e)
+			// Evaluates to false if the object has been confirmed deleted.
+			return !e.DeleteStateUnknown
+		},
+		CreateFunc: func(e event.CreateEvent) bool {
+            log.Info("ignoreHpaUpdates","CreateFunc",e)
+			// Evaluates to false if the object has been confirmed deleted.
+			return !e.DeleteStateUnknown
+		},
+        GenericFunc : func(e event.GenericEvent) bool {
+            log.Info("ignoreHpaUpdates","GenericFunc",e)
+			// Evaluates to false if the object has been confirmed deleted.
+			return !e.DeleteStateUnknown
+		},
+	}
+}
+
 // Add creates a new helm operator controller and adds it to the manager
 func Add(mgr manager.Manager, options WatchOptions) error {
 	controllerName := fmt.Sprintf("%v-controller", strings.ToLower(options.GVK.Kind))
@@ -73,10 +98,12 @@ func Add(mgr manager.Manager, options WatchOptions) error {
 	c, err := controller.New(controllerName, mgr, controller.Options{
 		Reconciler:              r,
 		MaxConcurrentReconciles: options.MaxConcurrentReconciles,
-	})
+	}).WithEventFilter(ignoreHpaUpdates())
 	if err != nil {
 		return err
 	}
+
+    log.Info("ignoreHpaUpdates enabled")
 
 	o := &unstructured.Unstructured{}
 	o.SetGroupVersionKind(options.GVK)
