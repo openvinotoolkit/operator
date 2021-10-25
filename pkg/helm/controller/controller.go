@@ -91,6 +91,7 @@ func Add(mgr manager.Manager, options WatchOptions) error {
 		OverrideValues:  options.OverrideValues,
 	}
 
+    r.WithEventFilter(ignoreHpaUpdates()).Complete(r)
 	// Register the GVK with the schema
 	mgr.GetScheme().AddKnownTypeWithName(options.GVK, &unstructured.Unstructured{})
 	metav1.AddToGroupVersion(mgr.GetScheme(), options.GVK.GroupVersion())
@@ -98,7 +99,7 @@ func Add(mgr manager.Manager, options WatchOptions) error {
 	c, err := controller.New(controllerName, mgr, controller.Options{
 		Reconciler:              r,
 		MaxConcurrentReconciles: options.MaxConcurrentReconciles,
-	}).WithEventFilter(ignoreHpaUpdates())
+	})
 	if err != nil {
 		return err
 	}
