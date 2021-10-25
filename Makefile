@@ -68,11 +68,16 @@ bundle_image_push:
 	docker push $(BUNDLE_REPOSITORY):$(TAG)
 
 openshift_catalog_build:
-	sudo opm index add --bundles $(BUNDLE_REPOSITORY):$(TAG) --from-index registry.redhat.io/redhat/community-operator-index:v4.8 -c docker --tag $(CATALOG_REPOSITORY):$(TAG)
+	docker -v | grep -q podman ; if [ $$? -eq 0 ]; then \
+	opm index add --bundles $(BUNDLE_REPOSITORY):$(TAG) --from-index registry.redhat.io/redhat/community-operator-index:v4.8 -c podman --tag $(CATALOG_REPOSITORY):$(TAG) ;\
+	else sudo opm index add --bundles $(BUNDLE_REPOSITORY):$(TAG) --from-index registry.redhat.io/redhat/community-operator-index:v4.8 -c docker --tag $(CATALOG_REPOSITORY):$(TAG) ;\
+    fi
+
 openshift_catalog_push:
 	docker push $(CATALOG_REPOSITORY):$(TAG)
 
 k8s_catalog_build:
+
 	sudo opm index add --bundles $(BUNDLE_REPOSITORY):$(TAG) --from-index registry.redhat.io/redhat/community-operator-index:v4.8 -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(TAG)
 k8s_catalog_push:
 	docker push $(CATALOG_REPOSITORY)-k8s:$(TAG)
