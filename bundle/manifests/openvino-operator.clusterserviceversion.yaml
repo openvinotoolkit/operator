@@ -62,6 +62,8 @@ metadata:
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
       - kind: ModelServer
         name: modelservers.intel.com
         specDescriptors:
