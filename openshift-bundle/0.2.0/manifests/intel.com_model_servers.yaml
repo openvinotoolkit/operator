@@ -57,6 +57,8 @@ spec:
                   properties:
                     config_configmap_name:
                       type: string
+                    model_config:
+                      type: string
                 model_settings:
                   type: object
                   description: Fill model settings if model config is not used
@@ -186,6 +188,8 @@ spec:
                   type: object
                   description: Access definition for model storage
                   properties:
+                    models_host_path:
+                      type: string
                     models_volume_claim:
                       type: string
                     security_context:
