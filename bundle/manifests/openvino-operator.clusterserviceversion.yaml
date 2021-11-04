@@ -62,14 +62,45 @@ metadata:
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
-  customresourcedefinitions:
-    owned:
-    - kind: ModelServer
-      name: modelservers.intel.com
-      version: v1alpha1
-    - kind: Notebook
-      name: notebooks.intel.com
-      version: v1alpha1
+      - kind: ModelServer
+        name: modelservers.intel.com
+        specDescriptors:
+          - description: Persistent Volume Claims
+            displayName: models_volume_claim
+            path: model_storage_configuration.models_volume_claim
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim'
+          - description: Aws access key
+            displayName: aws_access_key_id
+            path: model_storage_configuration.aws.aws_access_key_id
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes:Secret'
+          - description: Aws secret access key
+            displayName: aws_secret_access_key
+            path: model_storage_configuration.aws.aws_secret_access_key
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes:Secret'
+          - description: Secret name including Google Cloud Storage access token
+            displayName: gcp_creds_secret_name
+            path: model_storage_configuration.gcs.gcp_creds_secret_name
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes:Secret'
+          - description: Azure storage settings
+            displayName: azure_storage_connection_string
+            path: model_storage_configuration.azure.azure_storage_connection_string
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes:Secret'
+          - description: >-
+              Limits describes the minimum/maximum amount of compute Resources
+              required/allowed.
+            displayName: Resource Requirements
+            path: resources
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:resourceRequirements'
+        version: v1alpha1
+      - kind: Notebook
+        name: notebooks.intel.com
+        version: v1alpha1
   description: |
     OpenVINO Toolkit Operator manages OpenVINO components in OpenShift.
 
