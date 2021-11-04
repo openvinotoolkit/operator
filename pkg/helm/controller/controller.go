@@ -16,6 +16,7 @@ package controller
 
 import (
 	"fmt"
+	//"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -27,10 +28,13 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
+	//ctrl "sigs.k8s.io/controller-runtime"
 	crthandler "sigs.k8s.io/controller-runtime/pkg/handler"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/source"
+	predicateRT "sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/yaml"
 
 	libhandler "github.com/operator-framework/operator-lib/handler"
@@ -52,29 +56,62 @@ type WatchOptions struct {
 	OverrideValues          map[string]string
 	MaxConcurrentReconciles int
 }
+var isPrinted bool = false
 
-func ignoreHpaUpdates() predicate.Predicate {
-	return predicate.Funcs{
+func ignoreHpaUpdates() predicateRT.Predicate {
+	return predicateRT.Funcs{
 		UpdateFunc: func(e event.UpdateEvent) bool {
-            log.Info("ignoreHpaUpdates","UpdateFunc",e)
+			if e.ObjectOld == nil {
+				return false
+			}
+			if e.ObjectNew == nil {
+				return false
+			}
+
+			//fooType := reflect.TypeOf(e.ObjectOld)
+			log.Info("UPDATE")
+			//log.Info("annotations","annotations",e.ObjectOld.GetResourceVersion())
+		
+			/*for i := 0; i < fooType.NumMethod(); i++ {
+				method := fooType.Method(i)
+				if method.Name == "UnstructuredContent" {
+					inputs := make([]reflect.Value, 0)
+					list:= reflect.ValueOf(e).MethodByName("UnstructuredContent").Call(inputs)
+					log.Info("fooType","UnstructuredContent",list)
+				}
+				log.Info("Method","method",method.Name)
+			}*/
+			/* SEGFAULT pointers in structure o_O if !isPrinted {
+
+				for i := 0; i < 1; i++ {
+					field := fooType.Field(i)
+					log.Info("Field","field",field.Name)
+				}
+				isPrinted = true
+			} */
+
+
+			
+
 			// Ignore updates to CR status in which case metadata.Generation does not change
-			return e.ObjectOld.GetGeneration() != e.ObjectNew.GetGeneration()
-		},
-		DeleteFunc: func(e event.DeleteEvent) bool {
-            log.Info("ignoreHpaUpdates","DeleteFunc",e)
-			// Evaluates to false if the object has been confirmed deleted.
-			return !e.DeleteStateUnknown
+			if e.ObjectOld.GetGeneration() == e.ObjectNew.GetGeneration(){
+				return false
+			}
+			//if e.ObjectOld.GetObjectMeta().GetSpec().GetReplicas() != e.ObjectOld.GetObjectMeta().GetStatus().GetReplicas(){
+			//	return false
+			//}
+			return true		
 		},
 		CreateFunc: func(e event.CreateEvent) bool {
-            log.Info("ignoreHpaUpdates","CreateFunc",e)
-			// Evaluates to false if the object has been confirmed deleted.
-			return !e.DeleteStateUnknown
+			if e.Object == nil {
+				return false
+			}
+
+			log.Info("CREATE","CREATE",e.Object)
+			return true
 		},
-        GenericFunc : func(e event.GenericEvent) bool {
-            log.Info("ignoreHpaUpdates","GenericFunc",e)
-			// Evaluates to false if the object has been confirmed deleted.
-			return !e.DeleteStateUnknown
-		},
+		//DeleteFunc func(event.DeleteEvent) bool
+		//GenericFunc func(event.GenericEvent) bool
 	}
 }
 
@@ -98,12 +135,11 @@ func Add(mgr manager.Manager, options WatchOptions) error {
 	c, err := controller.New(controllerName, mgr, controller.Options{
 		Reconciler:              r,
 		MaxConcurrentReconciles: options.MaxConcurrentReconciles,
-	}).WithEventFilter(ignoreHpaUpdates())
+	})
+
 	if err != nil {
 		return err
 	}
-
-    log.Info("ignoreHpaUpdates enabled")
 
 	o := &unstructured.Unstructured{}
 	o.SetGroupVersionKind(options.GVK)
@@ -163,7 +199,7 @@ func watchDependentResources(mgr manager.Manager, r *HelmOperatorReconciler, c c
 
 				if useOwnerRef { // Setup watch using owner references.
 					err = c.Watch(&source.Kind{Type: unstructuredObj}, &crthandler.EnqueueRequestForOwner{OwnerType: owner},
-						predicate.DependentPredicate{})
+						ignoreHpaUpdates())
 					if err != nil {
 						return err
 					}
