@@ -128,6 +128,7 @@ func Add(mgr manager.Manager, options WatchOptions) error {
 		OverrideValues:  options.OverrideValues,
 	}
 
+    r.WithEventFilter(ignoreHpaUpdates()).Complete(r)
 	// Register the GVK with the schema
 	mgr.GetScheme().AddKnownTypeWithName(options.GVK, &unstructured.Unstructured{})
 	metav1.AddToGroupVersion(mgr.GetScheme(), options.GVK.GroupVersion())
