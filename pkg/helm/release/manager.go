@@ -293,6 +293,7 @@ func reconcileRelease(_ context.Context, kubeClient kube.Interface, expectedMani
 		// We also extend the JSON merge patch by ignoring "remove" operations for fields added by kubernetes
 		// Reference in the helm source code:
 		// https://github.com/helm/helm/blob/1c9b54ad7f62a5ce12f87c3ae55136ca20f09c98/pkg/kube/client.go#L392
+		
 		patch, patchType, err := createPatch(existing, expected)
 		if err != nil {
 			return fmt.Errorf("error creating patch: %w", err)
@@ -303,6 +304,10 @@ func reconcileRelease(_ context.Context, kubeClient kube.Interface, expectedMani
 			return nil
 		}
 
+		if allowScalling(existing){
+			return nil
+		}
+
 		_, err = helper.Patch(expected.Namespace, expected.Name, patchType, patch,
 			&metav1.PatchOptions{})
 		if err != nil {
@@ -310,6 +315,30 @@ func reconcileRelease(_ context.Context, kubeClient kube.Interface, expectedMani
 		}
 		return nil
 	})
+}
+
+func allowScalling(existing runtime.Object) bool {
+	existingJSON, err := json.Marshal(existing)
+	if err != nil {
+		fmt.Errorf("error Marshal existing release: %w", err)
+	}
+
+	jsonMap := make(map[string]map[string]interface{})
+	err = json.Unmarshal(existingJSON, &jsonMap)
+	if err != nil {
+		fmt.Errorf("error Unmarshal existing release: %w", err)
+	}
+
+	allowScalling := jsonMap["spec"]["allow_scalling"]
+
+	if allowScalling != "true" {
+		return false
+	}
+
+	specReplicas := jsonMap["spec"]["replicas"]
+	statusReplicas := jsonMap["status"]["replicas"]
+
+	return specReplicas != statusReplicas
 }
 
 func createPatch(existing runtime.Object, expected *resource.Info) ([]byte, apitypes.PatchType, error) {

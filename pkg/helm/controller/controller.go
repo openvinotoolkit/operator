@@ -28,13 +28,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
-	//ctrl "sigs.k8s.io/controller-runtime"
 	crthandler "sigs.k8s.io/controller-runtime/pkg/handler"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	"sigs.k8s.io/controller-runtime/pkg/source"
-	predicateRT "sigs.k8s.io/controller-runtime/pkg/predicate"
-	"sigs.k8s.io/controller-runtime/pkg/event"
 	"sigs.k8s.io/yaml"
 
 	libhandler "github.com/operator-framework/operator-lib/handler"
@@ -56,64 +53,6 @@ type WatchOptions struct {
 	OverrideValues          map[string]string
 	MaxConcurrentReconciles int
 }
-var isPrinted bool = false
-
-func ignoreHpaUpdates() predicateRT.Predicate {
-	return predicateRT.Funcs{
-		UpdateFunc: func(e event.UpdateEvent) bool {
-			if e.ObjectOld == nil {
-				return false
-			}
-			if e.ObjectNew == nil {
-				return false
-			}
-
-			//fooType := reflect.TypeOf(e.ObjectOld)
-			log.Info("UPDATE")
-			//log.Info("annotations","annotations",e.ObjectOld.GetResourceVersion())
-		
-			/*for i := 0; i < fooType.NumMethod(); i++ {
-				method := fooType.Method(i)
-				if method.Name == "UnstructuredContent" {
-					inputs := make([]reflect.Value, 0)
-					list:= reflect.ValueOf(e).MethodByName("UnstructuredContent").Call(inputs)
-					log.Info("fooType","UnstructuredContent",list)
-				}
-				log.Info("Method","method",method.Name)
-			}*/
-			/* SEGFAULT pointers in structure o_O if !isPrinted {
-
-				for i := 0; i < 1; i++ {
-					field := fooType.Field(i)
-					log.Info("Field","field",field.Name)
-				}
-				isPrinted = true
-			} */
-
-
-			
-
-			// Ignore updates to CR status in which case metadata.Generation does not change
-			if e.ObjectOld.GetGeneration() == e.ObjectNew.GetGeneration(){
-				return false
-			}
-			//if e.ObjectOld.GetObjectMeta().GetSpec().GetReplicas() != e.ObjectOld.GetObjectMeta().GetStatus().GetReplicas(){
-			//	return false
-			//}
-			return true		
-		},
-		CreateFunc: func(e event.CreateEvent) bool {
-			if e.Object == nil {
-				return false
-			}
-
-			log.Info("CREATE","CREATE",e.Object)
-			return true
-		},
-		//DeleteFunc func(event.DeleteEvent) bool
-		//GenericFunc func(event.GenericEvent) bool
-	}
-}
 
 // Add creates a new helm operator controller and adds it to the manager
 func Add(mgr manager.Manager, options WatchOptions) error {
@@ -128,7 +67,6 @@ func Add(mgr manager.Manager, options WatchOptions) error {
 		OverrideValues:  options.OverrideValues,
 	}
 
-    r.WithEventFilter(ignoreHpaUpdates()).Complete(r)
 	// Register the GVK with the schema
 	mgr.GetScheme().AddKnownTypeWithName(options.GVK, &unstructured.Unstructured{})
 	metav1.AddToGroupVersion(mgr.GetScheme(), options.GVK.GroupVersion())
@@ -200,7 +138,7 @@ func watchDependentResources(mgr manager.Manager, r *HelmOperatorReconciler, c c
 
 				if useOwnerRef { // Setup watch using owner references.
 					err = c.Watch(&source.Kind{Type: unstructuredObj}, &crthandler.EnqueueRequestForOwner{OwnerType: owner},
-						ignoreHpaUpdates())
+						predicate.DependentPredicate{})
 					if err != nil {
 						return err
 					}
