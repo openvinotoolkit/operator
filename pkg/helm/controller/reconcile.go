@@ -90,7 +90,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	if err != nil {
 		log.Error(err, "Failed to lookup resource")
 		return reconcile.Result{}, err
-	}	
+	}
 
 	manager, err := r.ManagerFactory.NewManager(o, r.OverrideValues)
 	if err != nil {

@@ -293,7 +293,6 @@ func reconcileRelease(_ context.Context, kubeClient kube.Interface, expectedMani
 		// We also extend the JSON merge patch by ignoring "remove" operations for fields added by kubernetes
 		// Reference in the helm source code:
 		// https://github.com/helm/helm/blob/1c9b54ad7f62a5ce12f87c3ae55136ca20f09c98/pkg/kube/client.go#L392
-		
 		patch, patchType, err := createPatch(existing, expected)
 		if err != nil {
 			return fmt.Errorf("error creating patch: %w", err)

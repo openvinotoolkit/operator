@@ -16,7 +16,6 @@ package controller
 
 import (
 	"fmt"
-	//"reflect"
 	"strings"
 	"sync"
 	"time"
@@ -75,7 +74,6 @@ func Add(mgr manager.Manager, options WatchOptions) error {
 		Reconciler:              r,
 		MaxConcurrentReconciles: options.MaxConcurrentReconciles,
 	})
-
 	if err != nil {
 		return err
 	}
