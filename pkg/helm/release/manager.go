@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+	"regexp"
 	"strings"
 
 	jsonpatch "gomodules.xyz/jsonpatch/v3"
@@ -303,9 +304,7 @@ func reconcileRelease(_ context.Context, kubeClient kube.Interface, expectedMani
 			return nil
 		}
 
-		if allowScalling(existing){
-			return nil
-		}
+		patch = patchForScalling(patch)
 
 		_, err = helper.Patch(expected.Namespace, expected.Name, patchType, patch,
 			&metav1.PatchOptions{})
@@ -316,28 +315,16 @@ func reconcileRelease(_ context.Context, kubeClient kube.Interface, expectedMani
 	})
 }
 
-func allowScalling(existing runtime.Object) bool {
-	existingJSON, err := json.Marshal(existing)
-	if err != nil {
-		fmt.Errorf("error Marshal existing release: %w", err)
+func patchForScalling(patch []byte) []byte {
+	replicasRx := regexp.MustCompile(".replicas.:\\d,")
+	stringPatch := string(patch[:])
+
+	submatchall := replicasRx.FindAllString(stringPatch, -1)
+	for _, element := range submatchall {
+		stringPatch = strings.Replace(stringPatch,element,"",1)
 	}
 
-	jsonMap := make(map[string]map[string]interface{})
-	err = json.Unmarshal(existingJSON, &jsonMap)
-	if err != nil {
-		fmt.Errorf("error Unmarshal existing release: %w", err)
-	}
-
-	allowScalling := jsonMap["spec"]["allow_scalling"]
-
-	if allowScalling != "true" {
-		return false
-	}
-
-	specReplicas := jsonMap["spec"]["replicas"]
-	statusReplicas := jsonMap["status"]["replicas"]
-
-	return specReplicas != statusReplicas
+	return []byte(stringPatch);
 }
 
 func createPatch(existing runtime.Object, expected *resource.Info) ([]byte, apitypes.PatchType, error) {
