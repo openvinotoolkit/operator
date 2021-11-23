@@ -151,7 +151,7 @@ spec:
                         grpc_bind_address:
                           description: Network interface address to bind to for the gRPC API
                           type: string
-                          default: 0.0.0.0
+                          default: "0.0.0.0"
                         rest_port:
                           description: REST server port
                           type: integer
@@ -166,6 +166,9 @@ spec:
                       type: integer
                       format: int32
                       default: 5
+                    node_selector:
+                      description: Kubernetes node selector for the serving deployment
+                      type: string
                 resources:
                   description: Resources for Model Serving server
                   type: object

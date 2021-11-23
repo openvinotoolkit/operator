@@ -14,56 +14,51 @@
 # limitations under the License.
 #
 
-replicas: 1
-image_name: "registry.connect.redhat.com/intel/openvino-model-server:latest"
-model_config.config_configmap_name: ""
-# configmap name holding the content of ovms configuration file. Excluding with model_name and model_path
-model_config.config_path: ""
-# to be used when ovms config is not included in the configmap but is mounted on the container via models_host_path or models_volume_claim param
-model_settings.model_name: ""
-model_settings.model_path: ""
-model_settings.target_device: "CPU"
-model_settings.nireq: ""
-model_settings.batch_size: ""
-model_settings.shape: ""
-model_settings.layout: ""
-model_settings.plugin_config: >-{\"CPU_THROUGHPUT_STREAMS\":\"CPU_THROUGHPUT_AUTO\"}
-model_settings.model_version_policy: >-{\"latest\": { \"num_versions\":1 }}
-model_settings.stateful.stateful: ""
-model_settings.stateful.idle_sequence_cleanup: ""
-model_settings.stateful.low_latency_transformation: ""
-model_settings.stateful.max_sequence_number: ""
-# server settings
-server.file_system_poll_wait_seconds: 0
-server.log_level: INFO
-server.log_path: ""
-server.grpc_workers: 1
-server.rest_workers: ""
-server.sequence_cleaner_poll_wait_minutes: 5
-server.ports.grpc_port: 8080
-server.ports.rest_port: 8081
-server.ports.grpc_bind_address: 0.0.0.0
-# model storage settings
-model_storage_configuration.https_proxy: ""
-model_storage_configuration.http_proxy: ""
-model_storage_configuration.models_host_path: ""
-# local path on the host to be mounted as /models directory
-model_storage_configuration.models_volume_claim: ""
-# persistent claim name to be mounted as /models directory. It is excluding with models_host_path.
-model_storage_configuration.security_context: {}
-  #  runAsUser: 5000
-  #  runAsGroup: 5000
-# k8s secret name holding gcp credential file gcp-creds.json
-model_storage_configuration.aws.aws_access_key_id: ""
-model_storage_configuration.aws.aws_secret_access_key: ""
-model_storage_configuration.aws.aws_region: ""
-model_storage_configuration.aws.s3_compat_api_endpoint: ""
-model_storage_configuration.aws.aws_profile: ""
-model_storage_configuration.azure.azure_storage_connection_string: ""
-model_storage_configuration.gcs.gcp_creds_secret_name: ""
-service_type: "LoadBalancer"
-# alternatively set to NodePort or ClusterIP
-annotations: {}
-# sidecar.istio.io/inject: "true"
-node_selector: {}
-# kubernetes.io/arch: amd64
+image_name: openvino/model_server:latest
+model_config:
+  config_configmap_name: ""
+  model_config: ""
+model_settings:
+  model_name: "resnet"
+  model_path: "gs://ovms-public-eu/resnet50-binary"
+  nireq: 0
+  plugin_config: '{\"CPU_THROUGHPUT_STREAMS\":\"1\"}'
+  batch_size: ""
+  shape: ""
+  model_version_policy: '{\"latest\": { \"num_versions\":1 }}'
+  layout: ""
+  target_device: "CPU"
+  stateful:
+    stateful: false
+    idle_sequence_cleanup: false
+    low_latency_transformation: true
+    max_sequence_number: 0
+server:
+  file_system_poll_wait_seconds: 0
+  sequence_cleaner_poll_wait_minutes: 0
+  log_level: "INFO"
+  log_path: ""
+  grpc_workers: 1
+  rest_workers: 0
+  ports:
+    grpc_port: 8080
+    grpc_bind_address: 0.0.0.0
+    rest_port: 8081
+  resources: {}
+  node_selector: ""
+model_storage_configuration:
+   https_proxy: "http://proxy-mu.intel.com:911"
+   http_proxy: ""
+   models_host_path: ""
+   models_volume_claim: ""
+   security_context: {}
+   aws:
+     aws_secret_access_key: ""
+     aws_access_key_id: ""
+     aws_region: ""
+     s3_compat_api_endpoint: ""
+     aws_profile: ""
+   gcs:
+     gcp_creds_secret_name: ""
+   azure:
+     azure_storage_connection_string: ""
