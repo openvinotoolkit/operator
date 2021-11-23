@@ -15,9 +15,14 @@
 #
 
 image_name: openvino/model_server:latest
-model_config:
+deployment_parameters:
+  node_selector: ""
+  annotations: {}
+  resources: {}
+  replicas: 1
+config_file:
   config_configmap_name: ""
-  model_config: ""
+  model_config_path: ""
 model_settings:
   model_name: "resnet"
   model_path: "gs://ovms-public-eu/resnet50-binary"
@@ -33,31 +38,27 @@ model_settings:
     idle_sequence_cleanup: false
     low_latency_transformation: true
     max_sequence_number: 0
-server:
+server_settings:
   file_system_poll_wait_seconds: 0
   sequence_cleaner_poll_wait_minutes: 0
   log_level: "INFO"
-  log_path: ""
   grpc_workers: 1
   rest_workers: 0
   ports:
     grpc_port: 8080
-    grpc_bind_address: 0.0.0.0
     rest_port: 8081
-  resources: {}
-  node_selector: ""
-model_storage_configuration:
+models_repository:
    https_proxy: "http://proxy-mu.intel.com:911"
    http_proxy: ""
-   models_host_path: ""
-   models_volume_claim: ""
-   security_context: {}
+   cluster_storage:
+     models_host_path: ""
+     models_volume_claim: ""
+     security_context: {}
    aws:
      aws_secret_access_key: ""
      aws_access_key_id: ""
      aws_region: ""
      s3_compat_api_endpoint: ""
-     aws_profile: ""
    gcs:
      gcp_creds_secret_name: ""
    azure:

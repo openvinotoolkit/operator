@@ -29,20 +29,20 @@ spec:
     matchLabels:
       release: {{ .Release.Name | quote }}
       app: {{ template "ovms.fullname" . }}
-  replicas: {{ .Values.replicas }}
+  replicas: {{ .Values.deployment_parameters.replicas }}
   template:
     metadata:
       annotations:
-{{ toYaml .Values.annotations | indent 8 }}
+{{ toYaml .Values.deployment_parameters.annotations | indent 8 }}
       labels:
         heritage: {{ .Release.Service | quote }}
         release: {{ .Release.Name | quote }}
         chart: {{ template "ovms.chart" . }}
         app: {{ template "ovms.fullname" . }}
     spec:
-      {{- if .Values.security_context }}
+      {{- if .Values.models_repository.cluster_storage.security_context }}
       securityContext:
-{{ toYaml .Values.security_context | indent 8 }}
+{{ toYaml .Values.models_repository.cluster_storage.security_context | indent 8 }}
       {{- end }}
       containers:
       - name: ovms
@@ -55,45 +55,45 @@ spec:
             port: 8080
           initialDelaySeconds: 5
           periodSeconds: 10
-        {{- if or .Values.model_storage_configuration.gcs.gcp_creds_secret_name .Values.model_storage_configuration.aws.aws_access_key_id .Values.model_storage_configuration.aws.aws_secret_access_key .Values.model_storage_configuration.aws.aws_region .Values.model_storage_configuration.aws.s3_compat_api_endpoint .Values.model_storage_configuration.http_proxy .Values.model_storage_configuration.https_proxy .Values.model_storage_configuration.no_proxy .Values.model_storage_configuration.azure.azure_storage_connection_string }}
+        {{- if or .Values.models_repository.gcs.gcp_creds_secret_name .Values.models_repository.aws.aws_access_key_id .Values.models_repository.aws.aws_secret_access_key .Values.models_repository.aws.aws_region .Values.models_repository.aws.s3_compat_api_endpoint .Values.models_repository.http_proxy .Values.models_repository.https_proxy .Values.models_repository.no_proxy .Values.models_repository.azure.azure_storage_connection_string }}
         env:
         {{- end }}
-        {{- if .Values.model_storage_configuration.http_proxy }}
+        {{- if .Values.models_repository.http_proxy }}
         - name: http_proxy
-          value: {{ .Values.model_storage_configuration.http_proxy }}
+          value: {{ .Values.models_repository.http_proxy }}
         {{- end }}
-        {{- if .Values.model_storage_configuration.https_proxy }}
+        {{- if .Values.models_repository.https_proxy }}
         - name: https_proxy
-          value: {{ .Values.model_storage_configuration.https_proxy }}
+          value: {{ .Values.models_repository.https_proxy }}
         {{- end }}
-        {{- if .Values.model_storage_configuration.no_proxy }}
+        {{- if .Values.models_repository.no_proxy }}
         - name: no_proxy
-          value: {{ .Values.model_storage_configuration.no_proxy }}
+          value: {{ .Values.models_repository.no_proxy }}
         {{- end }}
-        {{- if .Values.model_storage_configuration.gcs.gcp_creds_secret_name }}
+        {{- if .Values.models_repository.gcs.gcp_creds_secret_name }}
         - name: GOOGLE_APPLICATION_CREDENTIALS
           value: /secret/gcp-creds.json
         {{- end }}
-        {{- if .Values.model_storage_configuration.aws.aws_access_key_id }}
+        {{- if .Values.models_repository.aws.aws_access_key_id }}
         - name: AWS_ACCESS_KEY_ID
-          value: {{ .Values.model_storage_configuration.aws.aws_access_key_id }}
+          value: {{ .Values.models_repository.aws.aws_access_key_id }}
         {{- end }}
-        {{- if .Values.model_storage_configuration.aws.aws_secret_access_key }}
+        {{- if .Values.models_repository.aws.aws_secret_access_key }}
         - name: AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
               name: {{ template "ovms.fullname" . }}-aws-secret
               key: secret_access_key
         {{- end }}
-        {{- if .Values.model_storage_configuration.aws.aws_region }}
+        {{- if .Values.models_repository.aws.aws_region }}
         - name: AWS_REGION
-          value: {{ .Values.model_storage_configuration.aws.aws_region }}
+          value: {{ .Values.models_repository.aws.aws_region }}
         {{- end }}
-        {{- if .Values.model_storage_configuration.aws.s3_compat_api_endpoint }}
+        {{- if .Values.models_repository.aws.s3_compat_api_endpoint }}
         - name: S3_ENDPOINT
-          value: {{ .Values.model_storage_configuration.aws.s3_compat_api_endpoint }}
+          value: {{ .Values.models_repository.aws.s3_compat_api_endpoint }}
         {{- end }}
-        {{- if .Values.model_storage_configuration.azure.azure_storage_connection_string }}
+        {{- if .Values.models_repository.azure.azure_storage_connection_string }}
         - name: AZURE_STORAGE_CONNECTION_STRING
           valueFrom:
             secretKeyRef:
@@ -101,9 +101,9 @@ spec:
               key: connection_string
         {{- end }}
         args: [
-        {{- if or .Values.model_config.config_configmap_name .Values.model_config.config_path}}
-          {{- if .Values.model_config.config_path}}
-               "--config_path", "{{ .Values.model_config.config_path }}",
+        {{- if or .Values.config_file.config_configmap_name .Values.config_file.config_path}}
+          {{- if .Values.config_file.config_path}}
+               "--config_path", "{{ .Values.config_file.config_path }}",
           {{- else }}
                "--config_path", "/config/config.json",
           {{- end }}
@@ -133,57 +133,57 @@ spec:
                "--stateful",
                {{- end }}
         {{- end }}
-               "--log_level", "{{ .Values.server.log_level }}",
-               {{- if .Values.server.file_system_poll_wait_seconds }}
-               "--file_system_poll_wait_seconds", "{{ .Values.server.file_system_poll_wait_seconds }}",
+               "--log_level", "{{ .Values.server_settings.log_level }}",
+               {{- if .Values.server_settings.file_system_poll_wait_seconds }}
+               "--file_system_poll_wait_seconds", "{{ .Values.server_settings.file_system_poll_wait_seconds }}",
                {{- end }}
                "--port", "8080",
                "--rest_port", "8081"]
-        {{- if or .Values.model_storage_configuration.gcs.gcp_creds_secret_name .Values.model_config.config_configmap_name .Values.model_config.models_host_path .Values.models_volume_claim}}
+        {{- if or .Values.models_repository.gcs.gcp_creds_secret_name .Values.config_file.config_configmap_name .Values.models_repository.cluster_storage.models_host_path .Values.models_repository.cluster_storage.models_volume_claim}}
         volumeMounts:
         {{- end }}
-        {{- if .Values.model_storage_configuration.gcs.gcp_creds_secret_name }}
+        {{- if .Values.models_repository.gcs.gcp_creds_secret_name }}
         - name: gcpcreds
           mountPath: "/secret"
           readOnly: true
         {{- end }}
-        {{- if .Values.model_config.config_configmap_name }}
+        {{- if .Values.config_file.config_configmap_name }}
         - name: config
           mountPath: "/config"
           readOnly: true
         {{- end }}
-        {{- if or .Values.model_storage_configuration.models_host_path .Values.model_storage_configuration.models_volume_claim }}
+        {{- if or .Values.models_repository.cluster_storage.models_host_path .Values.models_repository.cluster_storage.models_volume_claim }}
         - name: models
           mountPath: "/models"
           readOnly: true
         {{- end }}
         resources:
-{{ toYaml .Values.resources | indent 10}}
-      {{- if .Values.node_selector }}
+{{ toYaml .Values.deployment_parameters.resources | indent 10}}
+      {{- if .Values.deployment_parameters.node_selector }}
       nodeSelector:
-{{ toYaml .Values.server.node_selector | indent 8 }}
+{{ toYaml .Values.deployment_parameters.node_selector | indent 8 }}
       {{- end }}
-      {{- if or .Values.model_storage_configuration.gcs.gcp_creds_secret_name .Values.model_config.config_configmap_name .Values.models_volume_claim .Values.model_storage_configuration.models_host_path }}
+      {{- if or .Values.models_repository.gcs.gcp_creds_secret_name .Values.config_file.config_configmap_name .Values.models_repository.cluster_storage.models_volume_claim .Values.models_repository.cluster_storage.models_host_path }}
       volumes:
       {{- end }}
-      {{- if .Values.model_storage_configuration.gcs.gcp_creds_secret_name }}
+      {{- if .Values.models_repository.gcs.gcp_creds_secret_name }}
       - name: gcpcreds
         secret:
           secretName: gcpcreds
       {{- end }}
-      {{- if .Values.model_config.config_configmap_name }}
+      {{- if .Values.config_file.config_configmap_name }}
       - name: config
         configMap:
-          name: {{ .Values.model_config.config_configmap_name }}
+          name: {{ .Values.config_file.config_configmap_name }}
       {{- end }}
-      {{- if .Values.model_storage_configuration.models_host_path }}
+      {{- if .Values.models_repository.cluster_storage.models_host_path }}
       - name: models
         hostPath:
-          path: "{{ .Values.model_storage_configuration.models_host_path }}"
+          path: "{{ .Values.models_repository.cluster_storage.models_host_path }}"
           type: Directory
       {{- end }}
-      {{- if and (.Values.model_storage_configuration.models_volume_claim) (eq .Values.model_storage_configuration.models_host_path "") }}
+      {{- if and (.Values.models_repository.cluster_storage.models_volume_claim) (eq .Values.models_repository.cluster_storage.models_host_path "") }}
       - name: models
         persistentVolumeClaim:
-          claimName: {{ .Values.model_storage_configuration.models_volume_claim }}
+          claimName: {{ .Values.models_repository.cluster_storage.models_volume_claim }}
       {{- end }}

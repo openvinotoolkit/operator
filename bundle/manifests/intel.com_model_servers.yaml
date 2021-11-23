@@ -41,7 +41,7 @@ spec:
             metadata:
               type: object
             spec:
-              description: Spec defines the desired state of ModelServers
+              description: Spec defines the desired state of Ovms
               type: object
               required:
                 - image_name
@@ -51,13 +51,43 @@ spec:
                   type: string
                   default: >-
                     registry.connect.redhat.com/intel/openvino-model-server:latest
-                model_config:
+                deployment_parameters:
+                  description: Cluster deployment parameters to be applied to the Model Server
+                  type: object
+                  properties:
+                    replicas:
+                      type: integer
+                      default: 1
+                    node_selector:
+                      type: string
+                    annotations:
+                      type: object
+                      x-kubernetes-preserve-unknown-fields: true
+                    resources:
+                      description: Resources for Model Serving server
+                      type: object
+                      properties:
+                        limits:
+                          type: object
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string
+                        requests:
+                          type: object
+                          properties:
+                            cpu:
+                              type: string
+                            memory:
+                              type: string                      
+                config_file:
                   description: Predefined config to be used by Model Server
                   type: object
                   properties:
                     config_configmap_name:
                       type: string
-                    model_config:
+                    config_path:
                       type: string
                 model_settings:
                   type: object
@@ -115,11 +145,11 @@ spec:
                           description: Determines how many sequences can be processed concurrently by one model instance. When that value is reached, attempt to start a new sequence will result in error.
                           type: integer
                           format: int32
-                server:
+                server_settings:
                   type: object
                   properties:
                     file_system_poll_wait_seconds:
-                      description: Time interval between config and model versions changes detection
+                      description: Time interval between config and model versions changes detections
                       type: integer
                       format: int32
                       default: 0
@@ -132,9 +162,6 @@ spec:
                         - DEBUG
                         - ERROR
                         - TRACE
-                    log_path:
-                      description: Optional path to the log file
-                      type: string
                     grpc_workers:
                       description: Number of gRPC servers. Default 1. Increase for multi client, high throughput scenarios
                       type: integer
@@ -148,10 +175,6 @@ spec:
                           type: integer
                           format: int32
                           default: 8080
-                        grpc_bind_address:
-                          description: Network interface address to bind to for the gRPC API
-                          type: string
-                          default: 0.0.0.0
                         rest_port:
                           description: REST server port
                           type: integer
@@ -166,40 +189,28 @@ spec:
                       type: integer
                       format: int32
                       default: 5
-                resources:
-                  description: Resources for Model Serving server
-                  type: object
-                  properties:
-                    limits:
-                      type: object
-                      properties:
-                        cpu:
-                          type: string
-                        memory:
-                          type: string
-                    requests:
-                      type: object
-                      properties:
-                        cpu:
-                          type: string
-                        memory:
-                          type: string
-                model_storage_configuration:
+                models_repository:
                   type: object
                   description: Access definition for model storage
                   properties:
-                    models_host_path:
-                      type: string
-                    models_volume_claim:
-                      type: string
-                    security_context:
+                    cluster_storage:
                       type: object
-                      description: Additional security context settings
+                      description: Local cluster storage options
                       properties:
-                        runAsUser:
+                        models_host_path:
                           type: string
-                        runAsGroup:
+                          description: Host path to be mounted inside the containers as /models dir
+                        models_volume_claim:
                           type: string
+                          description: Persistent volume claim to be mounted as /models dir
+                        security_context:
+                          type: object
+                          description: Security context to be applied to access the local storage
+                          properties:
+                            runAsUser:
+                              type: string
+                            runAsGroup:
+                              type: string                    
                     aws:
                       type: object
                       description: AWS S3 and Minio storage path requirements
@@ -216,9 +227,6 @@ spec:
                         s3_compat_api_endpoint:
                           type: string
                           description: Optional for AWS s3 storage and mandatory for Minio and other s3 compatible storage types
-                        aws_profile:
-                          type: string
-                          description: Aws profile credentials file in the docker image
                     gcs:
                       type: object
                       description: Google Cloud Storage path requirements
@@ -254,3 +262,4 @@ status:
     plural: ""
   conditions: null
   storedVersions: null
+

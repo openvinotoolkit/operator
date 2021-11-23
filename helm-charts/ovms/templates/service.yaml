@@ -25,11 +25,11 @@ metadata:
     app: {{ template "ovms.fullname" . }}
 spec:
   ports:
-    - port: {{ .Values.server.ports.grpc_port }}
+    - port: {{ .Values.server_settings.ports.grpc_port }}
       protocol: TCP
       targetPort: 8080
       name: grpc
-    - port: {{ .Values.server.ports.rest_port }}
+    - port: {{ .Values.server_settings.ports.rest_port }}
       protocol: TCP
       targetPort: 8081
       name: rest
