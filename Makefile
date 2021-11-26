@@ -119,6 +119,8 @@ undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/confi
 
 k8s_all:  docker-build  docker-push bundle_k8s_build bundle_image_push  k8s_catalog_build k8s_catalog_push install bundle_deploy_k8s
 
+openshift_all: docker-build  docker-push bundle_openshift_build bundle_image_push  openshift_catalog_build openshift_catalog_push catalog_deploy_openshift
+
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
 
