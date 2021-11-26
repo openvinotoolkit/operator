@@ -40,14 +40,8 @@ make deploy IMG=registry.toolbox.iotg.sclab.intel.com/cpp/operator:latest
 
 ## OLM development flow
 ```
-make olm_clean
-make olm_install
-make docker-build 
-make bundle_k8s_build
-make bundle_image_push
-make k8s_catalog_build
-make k8s_catalog_push
-make bundle_deploy_k8s
+make olm_reset
+make k8s_all TAG=<branch>-k8s
 ```
 
 ## K8S release process
@@ -60,13 +54,9 @@ Make a PR to https://github.com/k8s-operatorhub/community-operators/tree/main/op
 ## Openshift flow
 
 ```
-make docker-build 
-make bundle_openshift_build
-make bundle_image_push
-make openshift_catalog_build
-make openshift_catalog_push
-make catalog_deploy_openshift
+make openshift-all TAG=<branch>-openshift
 ```
+Manually install the operator from the GUI interface using the test catalog
 
 ## OpenShift release
 Update the OVMS image to the latest tag in RH registry
