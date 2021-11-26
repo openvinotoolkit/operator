@@ -19,6 +19,7 @@ GO_BUILD_ARGS = \
 export GO111MODULE = on
 export CGO_ENABLED = 0
 export PATH := $(PWD)/$(BUILD_DIR):$(PATH)
+TAG ?= latest
 
 ##@ Development
 
@@ -42,12 +43,12 @@ run: build # Run against the configured Kubernetes cluster in ~/.kube/config
 	./$(BUILD_DIR)/openvino-operator run
 
 docker-build: ## Build docker image with the manager.
-	docker build -t ${IMG} -f docker/Dockerfile .
+	docker build -t ${IMG}:${TAG} -f docker/Dockerfile .
 
 docker-push: ## Push docker image with the manager.
-	docker push ${IMG}
+	docker push ${IMG}:${TAG} 
 
-TAG ?= latest
+
 BUNDLE_REPOSITORY ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator-bundle
 CATALOG_REPOSITORY ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator-catalog
 
@@ -55,13 +56,13 @@ bundle_k8s_build:
 	sed -i "s|registry.connect.redhat.com/intel/ovms-operator:0.2.0|$(IMG):$(TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 
 	docker build -t $(BUNDLE_REPOSITORY):$(TAG) -f bundle/Dockerfile bundle
-	sed -i "s|$(IMG):$(TAG)|$(REPOSITORY)/registry.connect.redhat.com/intel/ovms-operator:0.2.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+	sed -i "s|$(IMG):$(TAG)|registry.connect.redhat.com/intel/ovms-operator:0.2.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 
 bundle_openshift_build:
 	sed -i "s|registry.connect.redhat.com/intel/ovms-operator:0.2.0|$(IMG):$(TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 	sed -i "s|gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0|registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.8.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 	docker build -t $(BUNDLE_REPOSITORY):$(TAG) -f bundle/Dockerfile bundle
-	sed -i "s|$(IMG):$(TAG)|$(REPOSITORY)/registry.connect.redhat.com/intel/ovms-operator:0.2.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+	sed -i "s|$(IMG):$(TAG)|registry.connect.redhat.com/intel/ovms-operator:0.2.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 	sed -i "s|registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.8.0|gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 
 bundle_image_push:
@@ -85,7 +86,7 @@ k8s_catalog_push:
 bundle_deploy_k8s:
 	cat tests/catalog-source.yaml | sed "s|catalog:latest|$(CATALOG_REPOSITORY)-k8s:$(TAG)|" | kubectl apply -f -
 	sleep 30
-	kubectl create ns operator
+	kubectl create ns operator || true
 	kubectl apply -f tests/operator-group.yaml
 	kubectl apply -f tests/operator-subscription.yaml
 	sleep 15
@@ -97,7 +98,9 @@ olm_install:
 olm_clean:
 	kubectl delete --ignore-not-found=true ns operator
 	kubectl get ns olm ; if [ $$? -eq 0 ]; then operator-sdk olm uninstall ; fi
-	
+
+olm_reset: olm_clean olm_install 
+
 catalog_deploy_openshift:
 	kubectl delete -n openshift-marketplace --ignore-not-found=true CatalogSource my-test-catalog
 	sleep 10
@@ -110,11 +113,15 @@ uninstall: kustomize ## Uninstall CRDs from the K8s cluster specified in ~/.kube
 	$(KUSTOMIZE) build config/crd | kubectl delete -f -
 
 deploy: kustomize ## Deploy controller to the K8s cluster specified in ~/.kube/config.
-	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}:${TAG}
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
 
 undeploy: ## Undeploy controller from the K8s cluster specified in ~/.kube/config.
 	$(KUSTOMIZE) build config/default | kubectl delete -f -
+
+k8s_all:  docker-build  docker-push bundle_k8s_build bundle_image_push  k8s_catalog_build k8s_catalog_push bundle_deploy_k8s
+
+openshift_all: docker-build  docker-push bundle_openshift_build bundle_image_push  openshift_catalog_build openshift_catalog_push catalog_deploy_openshift
 
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
