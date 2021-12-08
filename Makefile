@@ -41,6 +41,11 @@ build: ## Build operator-sdk, ansible-operator, and helm-operator.
 run: build # Run against the configured Kubernetes cluster in ~/.kube/config
 	./$(BUILD_DIR)/openvino-operator run
 
+.PHONY: test-unit
+TEST_PKGS = $(shell go list ./... | grep -v -E 'github.com/operator-framework/operator-sdk/test/')
+test-unit: ## Run unit tests
+	go test -coverprofile=coverage.out -covermode=count -short $(TEST_PKGS)
+
 docker-build: ## Build docker image with the manager.
 	docker build -t ${IMG} -f docker/Dockerfile .
 
