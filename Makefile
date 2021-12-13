@@ -42,7 +42,7 @@ run: build # Run against the configured Kubernetes cluster in ~/.kube/config
 	./$(BUILD_DIR)/openvino-operator run
 
 .PHONY: test-unit
-TEST_PKGS = $(shell go list ./... | grep -v -E 'github.com/operator-framework/operator-sdk/test/')
+TEST_PKGS = $(shell go list ./...)
 test-unit: ## Run unit tests
 	go test -coverprofile=coverage.out -covermode=count -short $(TEST_PKGS)
 
