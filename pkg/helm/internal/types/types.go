@@ -77,6 +77,8 @@ const (
 type HelmAppStatus struct {
 	Conditions      []HelmAppCondition `json:"conditions"`
 	DeployedRelease *HelmAppRelease    `json:"deployedRelease,omitempty"`
+	Replicas int `json:"replicas,omitempty"`
+	LabelSelector string `json:"labelSelector,omitempty"`
 }
 
 func (s *HelmAppStatus) ToMap() (map[string]interface{}, error) {

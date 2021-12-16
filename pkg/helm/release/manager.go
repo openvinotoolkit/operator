@@ -304,8 +304,6 @@ func reconcileRelease(_ context.Context, kubeClient kube.Interface, expectedMani
 			return nil
 		}
 
-		patch = patchForScalling(patch)
-
 		_, err = helper.Patch(expected.Namespace, expected.Name, patchType, patch,
 			&metav1.PatchOptions{})
 		if err != nil {
@@ -313,26 +311,6 @@ func reconcileRelease(_ context.Context, kubeClient kube.Interface, expectedMani
 		}
 		return nil
 	})
-}
-
-func patchForScalling(patch []byte) []byte {
-	// Remove replicas and resources from patch if there is a change from for example autoscaler or manual deployment scale.
-	// We want to resolve conflicts between autoscalers and controller when it comes to horizontal or vertical scalling
-	replicasRx := regexp.MustCompile(".replicas.:\\d,")
-	resRx := regexp.MustCompile(",.resources.:{[^}}]*}}")
-	stringPatch := string(patch[:])
-	
-	submatchall := replicasRx.FindAllString(stringPatch, -1)
-	for _, element := range submatchall {
-		stringPatch = strings.Replace(stringPatch,element,"",1)
-	}
-
-	submatchall = resRx.FindAllString(stringPatch, -1)
-	for _, element := range submatchall {
-		stringPatch = strings.Replace(stringPatch,element,"",1)
-	}
-
-	return []byte(stringPatch);
 }
 
 func createPatch(existing runtime.Object, expected *resource.Info) ([]byte, apitypes.PatchType, error) {

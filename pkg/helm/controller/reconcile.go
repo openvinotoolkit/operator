@@ -33,6 +33,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"sigs.k8s.io/controller-runtime/pkg/client/config"
+
 	"github.com/openvinotoolkit/openshift_operator/pkg/helm/internal/diff"
 	"github.com/openvinotoolkit/openshift_operator/pkg/helm/internal/types"
 	"github.com/openvinotoolkit/openshift_operator/pkg/helm/release"
@@ -270,6 +274,11 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 			Name:     installedRelease.Name,
 			Manifest: installedRelease.Manifest,
 		}
+		if r.GVK.Kind == "ModelServer" {
+			status.LabelSelector = "release=" + manager.ReleaseName()
+			status.Replicas = getReplicasStatus(ctx, status.LabelSelector, request.Namespace)
+		}
+
 		err = r.updateResourceStatus(ctx, o, status)
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 	}
@@ -333,6 +342,11 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 			Name:     upgradedRelease.Name,
 			Manifest: upgradedRelease.Manifest,
 		}
+		if r.GVK.Kind == "ModelServer" {
+			status.LabelSelector = "release=" + manager.ReleaseName()
+			status.Replicas = getReplicasStatus(ctx, status.LabelSelector, request.Namespace)
+		}
+
 		err = r.updateResourceStatus(ctx, o, status)
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 	}
@@ -361,6 +375,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	}
 	status.RemoveCondition(types.ConditionIrreconcilable)
 
+
 	if r.releaseHook != nil {
 		if err := r.releaseHook(expectedRelease); err != nil {
 			log.Error(err, "Failed to run release hook")
@@ -387,8 +402,43 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		Name:     expectedRelease.Name,
 		Manifest: expectedRelease.Manifest,
 	}
+	if r.GVK.Kind == "ModelServer" {
+		status.LabelSelector = "release=" + manager.ReleaseName()
+		status.Replicas = getReplicasStatus(ctx, status.LabelSelector, request.Namespace)
+	}
 	err = r.updateResourceStatus(ctx, o, status)
 	return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
+}
+
+func getReplicasStatus(ctx context.Context, labelSelector string, namespace string) int {
+	println("getting replicas",namespace, labelSelector)
+	cfg, err := config.GetConfig()
+	if err != nil {
+		log.Error(err, "Can not get api config")
+		return 0
+	}
+	clientset, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		log.Error(err, "Can not create a clientset")
+		return 0
+	}
+	listOptions:= metav1.ListOptions{LabelSelector: labelSelector}
+	k8sclient := clientset.AppsV1()
+	deploy, err := k8sclient.Deployments(namespace).List(ctx, listOptions)
+	if err != nil {
+		log.Error(err, "Can not list deployments")
+		return 0
+	}
+	if len(deploy.Items) == 0 {
+		log.Info("Deployment not created yet")
+		return 0
+	}
+	if len(deploy.Items) > 1 {
+		log.Info("Multiple deployments created with labelSelector "+ labelSelector + "Remove the conflicting deployment")
+		return 0
+	}
+	println("number of replicas", len(deploy.Items))
+	return int(deploy.Items[0].Status.AvailableReplicas)
 }
 
 // returns the boolean representation of the annotation string
