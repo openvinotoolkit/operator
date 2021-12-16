@@ -16,6 +16,9 @@ COPY . .
 # Build
 RUN GOOS=linux GOARCH=$TARGETARCH make build
 
+# Unit tests
+RUN GOOS=linux GOARCH=$TARGETARCH make test-unit
+
 # Final image.
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
 
