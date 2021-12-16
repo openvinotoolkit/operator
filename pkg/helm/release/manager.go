@@ -21,7 +21,6 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
-	"regexp"
 	"strings"
 
 	jsonpatch "gomodules.xyz/jsonpatch/v3"
