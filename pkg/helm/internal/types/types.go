@@ -131,6 +131,16 @@ func (s *HelmAppStatus) RemoveCondition(conditionType HelmAppConditionType) *Hel
 	return s
 }
 
+// SetScaling sets the status atributes related to horizontal and vertical 
+// scaling. They can be used by HPA and VPA opertors
+func (s *HelmAppStatus) SetScaling(kind string, replicas int, releaseName string) *HelmAppStatus {
+	if kind == "ModelServer" {
+		s.LabelSelector = "release=" + releaseName
+		s.Replicas = replicas
+	}
+	return s
+}
+
 // StatusFor safely returns a typed status block from a custom resource.
 func StatusFor(cr *unstructured.Unstructured) *HelmAppStatus {
 	switch s := cr.Object["status"].(type) {

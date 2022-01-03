@@ -274,10 +274,10 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 			Name:     installedRelease.Name,
 			Manifest: installedRelease.Manifest,
 		}
-		if r.GVK.Kind == "ModelServer" {
-			status.LabelSelector = "release=" + manager.ReleaseName()
-			status.Replicas = getReplicasStatus(ctx, status.LabelSelector, request.Namespace)
-		}
+		status.SetScaling(
+			r.GVK.Kind, 
+			getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), 
+			manager.ReleaseName())
 
 		err = r.updateResourceStatus(ctx, o, status)
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
@@ -342,10 +342,10 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 			Name:     upgradedRelease.Name,
 			Manifest: upgradedRelease.Manifest,
 		}
-		if r.GVK.Kind == "ModelServer" {
-			status.LabelSelector = "release=" + manager.ReleaseName()
-			status.Replicas = getReplicasStatus(ctx, status.LabelSelector, request.Namespace)
-		}
+		status.SetScaling(
+			r.GVK.Kind, 
+			getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), 
+			manager.ReleaseName())
 
 		err = r.updateResourceStatus(ctx, o, status)
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
@@ -402,16 +402,17 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		Name:     expectedRelease.Name,
 		Manifest: expectedRelease.Manifest,
 	}
-	if r.GVK.Kind == "ModelServer" {
-		status.LabelSelector = "release=" + manager.ReleaseName()
-		status.Replicas = getReplicasStatus(ctx, status.LabelSelector, request.Namespace)
-	}
+	status.SetScaling(
+		r.GVK.Kind, 
+		getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), 
+		manager.ReleaseName())
+
 	err = r.updateResourceStatus(ctx, o, status)
 	return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 }
 
-func getReplicasStatus(ctx context.Context, labelSelector string, namespace string) int {
-	println("getting replicas",namespace, labelSelector)
+func getReplicasStatus(ctx context.Context, releaseName string, namespace string) int {
+	labelSelector := "release="+releaseName 
 	cfg, err := config.GetConfig()
 	if err != nil {
 		log.Error(err, "Can not get api config")
@@ -437,7 +438,6 @@ func getReplicasStatus(ctx context.Context, labelSelector string, namespace stri
 		log.Info("Multiple deployments created with labelSelector "+ labelSelector + "Remove the conflicting deployment")
 		return 0
 	}
-	println("number of replicas", len(deploy.Items))
 	return int(deploy.Items[0].Status.AvailableReplicas)
 }
 
