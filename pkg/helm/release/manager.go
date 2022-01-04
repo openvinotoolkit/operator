@@ -312,6 +312,7 @@ func reconcileRelease(_ context.Context, kubeClient kube.Interface, expectedMani
 	})
 }
 
+
 func createPatch(existing runtime.Object, expected *resource.Info) ([]byte, apitypes.PatchType, error) {
 	existingJSON, err := json.Marshal(existing)
 	if err != nil {

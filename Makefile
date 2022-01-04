@@ -25,9 +25,11 @@ GO_BUILD_ARGS = \
 export GO111MODULE = on
 export CGO_ENABLED = 0
 export PATH := $(PWD)/$(BUILD_DIR):$(PATH)
+
 # TAG by default includes the git commit. It can be set manualy to any user friendly name like release name. 
 # the catalog imamge includes also the tag in a format <branch>-latest
 IMAGE_TAG ?= $(shell git rev-parse HEAD)
+
 
 ##@ Development
 

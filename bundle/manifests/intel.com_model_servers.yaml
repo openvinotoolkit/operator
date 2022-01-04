@@ -277,6 +277,10 @@ spec:
               x-kubernetes-preserve-unknown-fields: true
       subresources:
         status: {}
+        scale:
+          specReplicasPath: .spec.deployment_parameters.replicas
+          statusReplicasPath: .status.replicas
+          labelSelectorPath: .status.labelSelector
   conversion:
     strategy: None
 status:
