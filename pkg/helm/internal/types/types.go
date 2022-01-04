@@ -77,6 +77,8 @@ const (
 type HelmAppStatus struct {
 	Conditions      []HelmAppCondition `json:"conditions"`
 	DeployedRelease *HelmAppRelease    `json:"deployedRelease,omitempty"`
+	Replicas int `json:"replicas,omitempty"`
+	LabelSelector string `json:"labelSelector,omitempty"`
 }
 
 func (s *HelmAppStatus) ToMap() (map[string]interface{}, error) {
@@ -125,6 +127,16 @@ func (s *HelmAppStatus) RemoveCondition(conditionType HelmAppConditionType) *Hel
 			s.Conditions = append(s.Conditions[:i], s.Conditions[i+1:]...)
 			return s
 		}
+	}
+	return s
+}
+
+// SetScaling sets the status atributes related to horizontal and vertical 
+// scaling. They can be used by HPA and VPA opertors
+func (s *HelmAppStatus) SetScaling(kind string, replicas int, releaseName string) *HelmAppStatus {
+	if kind == "ModelServer" {
+		s.LabelSelector = "release=" + releaseName
+		s.Replicas = replicas
 	}
 	return s
 }
