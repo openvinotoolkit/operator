@@ -130,21 +130,21 @@ spec:
                "--nireq", "{{ .Values.models_settings.nireq }}",
                {{- end }}
                {{- if .Values.models_settings.plugin_config }}
-               "--plugin_config", '{{ .Values.model_settings.plugin_config }}',
+               "--plugin_config", '{{ .Values.models_settings.plugin_config }}',
                {{- end }}
                {{- if .Values.models_settings.batch_size }}
-               "--batch_size", '{{ .Values.model_settings.batch_size }}',
+               "--batch_size", '{{ .Values.models_settings.batch_size }}',
                {{- end }}
                {{- if .Values.models_settings.layout }}
-                "--layout", '{{ .Values.model_settings.layout }}',
+                "--layout", '{{ .Values.models_settings.layout }}',
                {{- end }}
                {{- if .Values.models_settings.shape }}
-               "--shape", '{{ .Values.model_settings.shape }}',
+               "--shape", '{{ .Values.models_settings.shape }}',
                {{- end }}
                {{- if .Values.models_settings.model_version_policy }}
                "--model_version_policy", '{{ .Values.models_settings.model_version_policy }}',
                {{- end }}
-               {{- if eq .Values.models_settings.stateful true}}
+               {{- if eq .Values.models_settings.is_stateful true}}
                "--stateful",
                {{- end }}
         {{- end }}
