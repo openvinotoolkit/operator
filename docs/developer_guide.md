@@ -40,32 +40,34 @@ make deploy IMG=registry.toolbox.iotg.sclab.intel.com/cpp/operator:latest
 
 ## OLM development flow
 ```
-make olm_reset
-make k8s_all TAG=<branch>-k8s
+make cluster_clean
+make all
 ```
 
 ## K8S release process
 ```
-make docker-build IMG=quay.io/openvino/ovms-operator:<version>
-make docker-push IMG=quay.io/openvino/ovms-operator:<version>
+make docker-build OPERATOR_IMAGE=quay.io/openvino/ovms-operator IMAGE_TAG=<version>
+make docker-push OPERATOR_IMAGE=quay.io/openvino/ovms-operator IMAGE_TAG=<version>
 ```
 Make a PR to https://github.com/k8s-operatorhub/community-operators/tree/main/operators/ovms-operator with the [bundle](../bundle) content.
 
-## Openshift flow
+## Openshift development flow
 
 ```
-make openshift-all TAG=<branch>-openshift
+make build_all_images TARGET_PLARFORM=openshift
+make deploy_catalog TARGET_PLATFORM=openshift
+
 ```
 Manually install the operator from the GUI interface using the test catalog
 
 ## OpenShift release
 Update the OVMS image to the latest tag in RH registry
 ```
-make docker-build
+make docker-build TARGET_PLATFORM=openshift
 ```
 Certify new version of the operator image
 ```
-make bundle_openshift_build IMG=registry.connect.redhat.com/intel/ovms-operator TAG=0.3.0
+make bundle_build OPERATOR_IMAGE=registry.connect.redhat.com/intel/ovms-operator IMAGE_TAG=0.3.0
 ```
 Certify the bundle image
 

@@ -19,6 +19,7 @@ require (
 	github.com/operator-framework/operator-registry v1.15.3
 	github.com/prometheus/client_golang v1.7.1
 	github.com/prometheus/client_model v0.2.0
+	github.com/prometheus/common v0.10.0 // indirect
 	github.com/sergi/go-diff v1.1.0
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/afero v1.2.2

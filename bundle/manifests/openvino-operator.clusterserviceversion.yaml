@@ -11,38 +11,53 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "annotations": {},
-            "aws_access_key_id": "",
-            "aws_region": "",
-            "aws_secret_access_key": "",
-            "batch_size": "",
-            "config_configmap_name": "",
-            "file_system_poll_wait_seconds": 0,
-            "gcp_creds_secret_name": "",
-            "grpc_port": 8080,
-            "https_proxy": "",
-            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:latest",
-            "log_level": "INFO",
-            "model_name": "resnet",
-            "model_path": "gs://ovms-public-eu/resnet50-binary",
-            "models_host_path": "",
-            "model_version_policy": "{\\\"latest\\\": { \\\"num_versions\\\":1 }}",
-            "models_volume_claim": "",
-            "nireq": "",
-            "plugin_config": "{\\\"CPU_THROUGHPUT_STREAMS\\\":\\\"1\\\"}",
-            "replicas": 1,
-            "resources": {
-              "limits": {
-                "cpu": 4,
-                "memory": "250Mi"
+            "image_name": "openvino/model_server:latest",
+            "deployment_parameters": {
+              "replicas": 1
+            },
+            "service_parameters": {
+              "grpc_port": 8080,
+              "rest_port": 8081
+            },            
+            "models_settings": {
+              "single_model_mode": true,
+              "config_configmap_name": "",
+              "model_config": ""              
+              "model_name": "resnet",
+              "model_path": "gs://ovms-public-eu/resnet50-binary",
+              "nireq": 0,
+              "plugin_config": '{"CPU_THROUGHPUT_STREAMS":"1"}',
+              "batch_size": "",
+              "shape": "",
+              "model_version_policy": '{"latest": { "num_versions":1 }}',
+              "layout": "",
+              "target_device": "CPU",
+              "is_stateful": false,
+              "idle_sequence_cleanup": false,
+              "low_latency_transformation": true,
+              "max_sequence_number": 0
               }
             },
-            "rest_port": 8081,
-            "s3_compat_api_endpoint": "",
-            "security_context": {},
-            "service_type": "ClusterIP",
-            "shape": "",
-            "target_device": "CPU"
+            "server_settings": {
+              "file_system_poll_wait_seconds": 0,
+              "sequence_cleaner_poll_wait_minutes": 0,
+              "log_level": "INFO",
+              "grpc_workers": 1,
+              "rest_workers": 0,
+            },
+            "models_repository": {
+              "https_proxy": "http://proxy-mu.intel.com:911",
+              "http_proxy": "",
+              "storage_type": google,
+              "models_host_path": "",
+              "models_volume_claim": "",
+              "aws_secret_access_key": "",
+              "aws_access_key_id": "",
+              "aws_region": "",
+              "s3_compat_api_endpoint": "",
+              "gcp_creds_secret_name": "",
+              "azure_storage_connection_string": ""
+            }
           }
         },
         {
@@ -64,12 +79,242 @@ spec:
   apiservicedefinitions: {}
   customresourcedefinitions:
     owned:
-    - kind: ModelServer
-      name: modelservers.intel.com
-      version: v1alpha1
-    - kind: Notebook
-      name: notebooks.intel.com
-      version: v1alpha1
+      - kind: ModelServer
+        name: modelservers.intel.com
+        specDescriptors:
+          - description: >-
+              Select this option for serving a single model.
+              For multi model and DAG deployments, a configuration file `config.json` should be added to a config_map resource
+            displayName: Is it as single model deployment? 
+            path: models_settings.single_model_mode
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'        
+
+          - description: Config map with the model server configuration file. If this field is empty, specify required parameters in `model_settings` section. Configuration config.json file can be created as describe on https://github.com/openvinotoolkit/model_server Create the config_map with this file via a command `oc create configmap ovms-config --from-file config.json`
+            displayName: Config map
+            path: models_settings.config_configmap_name
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes:ConfigMap'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:false'
+
+          - description: Path to the configuration file. Set if it is differenet from the default /config/config.json mounted from the config_map resource
+            displayName: Config path
+            path: models_settings.config_path
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced'
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:false'
+          - description: Model name to be used in the client calls
+            displayName: Model name 
+            path: models_settings.model_name
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+          - description: Path to the model repository. The content should include the numberical subfolders with the versions. Use formats like /opt/ml/models/model, gs://bucket/models/model, s3://bucket/models/model or azure://bucket/models/model
+            displayName: Model path
+            path: models_settings.model_path
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+          - description: >-
+              shape is optional and takes precedence over batch_size. The shape argument changes the model that is enabled in the model server to fit the parameters.
+              shape accepts three forms of the values: auto - the model server reloads the model with the shape that matches the input data matrix, 
+              a tuple, such as (1,3,224,224) - the tuple defines the shape to use for all incoming requests for models with a single input,
+              a dictionary of shapes, such as {"input1":"(1,3,224,224)","input2":"(1,3,50,50)", "input3":"auto"} 
+              - this option defines the shape of every included input in the model.
+              Some models don't support the reshape operation.
+              If the model can't be reshaped, it remains in the original parameters and all requests with incompatible input format result in an error.
+            displayName: Shape
+            path: models_settings.shape
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+          - description: >-
+              By default, the batch size is derived from the model, defined through the OpenVINO Model Optimizer. batch_size is useful for sequential inference requests of the same batch size.
+              Some models, such as object detection, don't work correctly with the batch_size parameter. With these models, the output's first dimension doesn't represent the batch size. You can set the batch size for these models by using network reshaping and setting the shape parameter appropriately.
+              The default option of using the Model Optimizer to determine the batch size uses the size of the first dimension in the first input for the size. For example, if the input shape is (1, 3, 225, 225), the batch size is set to 1. If you set batch_size to a numerical value, the model batch size is changed when the service starts.
+              batch_size also accepts a value of auto. If you use auto, then the served model batch size is set according to the incoming data at run time. The model is reloaded each time the input data changes the batch size. You might see a delayed response upon the first request.
+            displayName: Batch size
+            path: models_settings.batch_size
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+          - description: >-
+              Target device to be used to execute the inference or the plugin name for handling multiple devices.
+              It could be format like `CPU`, `GPU`, `HDDL`, `AUTO`, `MULTI:CPU,GPU`.
+            displayName: Target device 
+            path: models_settings.target_device
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+          - description: >-
+              Execution tuning parameters for the target device plugin. Parameters should be defined as a json format.
+            displayName: Plugin config
+            path: models_settings.plugin_config
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+          - description: >-
+              How the model versions should be managed. Possible formats: `{ "all": {} }`, `{ "latest": { "num_versions":2 }}`, `{ "specific": { "versions":[1, 3] } }`
+            displayName: Model version policy
+            path: models_settings.model_version_policy
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced' 
+          - description: >-
+              layout is optional argument which allows to change the layout of model input and output tensors. Only NCHW and NHWC layouts are supported.
+              When specified with single string value - layout change is only applied to single model input. To change multiple model inputs or outputs, you can specify json object with mapping, such as: {"input1":"NHWC","input2":"NHWC","output1":"NHWC"}.
+              If not specified, layout is inherited from model.
+            displayName: Layout
+            path: models_settings.layout
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+          - description: Size of the queue of inference requests
+            displayName: Nireq
+            path: models_settings.nireq
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced'
+          - description: >-
+              Does the model preserve the state between inference requests. Stateful models require special handling on the client side to manage the inference sessions.
+            displayName: Is stateful
+            path: models_settings.is_stateful
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced' 
+          - description: idle_sequence_cleanup
+            displayName: idle_sequence_cleanup
+            path: models_settings.idle_sequence_cleanup
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.is_stateful:true'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced'               
+          - description: low_latency_transformation
+            displayName: low_latency_transformation
+            path: models_settings.low_latency_transformation
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.is_stateful:true'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced' 
+          - description: max_sequence_number
+            displayName: max_sequence_number
+            path: models_settings.max_sequence_number
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.is_stateful:true'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced' 
+
+          - description: Persistent Volume Claim with models repository
+            displayName: Storage type
+            path: models_repository.storage_type
+
+          - description: Persistent Volume Claim with models repository to be mounted as /models
+            displayName: Persistent Volume Claim 
+            path: models_repository.models_volume_claim
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:cluster'
+          - description: Host path with models repository to be mounted as /models
+            displayName: Host path
+            path: models_repository.models_host_path
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:cluster'
+          - description: Security context to access the models
+            displayName: Run as user
+            path: models_repository.runAsUser
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:cluster'
+          - description: Security context to access the models
+            displayName: Run as group 
+            path: models_repository.runAsGroup
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:cluster'
+
+          - description: Aws access key_id
+            displayName: aws_access_key_id with access to the s3 bucket
+            path: models_repository.aws_access_key_id
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:S3'
+          - description: Aws secret access key
+            displayName: aws_secret_access_key
+            path: models_repository.aws_secret_access_key
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:password'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:S3'
+          - description: Aws region
+            displayName: Aws region
+            path: models_repository.aws_region
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:S3'
+          - description: s3_compat_api_endpoint
+            displayName: s3_compat_api_endpoint
+            path: models_repository.s3_compat_api_endpoint
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:S3'
+
+          - description: >-
+              Secret name including Google Cloud Storage access token. Create the secret resource using the command `oc create secret generic gcpcreds --from-file gcp-creds.json`
+            displayName: GCP credentials secret name
+            path: models_repository.gcp_creds_secret_name
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes:Secret'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:google'
+          - description: Azure storage settings
+            displayName: azure_storage_connection_string
+            path: models_repository.azure_storage_connection_string
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:azure'
+
+          - description: Replicas
+            displayName: Number of replicas
+            path: deployment_parameters.replicas
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:podCount'
+          - description: node affinity
+            displayName: Node affinity
+            path: deployment_parameters.node_affinity
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:nodeAffinity'
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced' 
+          - description: pod_affinity
+            displayName: pod_affinity
+            path: deployment_parameters.pod_affinity
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:podAffinity'
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced' 
+          - description: pod_antiaffinity
+            displayName: pod_antiaffinity
+            path: deployment_parameters.pod_antiaffinity
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:podAntiAffinity'
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced' 
+          - description: update_strategy
+            displayName: update_strategy
+            path: deployment_parameters.update_strategy
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:updateStrategy'
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced' 
+          - description: Number of gRPC servers. Default 1. Increase for multi client, high throughput scenarios
+            displayName: grpc_workers
+            path: server_settings.grpc_workers
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced' 
+          - description: Number of worker threads in REST server - has no effect if rest_port is not set. Default value depends on number of CPUs.
+            displayName: rest_workers
+            path: server_settings.rest_workers
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced' 
+          - description: >-
+              Time interval between two consecutive sequence cleaner scans. 
+              Default is 5. Zero value disables sequence cleaner.
+            displayName: sequence_cleaner_poll_wait_minutes
+            path: server_settings.sequence_cleaner_poll_wait_minutes
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced'                             
+
+          
+        version: v1alpha1
+      - kind: Notebook
+        name: notebooks.intel.com
+        version: v1alpha1
   description: |
     OpenVINO Toolkit Operator manages OpenVINO components in OpenShift.
 
@@ -306,4 +551,4 @@ spec:
   provider:
     name: Intel
     url: https://github.com/openvinotoolkit/model_server
-  version: 0.2.0
+  version: 0.3.0

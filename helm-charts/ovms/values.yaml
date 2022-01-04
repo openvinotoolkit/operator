@@ -14,52 +14,47 @@
 # limitations under the License.
 #
 
-replicas: 1
-image_name: "openvino/model_server:latest"
-config_configmap_name: ""
-# configmap name holding the content of ovms configuration file. Excluding with model_name and model_path
-config_path: ""
-# to be used when ovms config is not included in the configmap but is mounted on the container via models_host_path or models_volume_claim param
-grpc_port: 8080
-rest_port: 8081
-file_system_poll_wait_seconds: 0
-model_name: ""
-model_path: ""
-target_device: "CPU"
-nireq: ""
-batch_size: ""
-shape: ""
-layout: ""
-model_version_policy: >-
-  {\"latest\": { \"num_versions\":1 }}
-plugin_config: >-
-  {\"CPU_THROUGHPUT_STREAMS\":\"CPU_THROUGHPUT_AUTO\"}
-stateful: ""
-gcp_creds_secret_name: ""
-# k8s secret name holding gcp credential file gcp-creds.json
-aws_access_key_id: ""
-aws_secret_access_key: ""
-aws_region: ""
-s3_compat_api_endpoint: ""
-azure_storage_connection_string: ""
-log_level: INFO
-service_type: "LoadBalancer"
-# alternatively set to NodePort or ClusterIP
-resources: {}
-  #  limits:
-  #    cpu: 8.0
-  #    memory: 512Mi
-  #    gpu.intel.com/i915: 1
-security_context: {}
-  #  runAsUser: 5000
-  #  runAsGroup: 5000
-annotations: {}
-# sidecar.istio.io/inject: "true"
-node_selector: {}
-# kubernetes.io/arch: amd64
-models_host_path: ""
-# local path on the host to be mounted as /models directory
-models_volume_claim: ""
-# persistent claim name to be mounted as /models directory. It is excluding with models_host_path.
-
-
+image_name: openvino/model_server:latest
+deployment_parameters:
+  replicas: 1
+  openshift_service_mesh: false
+service_parameters:
+    grpc_port: 8080
+    rest_port: 8081
+    service_type: ClusterIP
+models_settings:
+  single_model_mode: true
+  config_configmap_name: ""
+  model_config_path: ""
+  model_name: "resnet"
+  model_path: "gs://ovms-public-eu/resnet50-binary"
+  nireq: 0
+  plugin_config: '{"CPU_THROUGHPUT_STREAMS":"1"}'
+  batch_size: ""
+  shape: ""
+  model_version_policy: '{"latest": { "num_versions":1 }}'
+  layout: ""
+  target_device: "CPU"
+  is_stateful: false
+  idle_sequence_cleanup: false
+  low_latency_transformation: true
+  max_sequence_number: 0
+server_settings:
+  file_system_poll_wait_seconds: 0
+  sequence_cleaner_poll_wait_minutes: 0
+  log_level: "INFO"
+  grpc_workers: 1
+  rest_workers: 0
+models_repository:
+  https_proxy: "http://proxy-mu.intel.com:911"
+  http_proxy: ""
+  storage_type: google
+  models_host_path: ""
+  models_volume_claim: ""
+  security_context: {}
+  aws_secret_access_key: ""
+  aws_access_key_id: ""
+  aws_region: ""
+  s3_compat_api_endpoint: ""
+  gcp_creds_secret_name: ""
+  azure_storage_connection_string: ""

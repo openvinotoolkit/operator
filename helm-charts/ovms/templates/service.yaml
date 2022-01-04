@@ -25,14 +25,14 @@ metadata:
     app: {{ template "ovms.fullname" . }}
 spec:
   ports:
-    - port: {{ .Values.grpc_port }}
+    - port: {{ .Values.service_parameters.grpc_port }}
       protocol: TCP
       targetPort: 8080
       name: grpc
-    - port: {{ .Values.rest_port }}
+    - port: {{ .Values.service_parameters.rest_port }}
       protocol: TCP
       targetPort: 8081
       name: rest
   selector:
     app: {{ template "ovms.fullname" . }}
-  type: {{ .Values.service_type }}
+  type: {{ .Values.service_parameters.service_type }}
