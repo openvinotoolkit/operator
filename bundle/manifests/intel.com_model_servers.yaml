@@ -83,11 +83,11 @@ spec:
                               type: string
                             memory:
                               type: string
-                            xpu-device:
+                            xpu_device:
                               description: >-
                                 The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes
                               type: string
-                            xpu-device_quantity:
+                            xpu_device_quantity:
                               type: string
                               default: "1"
                         requests:
@@ -97,11 +97,11 @@ spec:
                               type: string
                             memory:
                               type: string
-                            xpu-device:
+                            xpu_device:
                               description: >-
                                 The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes
                               type: string
-                            xpu-device_quantity:
+                            xpu_device_quantity:
                               type: string
                               default: "1"                                    
                 service_parameters:

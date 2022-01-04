@@ -133,7 +133,7 @@ spec:
                "--plugin_config", '{{ .Values.model_settings.plugin_config }}',
                {{- end }}
                {{- if .Values.models_settings.batch_size }}
-               "--batch_size", '{{ .Values.model_settings.batch_size }}'',
+               "--batch_size", '{{ .Values.model_settings.batch_size }}',
                {{- end }}
                {{- if .Values.models_settings.layout }}
                 "--layout", '{{ .Values.model_settings.layout }}',
@@ -187,8 +187,8 @@ spec:
 {{ if .Values.deployment_parameters.resources.limits.memory }}
             memory: {{ .Values.deployment_parameters.resources.limits.memory }}
 {{- end }}
-{{ if .Values.deployment_parameters.resources.limits.xpu-device }}
-            {{ .Values.deployment_parameters.resources.limits.xpu-device }}: {{ .Values.deployment_parameters.resources.limits.xpu-device_quantity }}
+{{ if .Values.deployment_parameters.resources.limits.xpu_device }}
+            {{ .Values.deployment_parameters.resources.limits.xpu_device }}: {{ .Values.deployment_parameters.resources.limits.xpu_device_quantity }}
 {{- end }}
       {{- if or .Values.models_repository.gcp_creds_secret_name .Values.models_settings.config_configmap_name .Values.models_repository.models_volume_claim .Values.models_repository.models_host_path }}
       volumes:

@@ -28,10 +28,10 @@ models_settings:
   model_name: "resnet"
   model_path: "gs://ovms-public-eu/resnet50-binary"
   nireq: 0
-  plugin_config: '{\"CPU_THROUGHPUT_STREAMS\":\"1\"}'
+  plugin_config: '{"CPU_THROUGHPUT_STREAMS":"1"}'
   batch_size: ""
   shape: ""
-  model_version_policy: '{\"latest\": { \"num_versions\":1 }}'
+  model_version_policy: '{"latest": { "num_versions":1 }}'
   layout: ""
   target_device: "CPU"
   is_stateful: false
@@ -44,16 +44,16 @@ server_settings:
   log_level: "INFO"
   grpc_workers: 1
   rest_workers: 0
- models_repository:
-   https_proxy: "http://proxy-mu.intel.com:911"
-   http_proxy: ""
-   storage_type: google
-   models_host_path: ""
-   models_volume_claim: ""
-   security_context: {}
-   aws_secret_access_key: ""
-   aws_access_key_id: ""
-   aws_region: ""
-   s3_compat_api_endpoint: ""
-   gcp_creds_secret_name: ""
-   azure_storage_connection_string: ""
+models_repository:
+  https_proxy: "http://proxy-mu.intel.com:911"
+  http_proxy: ""
+  storage_type: google
+  models_host_path: ""
+  models_volume_claim: ""
+  security_context: {}
+  aws_secret_access_key: ""
+  aws_access_key_id: ""
+  aws_region: ""
+  s3_compat_api_endpoint: ""
+  gcp_creds_secret_name: ""
+  azure_storage_connection_string: ""
