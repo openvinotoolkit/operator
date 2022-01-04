@@ -28,7 +28,7 @@ export PATH := $(PWD)/$(BUILD_DIR):$(PATH)
 
 # TAG by default includes the git commit. It can be set manualy to any user friendly name like release name. 
 # the catalog imamge includes also the tag in a format <branch>-latest
-IMAGE_TAG ?= $(shell git rev-parse HEAD)
+IMAGE_TAG ?= $(shell git rev-parse --short HEAD)
 
 
 ##@ Development
@@ -60,10 +60,10 @@ docker-push: ## Push docker image with the manager.
 
 
 BUNDLE_REPOSITORY ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator-bundle
-CATALOG_REPOSITORY ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator-bundle
+CATALOG_REPOSITORY ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator-catalog
 
 bundle_build:
-ifeq ($(TARGET_PLATFORM), "openshift")
+ifeq ($(TARGET_PLATFORM), openshift)
 	echo "Building openshift bundle"
 	sed -i "s|registry.connect.redhat.com/intel/ovms-operator:0.2.0|$(OPERATOR_IMAGE):$(IMAGE_TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 	sed -i "s|gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0|registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.8.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
@@ -78,14 +78,14 @@ else
 endif
 
 bundle_push:
-ifeq ($(TARGET_PLATFORM), "openshift")
+ifeq ($(TARGET_PLATFORM), openshift)
 	docker push $(BUNDLE_REPOSITORY):$(IMAGE_TAG)
 else
 	docker push $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG)
 endif
 
 catalog_build:
-ifeq ($(TARGET_PLATFORM), "openshift")
+ifeq ($(TARGET_PLATFORM), openshift)
 	docker -v | grep -q podman ; if [ $$? -eq 0 ]; then \
 	opm index add --bundles $(BUNDLE_REPOSITORY):$(IMAGE_TAG) --from-index registry.redhat.io/redhat/community-operator-index:v4.8 -c podman --tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) ;\
 	else sudo opm index add --bundles $(BUNDLE_REPOSITORY):$(IMAGE_TAG) --from-index registry.redhat.io/redhat/community-operator-index:v4.8 -c docker --tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) ;\
@@ -97,7 +97,7 @@ else
 endif
 
 catalog_push:
-ifeq ($(TARGET_PLATFORM), "openshift")
+ifeq ($(TARGET_PLATFORM), openshift)
 	docker push $(CATALOG_REPOSITORY):$(IMAGE_TAG)
 	docker push $(CATALOG_REPOSITORY):$(BRANCH)-latest 
 else
@@ -126,7 +126,8 @@ build_all_images: docker-build docker-push bundle_build bundle_push catalog_buil
 build_bundle_catalog_images: bundle_build bundle_push catalog_build catalog_push
 
 cluster_clean:
-ifeq ($(TARGET_PLATFORM), "openshift")
+	@echo target [$(TARGET_PLATFORM)]
+ifeq ($(TARGET_PLATFORM), openshift)
 	echo "Skipping cleanup"
 else
 	kubectl delete --ignore-not-found=true ns operator
@@ -135,7 +136,7 @@ else
 endif
 
 deploy_catalog:
-ifeq ($(TARGET_PLATFORM), "openshift")
+ifeq ($(TARGET_PLATFORM), openshift)
 	kubectl delete --ignore-not-found=true -n openshift-marketplace --ignore-not-found=true CatalogSource my-test-catalog
 	sleep 10
 	cat tests/catalog-source.yaml | sed "s|catalog:latest|$(CATALOG_REPOSITORY):$(IMAGE_TAG)|" | sed "s|olm|openshift-marketplace|"| kubectl apply -f -
@@ -148,7 +149,7 @@ else
 endif
 
 deploy_operator:
-ifeq ($(TARGET_PLATFORM), "openshift")
+ifeq ($(TARGET_PLATFORM), openshift)
 	echo "Skipping deployment, TDB"
 else
 	kubectl create ns operator || true

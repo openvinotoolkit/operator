@@ -551,4 +551,4 @@ spec:
   provider:
     name: Intel
     url: https://github.com/openvinotoolkit/model_server
-  version: 0.2.0
+  version: 0.3.0
