@@ -38,6 +38,10 @@ spec:
     storage: true
     subresources:
       status: {}
+      scale:
+        specReplicasPath: .spec.replicas
+        statusReplicasPath: .status.replicas
+        labelSelectorPath: .status.labelSelector
 status:
   acceptedNames:
     kind: ""
