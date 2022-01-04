@@ -72,6 +72,7 @@ spec:
                       x-kubernetes-preserve-unknown-fields: true
                     openshift_service_mesh:
                       type: boolean
+                      default: false
                     resources:
                       description: Resources for Model Serving server
                       type: object

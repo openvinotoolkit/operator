@@ -116,7 +116,7 @@ spec:
               key: connection_string
         {{- end }}
         args: [
-        {{- if  .Values.models_settings.single_model_mode false }}
+        {{- if eq .Values.models_settings.single_model_mode false }}
           {{- if .Values.models_settings.config_path}}
                "--config_path", "{{ .Values.models_settings.config_path }}",
           {{- else }}
