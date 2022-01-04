@@ -17,10 +17,9 @@ package flags_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/openvinotoolkit/openshift_operator/pkg/helm/flags"
 	"github.com/spf13/pflag"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
-
-	"github.com/operator-framework/operator-sdk/internal/helm/flags"
 )
 
 var _ = Describe("Flags", func() {
