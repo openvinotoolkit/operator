@@ -165,26 +165,25 @@ else
 endif
 
 platform-build-software: PLATFORM_BUILD_DIR PLATFORM_BUILD_MODE
-@echo ========== Target builds platform software  ===============
-@echo Args:
-@echo PLATFORM_BUILD_DIR: installation files directory [$(PLATFORM_BUILD_DIR)]
-@echo OPERATOR_IMAGE: [$(OPERATOR_IMAGE)]
-@echo IMAGE_TAG: [$(IMAGE_TAG)]
-@echo TARGET_PLATFORM: [$(TARGET_PLATFORM)]
-@echo PLATFORM_PACKAGE_DIR: packages files directory
-@echo PLATFORM_BUILD_MODE: build targets
-@echo PLATFORM_OPTS: yaml file with all platform opts for installation
+	@echo ========== Target builds platform software  ===============
+	@echo Args:
+	@echo PLATFORM_BUILD_DIR: installation files directory [$(PLATFORM_BUILD_DIR)]
+	@echo OPERATOR_IMAGE: [$(OPERATOR_IMAGE)]
+	@echo IMAGE_TAG: [$(IMAGE_TAG)]
+	@echo TARGET_PLATFORM: [$(TARGET_PLATFORM)]
+	@echo PLATFORM_PACKAGE_DIR: packages files directory
+	@echo PLATFORM_BUILD_MODE: build targets
+	@echo PLATFORM_OPTS: yaml file with all platform opts for installation
 
 platform-install-software: PLATFORM_KUBECONFIG PLATFORM_INSTALLER_DIR PLATFORM_INSTALLATION_MODE
-@echo ========== Target installs platform software on the top of the kubernetes ===============
-@echo Args:
-@echo PLATFORM_KUBECONFIG: Kubernetes config with permissions to install platform
-@echo PLATFORM_INSTALLER_DIR: installation files directory
-@echo PLATFORM_INSTALLATION_MODE: installation mode
-@echo PLATFORM_OPTS: yaml file with all platform opts for installation
-@echo Returns: kubernetes installation with PLATFORM_KUBECONFIG configuration file
-@echo =========================================================================================
-
+	@echo ========== Target installs platform software on the top of the kubernetes ===============
+	@echo Args:
+	@echo PLATFORM_KUBECONFIG: Kubernetes config with permissions to install platform
+	@echo PLATFORM_INSTALLER_DIR: installation files directory
+	@echo PLATFORM_INSTALLATION_MODE: installation mode
+	@echo PLATFORM_OPTS: yaml file with all platform opts for installation
+	@echo Returns: kubernetes installation with PLATFORM_KUBECONFIG configuration file
+	@echo =========================================================================================
 
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
