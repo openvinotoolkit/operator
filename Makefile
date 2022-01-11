@@ -58,7 +58,7 @@ test-unit: ## Run unit tests
 	go test -coverprofile=coverage.out -covermode=count -short $(TEST_PKGS)
 
 docker-build: ## Build docker image with the manager.
-	docker build -t ${OPERATOR_IMAGE}:${IMAGE_TAG} -f docker/Dockerfile .
+	docker build -t ${OPERATOR_IMAGE}:${IMAGE_TAG} --build_arg https_proxy=$(https_proxy) -f docker/Dockerfile .
 
 docker-push: ## Push docker image with the manager.
 	docker push ${OPERATOR_IMAGE}:${IMAGE_TAG} 
