@@ -167,7 +167,7 @@ endif
 platform-build-software: PLATFORM_BUILD_DIR PLATFORM_BUILD_MODE
 	@echo ========== Target builds platform software  ===============
 	@echo Args:
-	@echo PLATFORM_BUILD_DIR: installation files directory [$(PLATFORM_BUILD_DIR)]
+#	@echo PLATFORM_BUILD_DIR: installation files directory [$(PLATFORM_BUILD_DIR)]
 	@echo OPERATOR_IMAGE: [$(OPERATOR_IMAGE)]
 	@echo IMAGE_TAG: [$(IMAGE_TAG)]
 	@echo TARGET_PLATFORM: [$(TARGET_PLATFORM)]
@@ -184,6 +184,12 @@ platform-install-software: PLATFORM_KUBECONFIG PLATFORM_INSTALLER_DIR PLATFORM_I
 	@echo PLATFORM_OPTS: yaml file with all platform opts for installation
 	@echo Returns: kubernetes installation with PLATFORM_KUBECONFIG configuration file
 	@echo =========================================================================================
+
+PLATFORM_%:
+	@ if [ "${PLATFORM_${*}}" = "" ]; then \
+	echo "Environment variable PLATFORM_$ is not set, please set one before run"; \
+	exit 1; \
+	fi
 
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
