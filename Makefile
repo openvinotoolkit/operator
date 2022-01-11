@@ -3,7 +3,6 @@ SHELL = /bin/bash
 # Can be swaped with the public operator for building the final bundle image
 OPERATOR_IMAGE ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator
 
-
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 # TARGET_PLATFORM can be k8s or openshift
 TARGET_PLATFORM =? k8s
@@ -26,10 +25,13 @@ export GO111MODULE = on
 export CGO_ENABLED = 0
 export PATH := $(PWD)/$(BUILD_DIR):$(PATH)
 
+ifneq ($(PLATFORM_KUBECONFIG), "")
+export KUBECONFIG=$(PLATFORM_KUBECONFIG)
+endif
+
 # TAG by default includes the git commit. It can be set manualy to any user friendly name like release name. 
 # the catalog imamge includes also the tag in a format <branch>-latest
 IMAGE_TAG ?= $(shell git rev-parse --short HEAD)
-
 
 ##@ Development
 
@@ -131,7 +133,6 @@ build_all_images: docker-build docker-push bundle_build bundle_push catalog_buil
 build_bundle_catalog_images: bundle_build bundle_push catalog_build catalog_push
 
 cluster_clean:
-	@echo target [$(TARGET_PLATFORM)]
 ifeq ($(TARGET_PLATFORM), openshift)
 	echo "Skipping cleanup"
 else
