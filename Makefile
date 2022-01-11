@@ -164,10 +164,10 @@ else
 	kubectl get clusterserviceversion --all-namespaces
 endif
 
-platform-build-software: PLATFORM_BUILD_DIR PLATFORM_BUILD_MODE
+platform-build-software: PLATFORM_BUILD_DIR PLATFORM_BUILD_MODE $(PLATFORM_BUILD_MODE)
 	@echo ========== Target builds platform software  ===============
 	@echo Args:
-#	@echo PLATFORM_BUILD_DIR: installation files directory [$(PLATFORM_BUILD_DIR)]
+	@echo PLATFORM_BUILD_DIR: installation files directory [$(PLATFORM_BUILD_DIR)]
 	@echo OPERATOR_IMAGE: [$(OPERATOR_IMAGE)]
 	@echo IMAGE_TAG: [$(IMAGE_TAG)]
 	@echo TARGET_PLATFORM: [$(TARGET_PLATFORM)]
@@ -175,7 +175,7 @@ platform-build-software: PLATFORM_BUILD_DIR PLATFORM_BUILD_MODE
 	@echo PLATFORM_BUILD_MODE: build targets
 	@echo PLATFORM_OPTS: yaml file with all platform opts for installation
 
-platform-install-software: PLATFORM_KUBECONFIG PLATFORM_INSTALLER_DIR PLATFORM_INSTALLATION_MODE
+platform-install-software: PLATFORM_KUBECONFIG PLATFORM_INSTALLER_DIR PLATFORM_INSTALLATION_MODE $(PLATFORM_INSTALLATION_MODE)
 	@echo ========== Target installs platform software on the top of the kubernetes ===============
 	@echo Args:
 	@echo PLATFORM_KUBECONFIG: Kubernetes config with permissions to install platform
