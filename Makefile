@@ -3,7 +3,6 @@ SHELL = /bin/bash
 # Can be swaped with the public operator for building the final bundle image
 OPERATOR_IMAGE ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator
 
-
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 # TARGET_PLATFORM can be k8s or openshift
 TARGET_PLATFORM =? k8s
@@ -26,10 +25,13 @@ export GO111MODULE = on
 export CGO_ENABLED = 0
 export PATH := $(PWD)/$(BUILD_DIR):$(PATH)
 
+ifneq ($(PLATFORM_KUBECONFIG), "")
+export KUBECONFIG=$(PLATFORM_KUBECONFIG)
+endif
+
 # TAG by default includes the git commit. It can be set manualy to any user friendly name like release name. 
 # the catalog imamge includes also the tag in a format <branch>-latest
 IMAGE_TAG ?= $(shell git rev-parse --short HEAD)
-
 
 ##@ Development
 
@@ -58,7 +60,7 @@ test-unit: ## Run unit tests
 	go test -coverprofile=coverage.out -covermode=count -short $(TEST_PKGS)
 
 docker-build: ## Build docker image with the manager.
-	docker build -t ${OPERATOR_IMAGE}:${IMAGE_TAG} -f docker/Dockerfile .
+	docker build -t ${OPERATOR_IMAGE}:${IMAGE_TAG} --build-arg https_proxy=$(https_proxy) --build-arg http_proxy=$(http_proxy) -f docker/Dockerfile .
 
 docker-push: ## Push docker image with the manager.
 	docker push ${OPERATOR_IMAGE}:${IMAGE_TAG} 
@@ -131,13 +133,12 @@ build_all_images: docker-build docker-push bundle_build bundle_push catalog_buil
 build_bundle_catalog_images: bundle_build bundle_push catalog_build catalog_push
 
 cluster_clean:
-	@echo target [$(TARGET_PLATFORM)]
 ifeq ($(TARGET_PLATFORM), openshift)
 	echo "Skipping cleanup"
 else
 	kubectl delete --ignore-not-found=true ns operator
 	kubectl get ns olm ; if [ $$? -eq 0 ]; then operator-sdk olm uninstall ; fi
-	operator-sdk olm install
+	operator-sdk olm install --timeout 10m0s
 endif
 
 deploy_catalog:
@@ -164,27 +165,32 @@ else
 	kubectl get clusterserviceversion --all-namespaces
 endif
 
-platform-build-software: PLATFORM_BUILD_DIR PLATFORM_BUILD_MODE
-@echo ========== Target builds platform software  ===============
-@echo Args:
-@echo PLATFORM_BUILD_DIR: installation files directory [$(PLATFORM_BUILD_DIR)]
-@echo OPERATOR_IMAGE: [$(OPERATOR_IMAGE)]
-@echo IMAGE_TAG: [$(IMAGE_TAG)]
-@echo TARGET_PLATFORM: [$(TARGET_PLATFORM)]
-@echo PLATFORM_PACKAGE_DIR: packages files directory
-@echo PLATFORM_BUILD_MODE: build targets
-@echo PLATFORM_OPTS: yaml file with all platform opts for installation
+platform-build-software: PLATFORM_BUILD_DIR PLATFORM_BUILD_MODE $(PLATFORM_BUILD_MODE)
+	@echo ========== Target builds platform software  ===============
+	@echo Args:
+	@echo PLATFORM_BUILD_DIR: installation files directory [$(PLATFORM_BUILD_DIR)]
+	@echo OPERATOR_IMAGE: [$(OPERATOR_IMAGE)]
+	@echo IMAGE_TAG: [$(IMAGE_TAG)]
+	@echo TARGET_PLATFORM: [$(TARGET_PLATFORM)]
+	@echo PLATFORM_PACKAGE_DIR: packages files directory
+	@echo PLATFORM_BUILD_MODE: build targets
+	@echo PLATFORM_OPTS: yaml file with all platform opts for installation
 
-platform-install-software: PLATFORM_KUBECONFIG PLATFORM_INSTALLER_DIR PLATFORM_INSTALLATION_MODE
-@echo ========== Target installs platform software on the top of the kubernetes ===============
-@echo Args:
-@echo PLATFORM_KUBECONFIG: Kubernetes config with permissions to install platform
-@echo PLATFORM_INSTALLER_DIR: installation files directory
-@echo PLATFORM_INSTALLATION_MODE: installation mode
-@echo PLATFORM_OPTS: yaml file with all platform opts for installation
-@echo Returns: kubernetes installation with PLATFORM_KUBECONFIG configuration file
-@echo =========================================================================================
+platform-install-software: PLATFORM_KUBECONFIG PLATFORM_INSTALLER_DIR PLATFORM_INSTALLATION_MODE $(PLATFORM_INSTALLATION_MODE)
+	@echo ========== Target installs platform software on the top of the kubernetes ===============
+	@echo Args:
+	@echo PLATFORM_KUBECONFIG: Kubernetes config with permissions to install platform
+	@echo PLATFORM_INSTALLER_DIR: installation files directory
+	@echo PLATFORM_INSTALLATION_MODE: installation mode
+	@echo PLATFORM_OPTS: yaml file with all platform opts for installation
+	@echo Returns: kubernetes installation with PLATFORM_KUBECONFIG configuration file
+	@echo =========================================================================================
 
+PLATFORM_%:
+	@ if [ "${PLATFORM_${*}}" = "" ]; then \
+	echo "Environment variable PLATFORM_$ is not set, please set one before run"; \
+	exit 1; \
+	fi
 
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
