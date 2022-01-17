@@ -225,6 +225,21 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 			r.EventRecorder.Eventf(o, "Warning", "OverrideValuesInUse",
 				"Chart value %q overridden to %q by operator's watches.yaml", k, v)
 		}
+
+		if r.GVK.Kind == "Notebook" && RHODSNotInstalled(ctx) {
+			log.Error(err, "Release failed")
+			status.SetCondition(types.HelmAppCondition{
+				Type:    types.ConditionReleaseFailed,
+				Status:  types.StatusTrue,
+				Reason:  types.PreconditionError,
+				Message: "RHODS operator is required to deploy the notebook image integration with the JupyterHub",
+			})
+			if err := r.updateResourceStatus(ctx, o, status); err != nil {
+				log.Error(err, "Failed to update status after install release failure")
+			}
+			return reconcile.Result{}, err
+		}
+
 		installedRelease, err := manager.InstallRelease(ctx)
 		if err != nil {
 			log.Error(err, "Release failed")
@@ -274,10 +289,10 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 			Name:     installedRelease.Name,
 			Manifest: installedRelease.Manifest,
 		}
-		status.SetScaling(
-			r.GVK.Kind, 
-			getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), 
-			manager.ReleaseName())
+
+		if r.GVK.Kind == "ModelServer" {
+			status.SetScaling(getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), manager.ReleaseName())
+		}
 
 		err = r.updateResourceStatus(ctx, o, status)
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
@@ -299,10 +314,25 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 			r.EventRecorder.Eventf(o, "Warning", "OverrideValuesInUse",
 				"Chart value %q overridden to %q by operator's watches.yaml", k, v)
 		}
+
+		if r.GVK.Kind == "Notebook" && RHODSNotInstalled(ctx) {
+			log.Error(err, "Release upgrade failed")
+			status.SetCondition(types.HelmAppCondition{
+				Type:    types.ConditionReleaseFailed,
+				Status:  types.StatusTrue,
+				Reason:  types.PreconditionError,
+				Message: "RHODS operator is required to deploy the notebook image integration with the JupyterHub",
+			})
+			if err := r.updateResourceStatus(ctx, o, status); err != nil {
+				log.Error(err, "Failed to update status after install release failure")
+			}
+			return reconcile.Result{}, err
+		}
+
 		force := hasAnnotation(helmUpgradeForceAnnotation, o)
 		previousRelease, upgradedRelease, err := manager.UpgradeRelease(ctx, release.ForceUpgrade(force))
 		if err != nil {
-			log.Error(err, "Release failed")
+			log.Error(err, "Release upgrade failed")
 			status.SetCondition(types.HelmAppCondition{
 				Type:    types.ConditionReleaseFailed,
 				Status:  types.StatusTrue,
@@ -342,10 +372,10 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 			Name:     upgradedRelease.Name,
 			Manifest: upgradedRelease.Manifest,
 		}
-		status.SetScaling(
-			r.GVK.Kind, 
-			getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), 
-			manager.ReleaseName())
+
+		if r.GVK.Kind == "ModelServer" {
+			status.SetScaling(getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), manager.ReleaseName())
+		}
 
 		err = r.updateResourceStatus(ctx, o, status)
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
@@ -358,6 +388,20 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	// need to remove the ConditionReleaseFailed because the failing release is
 	// no longer being attempted.
 	status.RemoveCondition(types.ConditionReleaseFailed)
+
+	if r.GVK.Kind == "Notebook" && RHODSNotInstalled(ctx) {
+		log.Error(err, "Failed to reconcile release")
+		status.SetCondition(types.HelmAppCondition{
+			Type:    types.ConditionReleaseFailed,
+			Status:  types.StatusTrue,
+			Reason:  types.PreconditionError,
+			Message: "RHODS operator is required to deploy the notebook image integration with the JupyterHub",
+		})
+		if err := r.updateResourceStatus(ctx, o, status); err != nil {
+			log.Error(err, "Failed to update status after install release failure")
+		}
+		return reconcile.Result{}, err
+	}
 
 	expectedRelease, err := manager.ReconcileRelease(ctx)
 	if err != nil {
@@ -402,10 +446,10 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		Name:     expectedRelease.Name,
 		Manifest: expectedRelease.Manifest,
 	}
-	status.SetScaling(
-		r.GVK.Kind, 
-		getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), 
-		manager.ReleaseName())
+
+	if r.GVK.Kind == "ModelServer" {
+		status.SetScaling(getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), manager.ReleaseName())
+	}
 
 	err = r.updateResourceStatus(ctx, o, status)
 	return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
@@ -440,6 +484,35 @@ func getReplicasStatus(ctx context.Context, releaseName string, namespace string
 	}
 	return int(deploy.Items[0].Status.AvailableReplicas)
 }
+
+func RHODSNotInstalled(ctx context.Context) bool {
+	fieldSelector := "metadata.name=rhods-operator"
+	rhods_namespace := "redhat-ods-operator"
+	cfg, err := config.GetConfig()
+	if err != nil {
+		log.Error(err, "Can not get api config")
+		return true
+	}
+	clientset, err := kubernetes.NewForConfig(cfg)
+	if err != nil {
+		log.Error(err, "Can not create a clientset")
+		return true
+	}
+	listOptions:= metav1.ListOptions{FieldSelector: fieldSelector}
+	k8sclient := clientset.AppsV1()
+	deploy, err := k8sclient.Deployments(rhods_namespace).List(ctx, listOptions)
+	if err != nil {
+		log.Error(err, "Can not list deployments")
+		return true
+	}
+	if len(deploy.Items) == 0 {
+		log.Info("RHODS operator is not detected")
+		return true
+	}
+	log.Info("RHODS installation detected")
+	return false
+}
+
 
 // returns the boolean representation of the annotation string
 // will return false if annotation is not set
