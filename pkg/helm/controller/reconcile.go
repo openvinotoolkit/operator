@@ -226,13 +226,15 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 				"Chart value %q overridden to %q by operator's watches.yaml", k, v)
 		}
 
-		if r.GVK.Kind == "Notebook" && RHODSNotInstalled(ctx) {
-			log.Error(err, "Release failed")
+		notebook_error := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
+
+		if notebook_error != "" {
+			log.Error(err, "Failed to install release")
 			status.SetCondition(types.HelmAppCondition{
 				Type:    types.ConditionReleaseFailed,
 				Status:  types.StatusTrue,
 				Reason:  types.PreconditionError,
-				Message: "RHODS operator is required to deploy the notebook image integration with the JupyterHub",
+				Message: notebook_error,
 			})
 			if err := r.updateResourceStatus(ctx, o, status); err != nil {
 				log.Error(err, "Failed to update status after install release failure")
@@ -315,16 +317,18 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 				"Chart value %q overridden to %q by operator's watches.yaml", k, v)
 		}
 
-		if r.GVK.Kind == "Notebook" && RHODSNotInstalled(ctx) {
-			log.Error(err, "Release upgrade failed")
+		notebook_error := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
+
+		if notebook_error != "" {
+			log.Error(err, "Failed to upgrade release")
 			status.SetCondition(types.HelmAppCondition{
 				Type:    types.ConditionReleaseFailed,
 				Status:  types.StatusTrue,
 				Reason:  types.PreconditionError,
-				Message: "RHODS operator is required to deploy the notebook image integration with the JupyterHub",
+				Message: notebook_error,
 			})
 			if err := r.updateResourceStatus(ctx, o, status); err != nil {
-				log.Error(err, "Failed to update status after install release failure")
+				log.Error(err, "Failed to update status after upgrade release failure")
 			}
 			return reconcile.Result{}, err
 		}
@@ -389,16 +393,18 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	// no longer being attempted.
 	status.RemoveCondition(types.ConditionReleaseFailed)
 
-	if r.GVK.Kind == "Notebook" && RHODSNotInstalled(ctx) {
+	notebook_error := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
+
+	if notebook_error != "" {
 		log.Error(err, "Failed to reconcile release")
 		status.SetCondition(types.HelmAppCondition{
 			Type:    types.ConditionReleaseFailed,
 			Status:  types.StatusTrue,
 			Reason:  types.PreconditionError,
-			Message: "RHODS operator is required to deploy the notebook image integration with the JupyterHub",
+			Message: notebook_error,
 		})
 		if err := r.updateResourceStatus(ctx, o, status); err != nil {
-			log.Error(err, "Failed to update status after install release failure")
+			log.Error(err, "Failed to update status after reconsile release failure")
 		}
 		return reconcile.Result{}, err
 	}
@@ -513,6 +519,20 @@ func RHODSNotInstalled(ctx context.Context) bool {
 	return false
 }
 
+// Returns error message if the release is for Notebook resource without the preconditinos met
+func ValidateNotebook(ctx context.Context, kind string, namespace string) string {
+	if kind != "Notebook"{
+		return ""
+	}
+	if namespace != "redhat-ods-applications"{
+		return "Notebook resource should be created in redhat-ods-applications project to integrate notebook image with the Jupyterhub"
+	}else{
+		if  RHODSNotInstalled(ctx) {
+			return "RHODS operator is required to deploy the notebook image integration with the JupyterHub"
+		}
+	}
+	return ""
+}
 
 // returns the boolean representation of the annotation string
 // will return false if annotation is not set
