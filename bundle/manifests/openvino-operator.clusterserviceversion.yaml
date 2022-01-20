@@ -66,7 +66,11 @@ metadata:
           "metadata": {
             "name": "openvino-notebook"
           },
-          "spec": {}
+          "spec": {
+            "git_ref": "main",
+            "image_tag": "v2022.1",
+            "auto_update_image": false
+          }
         }
       ]
     capabilities: Basic Install
@@ -308,12 +312,31 @@ spec:
             displayName: sequence_cleaner_poll_wait_minutes
             path: server_settings.sequence_cleaner_poll_wait_minutes
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:advanced'                             
-
-          
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced'                                       
         version: v1alpha1
+        
       - kind: Notebook
         name: notebooks.intel.com
+        specDescriptors:
+          - description: >-
+              Git reference in the repository 
+            displayName: Git reference
+            path: git_ref
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - description: >-
+              Image tag name
+            displayName: Image tag name
+            path: git_ref
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - description: >-
+              Automatic update of the image
+            displayName: Automatic image updates
+            path: auto_update_image
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced'
+              - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
         version: v1alpha1
   description: |
     OpenVINO Toolkit Operator manages OpenVINO components in OpenShift.

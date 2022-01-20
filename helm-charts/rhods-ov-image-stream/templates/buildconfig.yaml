@@ -19,16 +19,16 @@ apiVersion: build.openshift.io/v1
 metadata:
   labels:
     build: openvino-notebook
-  name: openvino-notebook
+  name: {{ template "notebook.fullname" . }}
 spec:
   output:
     to:
       kind: ImageStreamTag
-      name: openvino-notebook:latest
+      name: openvino-notebook:{{ .Values.image_tag }}
   source:
     git:
       uri: https://github.com/openvinotoolkit/openvino_notebooks
-      ref: main
+      ref: "{{ .Values.git_ref }}"
     type: Git
   postCommit: {}
   strategy:
