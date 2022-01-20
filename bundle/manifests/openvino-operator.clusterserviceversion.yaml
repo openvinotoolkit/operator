@@ -64,11 +64,10 @@ metadata:
           "apiVersion": "intel.com/v1alpha1",
           "kind": "Notebook",
           "metadata": {
-            "name": "openvino-notebook"
+            "name": "v2022.1"
           },
           "spec": {
             "git_ref": "main",
-            "image_tag": "v2022.1",
             "auto_update_image": false
           }
         }
@@ -319,14 +318,9 @@ spec:
         name: notebooks.intel.com
         specDescriptors:
           - description: >-
-              Git reference in the repository 
+              Git reference in the repository https://github.com/openvinotoolkit/openvino_notebooks. 
+              The docker image will be build using that code version.
             displayName: Git reference
-            path: git_ref
-            x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'
-          - description: >-
-              Image tag name
-            displayName: Image tag name
             path: git_ref
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'

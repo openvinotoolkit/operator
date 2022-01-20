@@ -31,7 +31,7 @@ spec:
   lookupPolicy:
     local: true
   tags:
-    - name: {{ .Values.image_tag }}
+    - name: {{ .Release.Name }}
       annotations:
         opendatahub.io/notebook-python-dependencies: >-
           [{"name":"JupyterLab","version":"3.0.14"},{"name":"Notebook","version":"6.3.0"}]

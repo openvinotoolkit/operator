@@ -24,7 +24,7 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: openvino-notebook:{{ .Values.image_tag }}
+      name: openvino-notebook:{{ .Release.Name }}
   source:
     git:
       uri: https://github.com/openvinotoolkit/openvino_notebooks
