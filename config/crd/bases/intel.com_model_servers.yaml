@@ -41,7 +41,7 @@ spec:
             metadata:
               type: object
             spec:
-              description: Spec defines the desired state of Ovms
+              description: Spec defines the desired state of Model1server
               type: object
               required:
                 - image_name

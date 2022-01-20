@@ -308,12 +308,24 @@ spec:
             displayName: sequence_cleaner_poll_wait_minutes
             path: server_settings.sequence_cleaner_poll_wait_minutes
             x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:advanced'                             
-
-          
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced'                                       
         version: v1alpha1
+        
       - kind: Notebook
         name: notebooks.intel.com
+        specDescriptors:
+          - description: >-
+              Git reference in the repository 
+            displayName: Git reference
+            path: git_ref
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - description: >-
+              Image tag name
+            displayName: Image tag name
+            path: git_ref
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'                              
         version: v1alpha1
   description: |
     OpenVINO Toolkit Operator manages OpenVINO components in OpenShift.

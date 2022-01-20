@@ -26,9 +26,20 @@ spec:
             metadata:
               type: object
             spec:
-              description: Spec defines the desired state of Notebook
+              description: Spec defines the desired state of Model1server
               type: object
-              x-kubernetes-preserve-unknown-fields: true
+              required:
+                - git_ref
+              properties:
+                git_ref:
+                  description: Git reference in notebook repository to build the docker image
+                  type: string
+                  default: main
+                image_tag:
+                  description: Tag name of the image to be built
+                  type: string
+                  default: 2022.1
+                                      
             status:
               description: Status defines the observed state of Notebook
               type: object
