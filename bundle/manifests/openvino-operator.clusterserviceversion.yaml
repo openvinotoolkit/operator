@@ -313,19 +313,6 @@ spec:
         
       - kind: Notebook
         name: notebooks.intel.com
-        specDescriptors:
-          - description: >-
-              Git reference in the repository 
-            displayName: Git reference
-            path: git_ref
-            x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'
-          - description: >-
-              Image tag name
-            displayName: Image tag name
-            path: git_ref
-            x-descriptors:
-              - 'urn:alm:descriptor:com.tectonic.ui:text'                              
         version: v1alpha1
   description: |
     OpenVINO Toolkit Operator manages OpenVINO components in OpenShift.
