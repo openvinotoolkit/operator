@@ -2,6 +2,11 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
+    alm-examples-metadata: >-
+      {
+      "model-server-sample":{"description":"Example of the model server configuration"},
+      "v2022.1":{"description":"Default notebook configuration"}
+      }
     alm-examples: |-
       [
         {
@@ -22,7 +27,7 @@ metadata:
             "models_settings": {
               "single_model_mode": true,
               "config_configmap_name": "",
-              "model_config": ""              
+              "model_config": "",
               "model_name": "resnet",
               "model_path": "gs://ovms-public-eu/resnet50-binary",
               "nireq": 0,
@@ -36,7 +41,6 @@ metadata:
               "idle_sequence_cleanup": false,
               "low_latency_transformation": true,
               "max_sequence_number": 0
-              }
             },
             "server_settings": {
               "file_system_poll_wait_seconds": 0,
