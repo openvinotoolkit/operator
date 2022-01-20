@@ -310,7 +310,6 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'                                       
         version: v1alpha1
-        
       - kind: Notebook
         name: notebooks.intel.com
         version: v1alpha1
