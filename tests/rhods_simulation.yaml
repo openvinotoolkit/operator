@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: redhat-ods-operator
+  name: rhods-operator
+  labels:
+    olm.owner.namespace: redhat-ods-operator
+    operators.coreos.com/rhods-operator.redhat-ods-operator: ''
+spec:
+  selector:
+    matchLabels:
+      name: rhods-operator
+  template:
+    metadata:
+      labels:
+        name: rhods-operator
+    spec:
+      containers:
+      - image: k8s.gcr.io/echoserver:1.4
+        name: rhods-operator
+
+      
