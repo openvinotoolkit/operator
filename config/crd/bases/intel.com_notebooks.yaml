@@ -26,7 +26,7 @@ spec:
             metadata:
               type: object
             spec:
-              description: Spec defines the desired state of Model1server
+              description: Spec defines the desired state of Notebook
               type: object
               properties:
                 git_ref:
