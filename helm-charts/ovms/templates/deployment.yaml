@@ -49,15 +49,15 @@ spec:
       affinity:
 {{- if .Values.deployment_parameters.node_affinity }}
         nodeAffinity:
-{{ toYaml  .Values.models_repository.node_affinity | indent 8 }}
+{{ toYaml  .Values.deployment_parameters.node_affinity | indent 10 }}
 {{- end }}
 {{- if .Values.deployment_parameters.pod_affinity }}
         podAffinity:
-{{ toYaml  .Values.models_repository.pod_affinity | indent 8 }}
+{{ toYaml  .Values.deployment_parameters.pod_affinity | indent 10 }}
 {{- end }}
 {{- if .Values.deployment_parameters.pod_antiaffinity }}
         podAntiAffinity:
-{{ toYaml  .Values.models_repository.pod_antiaffinity | indent 8 }}
+{{ toYaml  .Values.deployment_parameters.pod_antiaffinity | indent 10 }}
 {{- end }}
       containers:
       - name: ovms
@@ -152,6 +152,15 @@ spec:
                {{- if .Values.server_settings.file_system_poll_wait_seconds }}
                "--file_system_poll_wait_seconds", "{{ .Values.server_settings.file_system_poll_wait_seconds }}",
                {{- end }}
+               {{- if .Values.server_settings.grpc_workers }}
+               "--grpc_workers", "{{ .Values.server_settings.grpc_workers }}",
+               {{- end }}
+               {{- if .Values.server_settings.rest_workers }}
+               "--rest_workers", "{{ .Values.server_settings.rest_workers }}",
+               {{- end }}
+               {{- if .Values.server_settings.sequence_cleaner_poll_wait_minutes }}
+               "--sequence_cleaner_poll_wait_minutes", "{{ .Values.server_settings.sequence_cleaner_poll_wait_minutes }}",
+               {{- end }}                            
                "--port", "8080",
                "--rest_port", "8081"]
         {{- if or .Values.models_repository.gcp_creds_secret_name .Values.models_settings.config_configmap_name .Values.models_repository.models_host_path .Values.models_repository.models_volume_claim}}
