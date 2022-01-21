@@ -2,6 +2,11 @@ apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
+    alm-examples-metadata: >-
+      {
+      "model-server-sample":{"description":"Example of the model server configuration"},
+      "v2022.1":{"description":"Default notebook configuration"}
+      }
     alm-examples: |-
       [
         {
@@ -22,14 +27,14 @@ metadata:
             "models_settings": {
               "single_model_mode": true,
               "config_configmap_name": "",
-              "model_config": "",     
+              "model_config": "",
               "model_name": "resnet",
               "model_path": "gs://ovms-public-eu/resnet50-binary",
               "nireq": 0,
               "plugin_config": "{\"CPU_THROUGHPUT_STREAMS\":1}",
               "batch_size": "",
               "shape": "",
-              "model_version_policy": "",
+              "model_version_policy": "{\"latest\": { \"num_versions\":1 }}",
               "layout": "",
               "target_device": "CPU",
               "is_stateful": false,
@@ -63,9 +68,11 @@ metadata:
           "apiVersion": "intel.com/v1alpha1",
           "kind": "Notebook",
           "metadata": {
-            "name": "openvino-notebook"
+            "name": "v2022.1"
           },
-          "spec": {          
+          "spec": {
+            "git_ref": "main",
+            "auto_update_image": false
           }
         }
       ]
@@ -310,8 +317,24 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'                                       
         version: v1alpha1
+        
       - kind: Notebook
         name: notebooks.intel.com
+        specDescriptors:
+          - description: >-
+              Git reference in the repository https://github.com/openvinotoolkit/openvino_notebooks. 
+              The docker image will be build using that code version.
+            displayName: Git reference
+            path: git_ref
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:text'
+          - description: >-
+              Automatic update of the image
+            displayName: Automatic image updates
+            path: auto_update_image
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:advanced'
+              - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
         version: v1alpha1
   description: |
     OpenVINO Toolkit Operator manages OpenVINO components in OpenShift.

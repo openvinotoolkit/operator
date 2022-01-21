@@ -15,4 +15,7 @@
 #
 
 image_name: "registry.access.redhat.com/intel/openvino_notebooks:latest"
+git_ref: main
+image_tag: 2022.1
+auto_update_image: false
 build_locally: "true"

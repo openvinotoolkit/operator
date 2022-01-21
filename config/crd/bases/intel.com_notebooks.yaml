@@ -28,7 +28,15 @@ spec:
             spec:
               description: Spec defines the desired state of Notebook
               type: object
-              x-kubernetes-preserve-unknown-fields: true
+              properties:
+                git_ref:
+                  description: Git reference in notebook repository to build the docker image
+                  type: string
+                  default: main
+                auto_update_image:
+                  description: Enable automatic updates of the image based on git repository changes
+                  type: boolean
+                  default: false
             status:
               description: Status defines the observed state of Notebook
               type: object

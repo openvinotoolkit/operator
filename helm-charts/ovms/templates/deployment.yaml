@@ -181,13 +181,13 @@ spec:
 {{- end }}        
         resources:
           limits:
-{{ if .Values.deployment_parameters.resources.limits.cpu }}
+{{ if (((.Values.deployment_parameters.resources).limits).cpu) }}
             cpu: {{ .Values.deployment_parameters.resources.limits.cpu }}
 {{- end }}
-{{ if .Values.deployment_parameters.resources.limits.memory }}
+{{ if (((.Values.deployment_parameters.resources).limits).memory) }}
             memory: {{ .Values.deployment_parameters.resources.limits.memory }}
 {{- end }}
-{{ if .Values.deployment_parameters.resources.limits.xpu_device }}
+{{ if (((.Values.deployment_parameters.resources).limits).xpu_device) }}
             {{ .Values.deployment_parameters.resources.limits.xpu_device }}: {{ .Values.deployment_parameters.resources.limits.xpu_device_quantity }}
 {{- end }}
       {{- if or .Values.models_repository.gcp_creds_secret_name .Values.models_settings.config_configmap_name .Values.models_repository.models_volume_claim .Values.models_repository.models_host_path }}

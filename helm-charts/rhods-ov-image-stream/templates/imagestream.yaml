@@ -17,7 +17,7 @@
 apiVersion: image.openshift.io/v1
 kind: "ImageStream"
 metadata:
-  name: "openvino-notebook"
+  name: {{ template "notebook.fullname" . }}
   labels:
     application: openvino-notebook
     opendatahub.io/notebook-image: "true"
@@ -31,7 +31,7 @@ spec:
   lookupPolicy:
     local: true
   tags:
-    - name: latest
+    - name: {{ .Release.Name }}
       annotations:
         opendatahub.io/notebook-python-dependencies: >-
           [{"name":"JupyterLab","version":"3.0.14"},{"name":"Notebook","version":"6.3.0"}]
