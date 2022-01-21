@@ -72,6 +72,7 @@ const (
 	ReasonUpgradeError        HelmAppConditionReason = "UpgradeError"
 	ReasonReconcileError      HelmAppConditionReason = "ReconcileError"
 	ReasonUninstallError      HelmAppConditionReason = "UninstallError"
+	PreconditionError      	  HelmAppConditionReason = "PreconditionError"
 )
 
 type HelmAppStatus struct {
@@ -133,11 +134,9 @@ func (s *HelmAppStatus) RemoveCondition(conditionType HelmAppConditionType) *Hel
 
 // SetScaling sets the status atributes related to horizontal and vertical 
 // scaling. They can be used by HPA and VPA opertors
-func (s *HelmAppStatus) SetScaling(kind string, replicas int, releaseName string) *HelmAppStatus {
-	if kind == "ModelServer" {
-		s.LabelSelector = "release=" + releaseName
-		s.Replicas = replicas
-	}
+func (s *HelmAppStatus) SetScaling(replicas int, releaseName string) *HelmAppStatus {
+	s.LabelSelector = "release=" + releaseName
+	s.Replicas = replicas
 	return s
 }
 

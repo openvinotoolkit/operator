@@ -1,0 +1,6 @@
+apiVersion: intel.com/v1alpha1
+kind: Notebook
+metadata:
+  name: openvino-notebook
+
+spec: {}

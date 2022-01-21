@@ -25,7 +25,7 @@ export GO111MODULE = on
 export CGO_ENABLED = 0
 export PATH := $(PWD)/$(BUILD_DIR):$(PATH)
 
-ifneq ($(PLATFORM_KUBECONFIG), "")
+ifneq ($(PLATFORM_KUBECONFIG), )
 export KUBECONFIG=$(PLATFORM_KUBECONFIG)
 endif
 
