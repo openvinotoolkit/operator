@@ -7,6 +7,12 @@ spec:
   deployment_parameters:
     replicas: 1
     openshift_service_mesh: false
+    resources:
+      limits:
+        cpu: "1"
+        memory: "350Mi"
+        xpu_device: "intel.com/gpu"
+        xpu_device_quantity: "3"
   models_settings:
     single_model_mode: true
     config_configmap_name: ""
@@ -17,7 +23,7 @@ spec:
     plugin_config: '{"CPU_THROUGHPUT_STREAMS":"1"}'
     batch_size: ""
     shape: ""
-    model_version_policy: '{"latest": {"num_versions":1 }}'
+    model_version_policy: "{\"latest\": {\"num_versions\":1 }}"
     layout: ""
     target_device: "CPU"
     is_stateful: false
@@ -28,16 +34,10 @@ spec:
     file_system_poll_wait_seconds: 0
     sequence_cleaner_poll_wait_minutes: 0
     log_level: "INFO"
-    grpc_workers: 1
-    rest_workers: 0
   service_parameters:
     port_grpc: 8080
     port_rest: 8081
     service_type: ClusterIP
   models_repository:
-    storage_type: google
-
-
-
-
-  
+    storage_type: "google"
+ 
