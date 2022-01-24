@@ -10,9 +10,10 @@ spec:
     resources:
       limits:
         cpu: "1"
-        memory: "350Mi"
-        xpu_device: "intel.com/gpu"
-        xpu_device_quantity: "3"
+        memory: "400Mi"
+      requests:
+        cpu: "1"
+        memory: "400Mi"
   models_settings:
     single_model_mode: true
     config_configmap_name: ""
