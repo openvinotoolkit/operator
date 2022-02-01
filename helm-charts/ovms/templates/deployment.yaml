@@ -46,8 +46,8 @@ spec:
         chart: {{ template "ovms.chart" . }}
         app: {{ template "ovms.fullname" . }}
     spec:
+{{- if .Values.deployment_parameters.node_affinity }}    
       affinity:
-{{- if .Values.deployment_parameters.node_affinity }}
         nodeAffinity:
 {{ toYaml  .Values.deployment_parameters.node_affinity | indent 10 }}
 {{- end }}
@@ -181,23 +181,35 @@ spec:
           mountPath: "/models"
           readOnly: true
         {{- end }}
+{{- if or .Values.models_repository.runAsUser .Values.models_repository.runAsGroup }}
         securityContext:
 {{- if .Values.models_repository.runAsUser }}
           runAsUser: {{ .Values.models_repository.runAsUser  }}
 {{- end }}
 {{- if .Values.models_repository.runAsGroup }}
           runAsGroup: {{ .Values.models_repository.runAsGroup  }}
-{{- end }}        
+{{- end }}
+{{- end }}
         resources:
           limits:
 {{ if (((.Values.deployment_parameters.resources).limits).cpu) }}
-            cpu: {{ .Values.deployment_parameters.resources.limits.cpu }}
+            cpu: "{{ .Values.deployment_parameters.resources.limits.cpu }}"
 {{- end }}
 {{ if (((.Values.deployment_parameters.resources).limits).memory) }}
             memory: {{ .Values.deployment_parameters.resources.limits.memory }}
 {{- end }}
 {{ if (((.Values.deployment_parameters.resources).limits).xpu_device) }}
-            {{ .Values.deployment_parameters.resources.limits.xpu_device }}: {{ .Values.deployment_parameters.resources.limits.xpu_device_quantity }}
+            {{ .Values.deployment_parameters.resources.limits.xpu_device }}: "{{ .Values.deployment_parameters.resources.limits.xpu_device_quantity }}"
+{{- end }}
+          requests:
+{{ if (((.Values.deployment_parameters.resources).requests).cpu) }}
+            cpu: "{{ .Values.deployment_parameters.resources.requests.cpu }}"
+{{- end }}
+{{ if (((.Values.deployment_parameters.resources).requests).memory) }}
+            memory: {{ .Values.deployment_parameters.resources.requests.memory }}
+{{- end }}
+{{ if (((.Values.deployment_parameters.resources).requests).xpu_device) }}
+            {{ .Values.deployment_parameters.resources.requests.xpu_device }}: "{{ .Values.deployment_parameters.resources.requests.xpu_device_quantity }}"
 {{- end }}
       {{- if or .Values.models_repository.gcp_creds_secret_name .Values.models_settings.config_configmap_name .Values.models_repository.models_volume_claim .Values.models_repository.models_host_path }}
       volumes:

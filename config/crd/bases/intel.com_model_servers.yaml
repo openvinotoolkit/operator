@@ -72,6 +72,7 @@ spec:
                       x-kubernetes-preserve-unknown-fields: true
                     openshift_service_mesh:
                       type: boolean
+                      default: false
                     resources:
                       description: Resources for Model Serving server
                       type: object
@@ -83,11 +84,11 @@ spec:
                               type: string
                             memory:
                               type: string
-                            xpu-device:
+                            xpu_device:
                               description: >-
                                 The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes
                               type: string
-                            xpu-device_quantity:
+                            xpu_device_quantity:
                               type: string
                               default: "1"
                         requests:
@@ -97,11 +98,11 @@ spec:
                               type: string
                             memory:
                               type: string
-                            xpu-device:
+                            xpu_device:
                               description: >-
                                 The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes
                               type: string
-                            xpu-device_quantity:
+                            xpu_device_quantity:
                               type: string
                               default: "1"                                    
                 service_parameters:
@@ -280,7 +281,7 @@ spec:
         scale:
           specReplicasPath: .spec.deployment_parameters.replicas
           statusReplicasPath: .status.replicas
-          labelSelectorPath: .status.labelSelector        
+          labelSelectorPath: .status.labelSelector
   conversion:
     strategy: None
 status:
