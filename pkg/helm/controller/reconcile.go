@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -37,6 +38,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
+	resty "github.com/go-resty/resty/v2"
 	"github.com/openvinotoolkit/openshift_operator/pkg/helm/internal/diff"
 	"github.com/openvinotoolkit/openshift_operator/pkg/helm/internal/types"
 	"github.com/openvinotoolkit/openshift_operator/pkg/helm/release"
@@ -334,6 +336,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		}
 
 		force := hasAnnotation(helmUpgradeForceAnnotation, o)
+		println("Starting upgrade")
 		previousRelease, upgradedRelease, err := manager.UpgradeRelease(ctx, release.ForceUpgrade(force))
 		if err != nil {
 			log.Error(err, "Release upgrade failed")
@@ -380,8 +383,10 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		if r.GVK.Kind == "ModelServer" {
 			status.SetScaling(getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), manager.ReleaseName())
 		}
-
+		println("Updating status after upgrade.")
 		err = r.updateResourceStatus(ctx, o, status)
+		println("Updated status after upgrade finished. Will sleep 1s")
+		time.Sleep(time.Second)
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 	}
 
@@ -392,6 +397,8 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	// need to remove the ConditionReleaseFailed because the failing release is
 	// no longer being attempted.
 	status.RemoveCondition(types.ConditionReleaseFailed)
+
+	println("Start reconciling release", r.GVK.Kind)
 
 	notebook_error := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
 
@@ -425,7 +432,6 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	}
 	status.RemoveCondition(types.ConditionIrreconcilable)
 
-
 	if r.releaseHook != nil {
 		if err := r.releaseHook(expectedRelease); err != nil {
 			log.Error(err, "Failed to run release hook")
@@ -456,9 +462,83 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	if r.GVK.Kind == "ModelServer" {
 		status.SetScaling(getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), manager.ReleaseName())
 	}
-
+	println("Updating status after reconcile. wait 1s")
 	err = r.updateResourceStatus(ctx, o, status)
+	if err != nil {
+		println("error", err.Error())
+	}
+	if r.GVK.Kind == "Notebook"{	
+		if is_auto, ok := manager.GetValues()["auto_update_image"].(bool); ok && is_auto  {
+			if branch, ok := manager.GetValues()["git_ref"].(string); ok {
+				ref := getGithubRef(branch, manager.GetValues()["git_uri"].(string) )
+				if ref != "" {
+					commit, _ := manager.GetValues()["commit"].(string)
+					println("Received commit from github", ref)
+					println("Old commit from CR", commit)
+					if commit != ref {
+						manager.SetValue("commit", ref)
+						new_spec := types.HelmAppSpec{
+							"git_ref": branch,
+							"auto_update_image": true,
+							"commit": ref,
+						}
+						o.Object["spec"] = new_spec
+						err := r.updateResource(ctx,o)
+						if err == nil{
+							println("UPDATED NOTEBOOK RESOURCE")
+						}else{
+							println("FAILED TO UPDATE NOTEBOOK RESOURCE", err.Error())
+						}
+					} else {
+						println("commit is not changed")
+					}
+				} else {
+					println("empty github commit")
+				}
+			} else {
+				println("missing branch name")
+			}
+		} else {
+			println("auto not bool")
+		}
+
+		return reconcile.Result{RequeueAfter: r.ReconcilePeriod * 5}, err
+	}
+	
 	return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
+}
+
+
+func getGithubRef(branch string, uri string) string {
+	type GithubResponse struct {
+		Sha    string    `json:"sha"`
+		Commit interface{} `json:"commit"`
+	}
+
+	// Create a Resty Client
+	client := resty.New()
+    var GithubResponseobj GithubResponse
+	url := getAPIUrl(uri, branch)
+	println("url", url)
+	if url == "" {
+		return ""
+	}
+	_, err := client.R().SetResult(&GithubResponseobj).Get(url)
+    if err != nil {
+		println("error:", err.Error())
+		log.Error(err, "Can not connected to notebook github repository")
+		return ""
+	}
+	return GithubResponseobj.Sha
+}
+
+func getAPIUrl(uri string, branch string) string{
+	re := regexp.MustCompile(`https://github.com/(.*\/.*)`)
+	match := re.FindStringSubmatch(uri)
+	if match != nil {
+		return "https://api.github.com/repos/" + match[1] + "/commits/" + branch
+	}
+	return ""
 }
 
 func getReplicasStatus(ctx context.Context, releaseName string, namespace string) int {

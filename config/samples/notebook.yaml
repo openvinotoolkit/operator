@@ -1,6 +1,7 @@
 apiVersion: intel.com/v1alpha1
 kind: Notebook
 metadata:
-  name: openvino-notebook
-
-spec: {}
+  name: v2022.1
+spec:
+  auto_update_image: true
+  git_ref: main

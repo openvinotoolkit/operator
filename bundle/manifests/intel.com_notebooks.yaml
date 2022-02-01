@@ -37,6 +37,13 @@ spec:
                   description: Enable automatic updates of the image based on git repository changes
                   type: boolean
                   default: false
+                commit:
+                  description: Git reference in notebook repository to build the docker image
+                  type: string
+                git_uri:
+                  description: Git reference in notebook repository to build the docker image
+                  type: string
+                  default: https://github.com/openvinotoolkit/openvino_notebooks
             status:
               description: Status defines the observed state of Notebook
               type: object
