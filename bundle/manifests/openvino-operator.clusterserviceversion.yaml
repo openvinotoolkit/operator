@@ -336,13 +336,13 @@ spec:
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
               - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
           - description: >-
-              HIDDEN FIELD 
+              HIDDEN FIELD
             displayName: HIDDEN FIELD git_uri
             path: git_uri
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:hidden'
           - description: >-
-              HIDDEN FIELD 
+              HIDDEN FIELD
             displayName: HIDDEN FIELD commit
             path: commit
             x-descriptors:
