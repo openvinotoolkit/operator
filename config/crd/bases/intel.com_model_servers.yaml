@@ -201,10 +201,10 @@ spec:
                       type: string
                       default: INFO
                       enum:
-                        - INFO
                         - DEBUG
+                        - INFO
+                        - WARNING
                         - ERROR
-                        - TRACE
                     grpc_workers:
                       description: Number of gRPC servers. Default 1. Increase for multi client, high throughput scenarios
                       type: integer
