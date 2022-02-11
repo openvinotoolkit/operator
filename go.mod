@@ -4,47 +4,34 @@ module github.com/openvinotoolkit/openshift_operator
 go 1.16
 
 require (
-	github.com/blang/semver/v4 v4.0.0
-	github.com/fatih/structtag v1.1.0
-	github.com/go-logr/logr v0.3.0
-	github.com/iancoleman/strcase v0.0.0-20191112232945-16388991a334
-	github.com/kr/text v0.1.0
-	github.com/markbates/inflect v1.0.4
-	github.com/maxbrunsfeld/counterfeiter/v6 v6.2.2
+	github.com/go-openapi/spec v0.19.5 // indirect
+	github.com/go-resty/resty/v2 v2.7.0
+	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/onsi/ginkgo v1.15.2
 	github.com/onsi/gomega v1.11.0
-	github.com/operator-framework/api v0.8.2-0.20210526151024-41d37db9141f
-	github.com/operator-framework/java-operator-plugins v0.0.0-20210629174633-88afbd6d98b2
+	github.com/operator-framework/api v0.8.2-0.20210526151024-41d37db9141f // indirect
 	github.com/operator-framework/operator-lib v0.4.1
 	github.com/operator-framework/operator-registry v1.15.3
 	github.com/prometheus/client_golang v1.7.1
-	github.com/prometheus/client_model v0.2.0
-	github.com/prometheus/common v0.10.0 // indirect
 	github.com/sergi/go-diff v1.1.0
 	github.com/sirupsen/logrus v1.7.0
-	github.com/spf13/afero v1.2.2
 	github.com/spf13/cobra v1.1.1
 	github.com/spf13/pflag v1.0.5
-	github.com/spf13/viper v1.7.0
 	github.com/stretchr/testify v1.6.1
-	github.com/thoas/go-funk v0.8.0
+	golang.org/x/crypto v0.0.0-20201012173705-84dcc777aaee // indirect
 	golang.org/x/lint v0.0.0-20210508222113-6edffad5e616 // indirect
-	golang.org/x/mod v0.4.2
 	golang.org/x/sys v0.0.0-20210521090106-6ca3eb03dfc2 // indirect
-	golang.org/x/tools v0.1.1
+	golang.org/x/tools v0.1.1 // indirect
 	gomodules.xyz/jsonpatch/v3 v3.0.1
 	helm.sh/helm/v3 v3.4.1
 	k8s.io/api v0.20.2
 	k8s.io/apiextensions-apiserver v0.20.2
 	k8s.io/apimachinery v0.20.2
-	k8s.io/apiserver v0.20.2 // indirect
 	k8s.io/cli-runtime v0.20.2
 	k8s.io/client-go v0.20.2
-	k8s.io/kubectl v0.20.2
+	k8s.io/kubectl v0.20.2 // indirect
 	rsc.io/letsencrypt v0.0.3 // indirect
 	sigs.k8s.io/controller-runtime v0.8.3
-	sigs.k8s.io/controller-tools v0.5.0
-	sigs.k8s.io/kubebuilder/v3 v3.0.0-beta.1
 	sigs.k8s.io/yaml v1.2.0
 )
 
