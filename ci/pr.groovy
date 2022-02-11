@@ -13,6 +13,12 @@ pipeline {
           }
         }
 
+        stage('build check') {
+            steps {
+                sh 'make build'
+            }
+        }
+
         stage('style check') {
             steps {
                 sh 'make style'
@@ -25,11 +31,18 @@ pipeline {
             }
         }
 
+        stage('unit check') {
+            steps {
+                sh 'make test-unit'
+            }
+        }
+
         stage('docker build check') {
             steps {
                 sh 'make docker_build'
             }
         }
+
 
     }
 }
