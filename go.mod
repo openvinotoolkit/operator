@@ -3,10 +3,8 @@ module github.com/openvinotoolkit/openshift_operator
 go 1.17
 
 require (
-	github.com/bshuster-repo/logrus-logstash-hook v1.0.2 // indirect
 	github.com/onsi/ginkgo v1.16.5
 	github.com/onsi/gomega v1.17.0
-	github.com/operator-framework/api v0.8.2-0.20210526151024-41d37db9141f // indirect
 	github.com/operator-framework/operator-lib v0.4.1
 	github.com/operator-framework/operator-registry v1.15.3
 	github.com/prometheus/client_golang v1.11.0
@@ -22,7 +20,6 @@ require (
 	k8s.io/apimachinery v0.23.1
 	k8s.io/cli-runtime v0.23.1
 	k8s.io/client-go v0.23.1
-	rsc.io/letsencrypt v0.0.3 // indirect
 	sigs.k8s.io/controller-runtime v0.11.0
 	sigs.k8s.io/yaml v1.3.0
 )
@@ -47,6 +44,7 @@ require (
 	github.com/asaskevich/govalidator v0.0.0-20200428143746-21a406dcc535 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
+	github.com/bshuster-repo/logrus-logstash-hook v1.0.2 // indirect
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/chai2010/gettext-go v0.0.0-20160711120539-c6fed771bfd5 // indirect
 	github.com/containerd/containerd v1.5.9 // indirect
@@ -112,6 +110,7 @@ require (
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
+	github.com/operator-framework/api v0.8.2-0.20210526151024-41d37db9141f // indirect
 	github.com/peterbourgon/diskv v2.0.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -156,9 +155,9 @@ require (
 	k8s.io/kubectl v0.23.1 // indirect
 	k8s.io/utils v0.0.0-20210930125809-cb0fa318a74b // indirect
 	oras.land/oras-go v1.1.0 // indirect
+	rsc.io/letsencrypt v0.0.3 // indirect
 	sigs.k8s.io/json v0.0.0-20211020170558-c049b76a60c6 // indirect
 	sigs.k8s.io/kustomize/api v0.10.1 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.13.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.0 // indirect
 )
-
