@@ -192,6 +192,13 @@ PLATFORM_%:
 	exit 1; \
 	fi
 
+style:
+	docker run --rm -v $$(pwd):/app -w /app golangci/golangci-lint:v1.44.0 golangci-lint run -E stylecheck --disable-all -v
+
+lint:
+	docker run --rm -v $$(pwd):/app -w /app golangci/golangci-lint:v1.44.0 golangci-lint run --skip-dirs ../go/pkg/mod -v
+
+
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m | sed 's/x86_64/amd64/')
 

@@ -226,15 +226,15 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 				"Chart value %q overridden to %q by operator's watches.yaml", k, v)
 		}
 
-		notebook_error := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
+		notebookError := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
 
-		if notebook_error != "" {
+		if notebookError != "" {
 			log.Error(err, "Failed to install release")
 			status.SetCondition(types.HelmAppCondition{
 				Type:    types.ConditionReleaseFailed,
 				Status:  types.StatusTrue,
 				Reason:  types.PreconditionError,
-				Message: notebook_error,
+				Message: notebookError,
 			})
 			if err := r.updateResourceStatus(ctx, o, status); err != nil {
 				log.Error(err, "Failed to update status after install release failure")
@@ -317,15 +317,15 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 				"Chart value %q overridden to %q by operator's watches.yaml", k, v)
 		}
 
-		notebook_error := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
+		notebookError := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
 
-		if notebook_error != "" {
+		if notebookError != "" {
 			log.Error(err, "Failed to upgrade release")
 			status.SetCondition(types.HelmAppCondition{
 				Type:    types.ConditionReleaseFailed,
 				Status:  types.StatusTrue,
 				Reason:  types.PreconditionError,
-				Message: notebook_error,
+				Message: notebookError,
 			})
 			if err := r.updateResourceStatus(ctx, o, status); err != nil {
 				log.Error(err, "Failed to update status after upgrade release failure")
@@ -393,15 +393,15 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	// no longer being attempted.
 	status.RemoveCondition(types.ConditionReleaseFailed)
 
-	notebook_error := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
+	notebookError := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
 
-	if notebook_error != "" {
+	if notebookError != "" {
 		log.Error(err, "Failed to reconcile release")
 		status.SetCondition(types.HelmAppCondition{
 			Type:    types.ConditionReleaseFailed,
 			Status:  types.StatusTrue,
 			Reason:  types.PreconditionError,
-			Message: notebook_error,
+			Message: notebookError,
 		})
 		if err := r.updateResourceStatus(ctx, o, status); err != nil {
 			log.Error(err, "Failed to update status after reconsile release failure")
@@ -493,7 +493,7 @@ func getReplicasStatus(ctx context.Context, releaseName string, namespace string
 
 func RHODSNotInstalled(ctx context.Context) bool {
 	fieldSelector := "metadata.name=rhods-operator"
-	rhods_namespace := "redhat-ods-operator"
+	rhodsNamespace := "redhat-ods-operator"
 	cfg, err := config.GetConfig()
 	if err != nil {
 		log.Error(err, "Can not get api config")
@@ -506,7 +506,7 @@ func RHODSNotInstalled(ctx context.Context) bool {
 	}
 	listOptions:= metav1.ListOptions{FieldSelector: fieldSelector}
 	k8sclient := clientset.AppsV1()
-	deploy, err := k8sclient.Deployments(rhods_namespace).List(ctx, listOptions)
+	deploy, err := k8sclient.Deployments(rhodsNamespace).List(ctx, listOptions)
 	if err != nil {
 		log.Error(err, "Can not list deployments")
 		return true
