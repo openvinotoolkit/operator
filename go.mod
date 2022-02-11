@@ -162,4 +162,3 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.0 // indirect
 )
 
-//exclude github.com/spf13/viper v1.3.2 // Required to fix CVE-2018-1098
