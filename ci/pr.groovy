@@ -39,7 +39,7 @@ pipeline {
 
         stage('docker build check') {
             steps {
-                sh 'make docker_build'
+                sh 'make build_all_images'
             }
         }
 
