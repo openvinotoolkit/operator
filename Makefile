@@ -99,7 +99,7 @@ ifeq ($(TARGET_PLATFORM), openshift)
     fi
 	docker tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) $(CATALOG_REPOSITORY):$(BRANCH)-latest 
 else
-	sudo opm index add --bundles $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) --from-index quay.io/operatorhubio/catalog:latest -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG)
+	sudo opm index add --bundles $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG)  -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG)
 	docker tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG) $(CATALOG_REPOSITORY)-k8s:$(BRANCH)-latest 	
 endif
 
