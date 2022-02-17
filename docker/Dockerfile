@@ -34,6 +34,7 @@ USER ${USER_UID}
 COPY --from=builder /workspace/build/openvino-operator /usr/local/bin/openvino-operator
 COPY watches.yaml watches.yaml
 COPY helm-charts helm-charts
-
+COPY LICENSE .
+COPY licenses /licenses
 
 ENTRYPOINT ["/usr/local/bin/openvino-operator", "run", "--watches-file=./watches.yaml"]
