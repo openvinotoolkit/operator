@@ -228,15 +228,15 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 				"Chart value %q overridden to %q by operator's watches.yaml", k, v)
 		}
 
-		notebook_error := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
+		notebookError := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
 
-		if notebook_error != "" {
+		if notebookError != "" {
 			log.Error(err, "Failed to install release")
 			status.SetCondition(types.HelmAppCondition{
 				Type:    types.ConditionReleaseFailed,
 				Status:  types.StatusTrue,
 				Reason:  types.PreconditionError,
-				Message: notebook_error,
+				Message: notebookError,
 			})
 			if err := r.updateResourceStatus(ctx, o, status); err != nil {
 				log.Error(err, "Failed to update status after install release failure")
@@ -319,15 +319,15 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 				"Chart value %q overridden to %q by operator's watches.yaml", k, v)
 		}
 
-		notebook_error := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
+		notebookError := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
 
-		if notebook_error != "" {
+		if notebookError != "" {
 			log.Error(err, "Failed to upgrade release")
 			status.SetCondition(types.HelmAppCondition{
 				Type:    types.ConditionReleaseFailed,
 				Status:  types.StatusTrue,
 				Reason:  types.PreconditionError,
-				Message: notebook_error,
+				Message: notebookError,
 			})
 			if err := r.updateResourceStatus(ctx, o, status); err != nil {
 				log.Error(err, "Failed to update status after upgrade release failure")
@@ -385,8 +385,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		}
 		println("Updating status after upgrade.")
 		err = r.updateResourceStatus(ctx, o, status)
-		println("Updated status after upgrade finished. Will sleep 1s")
-		time.Sleep(time.Second)
+		time.Sleep(time.Second)  // wait 1s to reduce conflicts with concurent updates
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 	}
 
@@ -398,17 +397,15 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	// no longer being attempted.
 	status.RemoveCondition(types.ConditionReleaseFailed)
 
-	println("Start reconciling release", r.GVK.Kind)
+	notebookError := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
 
-	notebook_error := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
-
-	if notebook_error != "" {
+	if notebookError != "" {
 		log.Error(err, "Failed to reconcile release")
 		status.SetCondition(types.HelmAppCondition{
 			Type:    types.ConditionReleaseFailed,
 			Status:  types.StatusTrue,
 			Reason:  types.PreconditionError,
-			Message: notebook_error,
+			Message: notebookError,
 		})
 		if err := r.updateResourceStatus(ctx, o, status); err != nil {
 			log.Error(err, "Failed to update status after reconsile release failure")
@@ -462,54 +459,54 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	if r.GVK.Kind == "ModelServer" {
 		status.SetScaling(getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), manager.ReleaseName())
 	}
-	println("Updating status after reconcile. wait 1s")
 	err = r.updateResourceStatus(ctx, o, status)
 	if err != nil {
 		println("error", err.Error())
 	}
-	if r.GVK.Kind == "Notebook"{	
-		if is_auto, ok := manager.GetValues()["auto_update_image"].(bool); ok && is_auto  {
-			if branch, ok := manager.GetValues()["git_ref"].(string); ok {
-				ref := getGithubRef(branch, manager.GetValues()["git_uri"].(string) )
-				if ref != "" {
-					commit, _ := manager.GetValues()["commit"].(string)
-					println("Received commit from github", ref)
-					println("Old commit from CR", commit)
-					if commit != ref {
-						manager.SetValue("commit", ref)
-						new_spec := types.HelmAppSpec{
-							"git_ref": branch,
-							"auto_update_image": true,
-							"commit": ref,
-						}
-						o.Object["spec"] = new_spec
-						err := r.updateResource(ctx,o)
-						if err == nil{
-							println("UPDATED NOTEBOOK RESOURCE")
-						}else{
-							println("FAILED TO UPDATE NOTEBOOK RESOURCE", err.Error())
-						}
-					} else {
-						println("commit is not changed")
-					}
-				} else {
-					println("empty github commit")
-				}
-			} else {
-				println("missing branch name")
-			}
-		} else {
-			println("auto not bool")
-		}
 
+	if r.GVK.Kind == "Notebook"{
+		notebookValues := manager.GetValues()
+		if autoUpdateEnabled(notebookValues) {
+			ref, err := getGithubRef(notebookValues)
+			if err != nil {
+				updateCommit(ref, notebookValues, manager, o, ctx, r)
+			}
+		}
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod * 5}, err
 	}
-	
 	return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 }
 
+func updateCommit(ref string, values map[string]interface{}, m release.Manager, o *unstructured.Unstructured, ctx context.Context, r HelmOperatorReconciler){
+	if commit, ok := values["commit"].(string); ok{
+		if ref != commit{
+			m.SetValue("commit", ref)
+			newSpec := types.HelmAppSpec{
+				"git_ref": values["git_ref"].(string),
+				"auto_update_image": true,
+				"commit": ref,
+			}
+			o.Object["spec"] = newSpec
+			err := r.updateResource(ctx,o)
+			if err == nil{
+				log.Info("Updated notebook commit info")
+			}else{
+				log.Error(err, "Failed to update commit info")
+			}
+		}
+	}
+}
 
-func getGithubRef(branch string, uri string) string {
+func autoUpdateEnabled(values map[string]interface{}) bool{
+	if _, ok := values["auto_update_image"].(bool); !ok  { return false } // auto_update_image key is missing
+	if values["auto_update_image"] == false { return false }
+	if _, ok := values["git_ref"].(string); !ok {  return false } // git_ref key is missing so the commit update is not possible
+	if values["git_ref"] == "" { return false }
+	return true
+}
+
+
+func getGithubRef(values map[string]interface{}) (string, error) {
 	type GithubResponse struct {
 		Sha    string    `json:"sha"`
 		Commit interface{} `json:"commit"`
@@ -518,18 +515,21 @@ func getGithubRef(branch string, uri string) string {
 	// Create a Resty Client
 	client := resty.New()
     var GithubResponseobj GithubResponse
-	url := getAPIUrl(uri, branch)
+	uri := "http://github.com/openvinotoolkit/notebook"
+	if val, ok := values["git_uri"].(string); ok {
+		uri = val
+	}
+	url := getAPIUrl(uri, values["git_ref"].(string))
 	println("url", url)
 	if url == "" {
-		return ""
+		return "", errors.New("can not create github api request")
 	}
 	_, err := client.R().SetResult(&GithubResponseobj).Get(url)
     if err != nil {
-		println("error:", err.Error())
-		log.Error(err, "Can not connected to notebook github repository")
-		return ""
+		log.Error(err, "Can not connect to notebook github repository")
+		return "", err
 	}
-	return GithubResponseobj.Sha
+	return GithubResponseobj.Sha, nil
 }
 
 func getAPIUrl(uri string, branch string) string{
@@ -573,7 +573,7 @@ func getReplicasStatus(ctx context.Context, releaseName string, namespace string
 
 func RHODSNotInstalled(ctx context.Context) bool {
 	fieldSelector := "metadata.name=rhods-operator"
-	rhods_namespace := "redhat-ods-operator"
+	rhodsNamespace := "redhat-ods-operator"
 	cfg, err := config.GetConfig()
 	if err != nil {
 		log.Error(err, "Can not get api config")
@@ -586,7 +586,7 @@ func RHODSNotInstalled(ctx context.Context) bool {
 	}
 	listOptions:= metav1.ListOptions{FieldSelector: fieldSelector}
 	k8sclient := clientset.AppsV1()
-	deploy, err := k8sclient.Deployments(rhods_namespace).List(ctx, listOptions)
+	deploy, err := k8sclient.Deployments(rhodsNamespace).List(ctx, listOptions)
 	if err != nil {
 		log.Error(err, "Can not list deployments")
 		return true

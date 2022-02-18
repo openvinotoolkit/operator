@@ -99,7 +99,7 @@ ifeq ($(TARGET_PLATFORM), openshift)
     fi
 	docker tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) $(CATALOG_REPOSITORY):$(BRANCH)-latest 
 else
-	sudo opm index add --bundles $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) --from-index quay.io/operatorhubio/catalog:latest -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG)
+	sudo opm index add --bundles $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG)  -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG)
 	docker tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG) $(CATALOG_REPOSITORY)-k8s:$(BRANCH)-latest 	
 endif
 
@@ -191,6 +191,13 @@ PLATFORM_%:
 	echo "Environment variable PLATFORM_$ is not set, please set one before run"; \
 	exit 1; \
 	fi
+
+style:
+	docker run --rm -v $$(pwd):/app -w /app -e https_proxy=$(https_proxy) golangci/golangci-lint:v1.44.0 golangci-lint run -E stylecheck --disable-all -v --timeout 3m0s
+
+lint:
+	docker run --rm -v $$(pwd):/app -w /app -e https_proxy=$(https_proxy) golangci/golangci-lint:v1.44.0 golangci-lint run --skip-dirs ../go/pkg/mod -v --timeout 3m0s
+
 
 OS := $(shell uname -s | tr '[:upper:]' '[:lower:]')
 ARCH := $(shell uname -m | sed 's/x86_64/amd64/')

@@ -1,4 +1,4 @@
-apiVersion: operators.coreos.com/v1alpha1
+bundle/manifests/intel.com_notebooks.yamlapiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
@@ -16,7 +16,7 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "image_name": "openvino/model_server:latest",
+            "image_name": "registry.access.redhat.com/intel/openvino_notebooks:latest",
             "deployment_parameters": {
               "replicas": 1
             },
@@ -345,6 +345,12 @@ spec:
               HIDDEN FIELD
             displayName: HIDDEN FIELD commit
             path: commit
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:hidden'
+          - description: >-
+              HIDDEN FIELD
+            displayName: HIDDEN FIELD commit
+            path: reconcile_duration_multiplier
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:hidden'
         version: v1alpha1
