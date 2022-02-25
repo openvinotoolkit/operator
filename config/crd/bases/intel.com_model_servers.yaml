@@ -175,7 +175,7 @@ spec:
                       format: int32
                     is_stateful:
                       type: boolean
-                      default: false                      
+                      default: false
                     idle_sequence_cleanup:
                       description: Flag indicating if model is subject to sequence cleaner scans
                       type: boolean
@@ -201,10 +201,11 @@ spec:
                       type: string
                       default: INFO
                       enum:
-                        - INFO
-                        - DEBUG
-                        - ERROR
                         - TRACE
+                        - DEBUG
+                        - INFO
+                        - WARNING
+                        - ERROR
                     grpc_workers:
                       description: Number of gRPC servers. Default 1. Increase for multi client, high throughput scenarios
                       type: integer
