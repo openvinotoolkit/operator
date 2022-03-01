@@ -44,7 +44,7 @@ spec:
                   description: Git reposiory to be used for image building
                   type: string
                 reconcile_duration_multiplier:
-                  description: Increases the reconcile duration. It can reduce due frequency of synns with github code changes.
+                  description: Increases the reconcile duration. It can reduce due frequency of syncs with github code changes.
                   type: integer
             status:
               description: Status defines the observed state of Notebook
