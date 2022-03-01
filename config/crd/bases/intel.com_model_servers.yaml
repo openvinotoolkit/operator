@@ -104,7 +104,7 @@ spec:
                               type: string
                             xpu_device_quantity:
                               type: string
-                              default: "1"                                    
+                              default: "1"
                 service_parameters:
                   type: object
                   description: Fill service settings
@@ -126,7 +126,7 @@ spec:
                       enum:
                         - ClusterIP
                         - NodePort
-                        - Loadbalancer                
+                        - Loadbalancer
                 models_settings:
                   type: object
                   description: Fill model settings if model config is not used
@@ -140,7 +140,7 @@ spec:
                     config_configmap_name:
                       type: string
                     config_path:
-                      type: string                  
+                      type: string
                     model_name:
                       description: Name of the model loaded to Model Server
                       type: string
@@ -247,7 +247,7 @@ spec:
                        type: string
                        description: >-
                          Set the group ID if access to the model repository is restricted. Model server will start with this security context.
-                         In openshift, you might need to create Security Context Constraints to allow grant permissions for changing the context.              
+                         In openshift, you might need to create Security Context Constraints to allow grant permissions for changing the context.
                     aws_secret_access_key:
                       type: string
                       description: Aws secret access key
