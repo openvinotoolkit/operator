@@ -37,6 +37,18 @@ spec:
                   description: Enable automatic updates of the image based on git repository changes
                   type: boolean
                   default: false
+                commit:
+                  description: Git reference in notebook repository to build the docker image
+                  type: string
+                build_date:
+                  description: When the automatic image update was performed
+                  type: string
+                git_uri:
+                  description: Git reposiory to be used for image building
+                  type: string
+                reconcile_duration_multiplier:
+                  description: Increases the reconcile duration. It can reduce due frequency of synns with github code changes.
+                  type: integer
             status:
               description: Status defines the observed state of Notebook
               type: object

@@ -27,8 +27,12 @@ spec:
       name: openvino-notebook:{{ .Release.Name }}
   source:
     git:
-      uri: https://github.com/openvinotoolkit/openvino_notebooks
+      uri: {{ .Values.git_uri}}
+{{- if .Values.commit }}
+      ref: "{{ .Values.commit }}"
+{{- else }}
       ref: "{{ .Values.git_ref }}"
+{{ end }}
     type: Git
   postCommit: {}
   strategy:

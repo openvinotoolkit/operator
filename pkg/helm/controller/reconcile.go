@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -37,6 +38,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
+	resty "github.com/go-resty/resty/v2"
 	"github.com/openvinotoolkit/openshift_operator/pkg/helm/internal/diff"
 	"github.com/openvinotoolkit/openshift_operator/pkg/helm/internal/types"
 	"github.com/openvinotoolkit/openshift_operator/pkg/helm/release"
@@ -334,6 +336,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		}
 
 		force := hasAnnotation(helmUpgradeForceAnnotation, o)
+		println("Starting upgrade")
 		previousRelease, upgradedRelease, err := manager.UpgradeRelease(ctx, release.ForceUpgrade(force))
 		if err != nil {
 			log.Error(err, "Release upgrade failed")
@@ -380,8 +383,9 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		if r.GVK.Kind == "ModelServer" {
 			status.SetScaling(getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), manager.ReleaseName())
 		}
-
+		println("Updating status after upgrade.")
 		err = r.updateResourceStatus(ctx, o, status)
+		time.Sleep(time.Second)  // wait 1s to reduce conflicts with concurent updates
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 	}
 
@@ -425,7 +429,6 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	}
 	status.RemoveCondition(types.ConditionIrreconcilable)
 
-
 	if r.releaseHook != nil {
 		if err := r.releaseHook(expectedRelease); err != nil {
 			log.Error(err, "Failed to run release hook")
@@ -456,9 +459,86 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	if r.GVK.Kind == "ModelServer" {
 		status.SetScaling(getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), manager.ReleaseName())
 	}
-
 	err = r.updateResourceStatus(ctx, o, status)
+	if err != nil {
+		println("error", err.Error())
+	}
+
+	if r.GVK.Kind == "Notebook"{
+		notebookValues := manager.GetValues()
+		if autoUpdateEnabled(notebookValues) {
+			ref, err := getGithubRef(notebookValues)
+			if err != nil {
+				updateCommit(ref, notebookValues, manager, o, ctx, r)
+			}
+		}
+		return reconcile.Result{RequeueAfter: r.ReconcilePeriod * 5}, err
+	}
 	return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
+}
+
+func updateCommit(ref string, values map[string]interface{}, m release.Manager, o *unstructured.Unstructured, ctx context.Context, r HelmOperatorReconciler){
+	if commit, ok := values["commit"].(string); ok{
+		if ref != commit{
+			m.SetValue("commit", ref)
+			newSpec := types.HelmAppSpec{
+				"git_ref": values["git_ref"].(string),
+				"auto_update_image": true,
+				"commit": ref,
+			}
+			o.Object["spec"] = newSpec
+			err := r.updateResource(ctx,o)
+			if err == nil{
+				log.Info("Updated notebook commit info")
+			}else{
+				log.Error(err, "Failed to update commit info")
+			}
+		}
+	}
+}
+
+func autoUpdateEnabled(values map[string]interface{}) bool{
+	if _, ok := values["auto_update_image"].(bool); !ok  { return false } // auto_update_image key is missing
+	if values["auto_update_image"] == false { return false }
+	if _, ok := values["git_ref"].(string); !ok {  return false } // git_ref key is missing so the commit update is not possible
+	if values["git_ref"] == "" { return false }
+	return true
+}
+
+
+func getGithubRef(values map[string]interface{}) (string, error) {
+	type GithubResponse struct {
+		Sha    string    `json:"sha"`
+		Commit interface{} `json:"commit"`
+	}
+
+	// Create a Resty Client
+	client := resty.New()
+	var GithubResponseobj GithubResponse
+	uri := "http://github.com/openvinotoolkit/notebook"
+	if val, ok := values["git_uri"].(string); ok {
+		uri = val
+	}
+	url, e := getAPIUrl(uri, values["git_ref"].(string))
+	println("url", url)
+	if e != nil {
+		return "", errors.New("can not create github api request")
+	}
+	_, err := client.R().SetResult(&GithubResponseobj).Get(url)
+	if err != nil {
+		log.Error(err, "Can not connect to notebook github repository")
+		return "", err
+	}
+	return GithubResponseobj.Sha, nil
+}
+
+func getAPIUrl(uri string, branch string) (string, error) {
+	re := regexp.MustCompile(`https://github.com/(.*\/.*)`)
+	match := re.FindStringSubmatch(uri)
+	if match != nil {
+		return "https://api.github.com/repos/" + match[1] + "/commits/" + branch, nil
+	}
+	return "", errors.New("invalid uri" + uri)
 }
 
 func getReplicasStatus(ctx context.Context, releaseName string, namespace string) int {

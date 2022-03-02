@@ -49,6 +49,7 @@ clean: ## Cleanup build artifacts and tool binaries.
 .PHONY: build
 build: ## Build operator-sdk, ansible-operator, and helm-operator.
 	@mkdir -p $(BUILD_DIR)
+	go mod download
 	go build $(GO_BUILD_ARGS) -o $(BUILD_DIR)/openvino-operator ./cmd
 
 run: build # Run against the configured Kubernetes cluster in ~/.kube/config

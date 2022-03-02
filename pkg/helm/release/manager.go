@@ -59,6 +59,8 @@ type Manager interface {
 	ReconcileRelease(context.Context) (*rpb.Release, error)
 	UninstallRelease(context.Context, ...UninstallOption) (*rpb.Release, error)
 	CleanupRelease(context.Context, string) (bool, error)
+	GetValues() map[string]interface{}
+	SetValue(string, string) bool
 }
 
 type manager struct {
@@ -85,6 +87,18 @@ type UninstallOption func(*action.Uninstall) error
 // ReleaseName returns the name of the release.
 func (m manager) ReleaseName() string {
 	return m.releaseName
+}
+
+func (m manager) GetValues() map[string]interface{} {
+	return m.values
+}
+
+func (m manager) SetValue(key string, value string) bool {
+	_, ok := m.values[key].(string)
+	if ok {
+		m.values[key] = value
+	} 
+	return ok
 }
 
 func (m manager) IsInstalled() bool {
@@ -302,7 +316,6 @@ func reconcileRelease(_ context.Context, kubeClient kube.Interface, expectedMani
 			// nothing to do
 			return nil
 		}
-
 		_, err = helper.Patch(expected.Namespace, expected.Name, patchType, patch,
 			&metav1.PatchOptions{})
 		if err != nil {
