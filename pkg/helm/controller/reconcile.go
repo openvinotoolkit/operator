@@ -514,31 +514,31 @@ func getGithubRef(values map[string]interface{}) (string, error) {
 
 	// Create a Resty Client
 	client := resty.New()
-    var GithubResponseobj GithubResponse
+	var GithubResponseobj GithubResponse
 	uri := "http://github.com/openvinotoolkit/notebook"
 	if val, ok := values["git_uri"].(string); ok {
 		uri = val
 	}
-	url := getAPIUrl(uri, values["git_ref"].(string))
+	url, e := getAPIUrl(uri, values["git_ref"].(string))
 	println("url", url)
-	if url == "" {
+	if e != nil {
 		return "", errors.New("can not create github api request")
 	}
 	_, err := client.R().SetResult(&GithubResponseobj).Get(url)
-    if err != nil {
+	if err != nil {
 		log.Error(err, "Can not connect to notebook github repository")
 		return "", err
 	}
 	return GithubResponseobj.Sha, nil
 }
 
-func getAPIUrl(uri string, branch string) string{
+func getAPIUrl(uri string, branch string) (string, error) {
 	re := regexp.MustCompile(`https://github.com/(.*\/.*)`)
 	match := re.FindStringSubmatch(uri)
 	if match != nil {
-		return "https://api.github.com/repos/" + match[1] + "/commits/" + branch
+		return "https://api.github.com/repos/" + match[1] + "/commits/" + branch, nil
 	}
-	return ""
+	return "", errors.New("invalid uri" + uri)
 }
 
 func getReplicasStatus(ctx context.Context, releaseName string, namespace string) int {

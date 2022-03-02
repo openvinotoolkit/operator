@@ -97,7 +97,6 @@ func (m manager) SetValue(key string, value string) bool {
 	_, ok := m.values[key].(string)
 	if ok {
 		m.values[key] = value
-		println("Assigning value", value, " to key ", key)
 	} 
 	return ok
 }
@@ -315,7 +314,6 @@ func reconcileRelease(_ context.Context, kubeClient kube.Interface, expectedMani
 
 		if patch == nil {
 			// nothing to do
-			println("nothing to do in reconcile")
 			return nil
 		}
 		_, err = helper.Patch(expected.Namespace, expected.Name, patchType, patch,
