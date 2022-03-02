@@ -201,6 +201,7 @@ spec:
                       type: string
                       default: INFO
                       enum:
+                        - TRACE
                         - DEBUG
                         - INFO
                         - WARNING

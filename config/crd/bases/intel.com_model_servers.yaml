@@ -175,7 +175,7 @@ spec:
                       format: int32
                     is_stateful:
                       type: boolean
-                      default: false                      
+                      default: false
                     idle_sequence_cleanup:
                       description: Flag indicating if model is subject to sequence cleaner scans
                       type: boolean
@@ -201,6 +201,7 @@ spec:
                       type: string
                       default: INFO
                       enum:
+                        - TRACE
                         - DEBUG
                         - INFO
                         - WARNING
