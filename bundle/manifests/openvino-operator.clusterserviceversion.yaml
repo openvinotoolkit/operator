@@ -1,4 +1,4 @@
-bundle/manifests/intel.com_notebooks.yamlapiVersion: operators.coreos.com/v1alpha1
+apiVersion: operators.coreos.com/v1alpha1
 kind: ClusterServiceVersion
 metadata:
   annotations:
