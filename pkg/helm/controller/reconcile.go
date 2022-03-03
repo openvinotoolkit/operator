@@ -103,7 +103,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		"apiVersion", o.GetAPIVersion(),
 		"kind", o.GetKind(),
 	)
-	log.V(1).Info("Reconciling")
+	log.Info("Reconciling")
 
 	err := r.Client.Get(ctx, request.NamespacedName, o)
 	if apierrors.IsNotFound(err) {
@@ -112,6 +112,32 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	if err != nil {
 		log.Error(err, "Failed to lookup resource")
 		return reconcile.Result{}, err
+	}
+
+	// Inject current commit SHA (if auto update enabled) and date to notebook resource if not present already
+	if r.GVK.Kind == "Notebook" {
+		currentNotebookSpec, ok := o.Object["spec"].(map[string]interface{})
+		if !ok {
+			err = errors.New("bad CR object")
+			log.Error(err, "Received bad CR object. Could not parse spec.")
+			return reconcile.Result{}, err
+		}
+
+		if _, ok := currentNotebookSpec["commit"]; !ok {
+			log.Info("Notebooks auto update enabled. Setting initial notebooks build commit SHA")
+			ref, err := getGithubRef(currentNotebookSpec)
+			if err == nil {
+				currentNotebookSpec["commit"] = ref
+			} else {
+				currentNotebookSpec["commit"] = ""
+			}
+		}
+
+		if _, ok := currentNotebookSpec["latest_update_date"]; !ok {
+			log.Info("Setting initial notebooks build date")
+			updateDate := getUpdateDate()
+			currentNotebookSpec["latest_update_date"] = updateDate
+		}
 	}
 
 	manager, err := r.ManagerFactory.NewManager(o, r.OverrideValues)
@@ -294,7 +320,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		if log.V(0).Enabled() {
 			fmt.Println(diff.Generate("", installedRelease.Manifest))
 		}
-		log.V(1).Info("Config values", "values", installedRelease.Config)
+		log.V(2).Info("Config values", "values", installedRelease.Config)
 		message := ""
 		if installedRelease.Info != nil {
 			message = installedRelease.Info.Notes
@@ -315,6 +341,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		}
 
 		err = r.updateResourceStatus(ctx, o, status)
+		time.Sleep(time.Second)  // wait 1s to reduce conflicts with concurent updates
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 	}
 
@@ -352,11 +379,11 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		}
 
 		force := hasAnnotation(helmUpgradeForceAnnotation, o)
-		println("Starting upgrade")
+		log.Info("Starting upgrade")
 		previousRelease, upgradedRelease, err := manager.UpgradeRelease(ctx, release.ForceUpgrade(force))
 		if err != nil {
 			log.Error(err, "Release upgrade failed")
-			status.SetCondition(types.HelmAppCondition{
+			status.SetCondition(types.HelmAppCondition {
 				Type:    types.ConditionReleaseFailed,
 				Status:  types.StatusTrue,
 				Reason:  types.ReasonUpgradeError,
@@ -380,7 +407,9 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		if log.V(0).Enabled() {
 			fmt.Println(diff.Generate(previousRelease.Manifest, upgradedRelease.Manifest))
 		}
-		log.V(1).Info("Config values", "values", upgradedRelease.Config)
+		log.V(0).Info("Old Config values", "values", previousRelease.Config)
+		log.V(0).Info("New Config values", "values", upgradedRelease.Config)
+
 		message := ""
 		if upgradedRelease.Info != nil {
 			message = upgradedRelease.Info.Notes
@@ -399,8 +428,39 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		if r.GVK.Kind == "ModelServer" {
 			status.SetScaling(getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), manager.ReleaseName())
 		}
-		println("Updating status after upgrade.")
+		log.Info("Updating status after upgrade.")
 		err = r.updateResourceStatus(ctx, o, status)
+
+		if r.GVK.Kind == "Notebook" {
+			if gitRepositoryUpdateRequired(previousRelease.Config, upgradedRelease.Config) {
+				log.Info("New repository or branch detected - updating commit value")
+				notebookValues := manager.GetValues()
+				ref, err := getGithubRef(notebookValues) // On error during getting new commit sha, set empty string
+				updateCommit(ref, notebookValues, manager, o, ctx, r)
+				err = r.updateResourceStatus(ctx, o, status)
+				if err != nil {
+					log.Error(err, "Failed to update resource status")
+				}
+			} else if gitCommitUpdateRequired(previousRelease.Config, upgradedRelease.Config) {
+				log.Info("New commit detected - deleting BuildConfig to trigger build with new configuration")
+				buildConfigName := "openvino-notebooks-" + request.Name
+				buildConfigNamespace := request.Namespace
+	
+				buildConfigObj := &unstructured.Unstructured{}
+				buildConfigObj.SetName(buildConfigName)
+				buildConfigObj.SetNamespace(buildConfigNamespace)
+				buildConfigObj.SetGroupVersionKind(schema.GroupVersionKind{
+					Group:   "build.openshift.io",
+					Kind:    "BuildConfig",
+					Version: "v1",
+				})
+				err = r.Client.Delete(ctx, buildConfigObj)
+				if err != nil {
+					log.Error(err, "Failed to delete old BuildConfig resource")
+				}
+			}
+		}
+
 		time.Sleep(time.Second)  // wait 1s to reduce conflicts with concurent updates
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 	}
@@ -424,7 +484,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 			Message: notebookError,
 		})
 		if err := r.updateResourceStatus(ctx, o, status); err != nil {
-			log.Error(err, "Failed to update status after reconsile release failure")
+			log.Error(err, "Failed to update status after reconcile release failure")
 		}
 		return reconcile.Result{}, err
 	}
@@ -475,52 +535,110 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	if r.GVK.Kind == "ModelServer" {
 		status.SetScaling(getReplicasStatus(ctx, manager.ReleaseName(), request.Namespace), manager.ReleaseName())
 	}
-	err = r.updateResourceStatus(ctx, o, status)
-	if err != nil {
-		println("error", err.Error())
-	}
 
-	if r.GVK.Kind == "Notebook"{
+	if r.GVK.Kind == "Notebook" {
 		notebookValues := manager.GetValues()
 		if autoUpdateEnabled(notebookValues) {
 			ref, err := getGithubRef(notebookValues)
-			if err != nil {
-				updateCommit(ref, notebookValues, manager, o, ctx, r)
+			if err == nil {
+				if isCommitUpdateNeeded(ref, notebookValues) {
+					updateCommit(ref, notebookValues, manager, o, ctx, r)
+				}
 			}
+			err = r.updateResourceStatus(ctx, o, status)
+			if err != nil {
+				log.Error(err, "Failed to update resource status")
+			}
+			return reconcile.Result{RequeueAfter: getNotebookUpdateTimeframe(notebookValues)}, err
 		}
-		return reconcile.Result{RequeueAfter: r.ReconcilePeriod * 5}, err
 	}
+
+	err = r.updateResourceStatus(ctx, o, status)
+	if err != nil {
+		log.Error(err, "Failed to update resource status")
+	}
+
 	return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 }
 
-func updateCommit(ref string, values map[string]interface{}, m release.Manager, o *unstructured.Unstructured, ctx context.Context, r HelmOperatorReconciler){
-	if commit, ok := values["commit"].(string); ok{
-		if ref != commit{
-			m.SetValue("commit", ref)
-			newSpec := types.HelmAppSpec{
-				"git_ref": values["git_ref"].(string),
-				"auto_update_image": true,
-				"commit": ref,
-			}
-			o.Object["spec"] = newSpec
-			err := r.updateResource(ctx,o)
-			if err == nil{
-				log.Info("Updated notebook commit info")
-			}else{
-				log.Error(err, "Failed to update commit info")
-			}
+func gitRepositoryUpdateRequired(previousReleaseConfig map[string]interface{}, upgradedReleaseConfig map[string]interface{}) bool {
+	gitURIChanged := previousReleaseConfig["git_uri"] != upgradedReleaseConfig["git_uri"]
+	gitRefChanged := previousReleaseConfig["git_ref"] != upgradedReleaseConfig["git_ref"]
+	if gitURIChanged || gitRefChanged { 
+		return true 
+	}
+	return false
+}
+
+func gitCommitUpdateRequired(previousReleaseConfig map[string]interface{}, upgradedReleaseConfig map[string]interface{}) bool {
+	gitCommitShaChanged := previousReleaseConfig["commit"] != upgradedReleaseConfig["commit"]
+	if gitCommitShaChanged { 
+		return true 
+	}
+	return false
+}
+
+func getNotebookUpdateTimeframe( values map[string]interface{}) time.Duration {
+	if reconcileDurationMultiplier, ok := values["reconcile_duration_multiplier"].(int64); ok { 
+		return time.Duration(reconcileDurationMultiplier) * time.Minute 
+	}
+	// By default, requeue reconcile after 2h
+	return time.Duration(120) * time.Minute
+}
+
+func getUpdateDate() string {
+	currentTime := time.Now()
+	date := currentTime.Format("2006_Jan_02")
+	return date
+}
+
+func isCommitUpdateNeeded(ref string, values map[string]interface{}) bool {
+	currentCommit, currentCommitDefined := values["commit"]
+
+	if currentCommitDefined {
+		log.Info("Current commit defined. Comparing with latest commit...")
+		currentCommitSha, currentCommitOk := currentCommit.(string)
+		if !currentCommitOk{
+			log.Error(errors.New("bad type"), "Latest commit SHA is not string")
+			return false
 		}
+		if ref == currentCommitSha {
+			log.Info("Current commit is the latest commit. Update not required.")
+			return false
+		}
+		log.Info("Detected new latest commit. Update in progress...")
+	} else {
+		log.Info("Current commit not defined - using latest. Update in progress...")
+	}
+	return true
+}
+
+func updateCommit(ref string, values map[string]interface{}, m release.Manager, o *unstructured.Unstructured, ctx context.Context, r HelmOperatorReconciler){
+	updateDate := getUpdateDate()
+	newSpec := types.HelmAppSpec{
+		"git_uri": values["git_uri"].(string),
+		"git_ref": values["git_ref"].(string),
+		"auto_update_image": values["auto_update_image"].(bool),
+		"reconcile_duration_multiplier": values["reconcile_duration_multiplier"].(int64),
+		"commit": ref,
+		"latest_update_date": updateDate,
+	}
+	o.Object["spec"] = newSpec
+	err := r.updateResource(ctx, o)
+	if err == nil {
+		log.Info("Updated notebook commit info")
+	} else {
+		log.Error(err, "Failed to update commit info")
 	}
 }
 
-func autoUpdateEnabled(values map[string]interface{}) bool{
+func autoUpdateEnabled(values map[string]interface{}) bool {
 	if _, ok := values["auto_update_image"].(bool); !ok  { return false } // auto_update_image key is missing
 	if values["auto_update_image"] == false { return false }
 	if _, ok := values["git_ref"].(string); !ok {  return false } // git_ref key is missing so the commit update is not possible
 	if values["git_ref"] == "" { return false }
 	return true
 }
-
 
 func getGithubRef(values map[string]interface{}) (string, error) {
 	type GithubResponse struct {
@@ -535,14 +653,20 @@ func getGithubRef(values map[string]interface{}) (string, error) {
 	if val, ok := values["git_uri"].(string); ok {
 		uri = val
 	}
-	url, e := getAPIUrl(uri, values["git_ref"].(string))
-	if e != nil {
-		log.Error(e, "Can not create github api request")
-		return "", e
-	}
-	_, err := client.R().SetResult(&GithubResponseobj).Get(url)
+	url, err := getAPIUrl(uri, values["git_ref"].(string))
 	if err != nil {
-		log.Error(err, "Can not connect to notebook github repository")
+		log.Error(err, "Cannot create github api request")
+		return "", errors.New("can not create github api request")
+	}
+	_, err = client.R().SetResult(&GithubResponseobj).Get(url)
+	if err != nil {
+		log.Error(err, "Cannot connect to notebook github repository")
+		return "", err
+	}
+	log.Info("Connected to notebooks repository: " + url + "; Latest commit: " + GithubResponseobj.Sha)
+	if GithubResponseobj.Sha == "" {
+		err = errors.New("empty commit sha")
+		log.Error(err, "Cannot retrieve latest commit")
 		return "", err
 	}
 	return GithubResponseobj.Sha, nil
