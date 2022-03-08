@@ -130,7 +130,6 @@ func run(cmd *cobra.Command, f *flags.Flags) {
 	// Set default manager options
 	options = f.ToManagerOptions(options)
 
-	// Set default manager options
 	if options.NewClient == nil {
 		options.NewClient = func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
 			// Create the Client for Write operations.
