@@ -52,7 +52,7 @@ func printVersion() {
 		"Go Version", runtime.Version(),
 		"GOOS", runtime.GOOS,
 		"GOARCH", runtime.GOARCH,
-		"helm-operator", sdkVersion.Version,
+		"openvino-operator", sdkVersion.Version,
 		"commit", sdkVersion.GitCommit)
 }
 
@@ -128,6 +128,8 @@ func run(cmd *cobra.Command, f *flags.Flags) {
 	}
 
 	// Set default manager options
+	options = f.ToManagerOptions(options)
+
 	if options.NewClient == nil {
 		options.NewClient = func(cache cache.Cache, config *rest.Config, options client.Options, uncachedObjects ...client.Object) (client.Client, error) {
 			// Create the Client for Write operations.
@@ -166,7 +168,6 @@ func run(cmd *cobra.Command, f *flags.Flags) {
 			"Watching all namespaces.", k8sutil.WatchNamespaceEnvVar))
 		options.Namespace = metav1.NamespaceAll
 	}
-
 	mgr, err := manager.New(cfg, options)
 	if err != nil {
 		log.Error(err, "Failed to create a new manager.")
