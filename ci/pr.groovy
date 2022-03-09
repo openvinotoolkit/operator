@@ -37,6 +37,12 @@ pipeline {
             }
         }
 
+        stage('sdl check') {
+            steps {
+                sh 'make sdl-check'
+            }
+        }
+
         stage('docker build check') {
             steps {
                 sh 'make build_all_images'
