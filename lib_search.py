@@ -41,9 +41,9 @@ def check_dir(start_dir):
     no_header = []
 
     exclude_files = ['.git', '.venv', '__pycache__', '.vscode', '.tgz', '.md', '.groovy', 'NOTES.txt', '.mod', '.sum',
-                     '.yaml', '.helmignore', '.tpl', 'missing_headers.txt']
+                     '.yaml', '.helmignore', '.tpl', 'missing_headers.txt', 'coverage.out']
 
-    exclude_directories = []
+    exclude_directories = ['build']
 
     for (d_path, dir_set, file_set) in os.walk(start_dir):
         for f_name in file_set:
