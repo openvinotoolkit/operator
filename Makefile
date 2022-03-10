@@ -215,7 +215,21 @@ style:
 lint:
 	docker run --rm -v $$(pwd):/app -w /app -e https_proxy=$(https_proxy) golangci/golangci-lint:v1.44.0 golangci-lint run --skip-dirs ../go/pkg/mod -v --timeout 3m0s
 
-sdl-check:
+VIRTUALENV_EXE := python3 -m virtualenv -p python3
+VIRTUALENV_DIR := .venv
+ACTIVATE="$(VIRTUALENV_DIR)/bin/activate"
+
+venv:$(ACTIVATE)
+	@echo -n "Using venv "
+	@. $(ACTIVATE); python3 --version
+
+$(ACTIVATE):
+	@echo "Updating virtualenv dependencies in: $(VIRTUALENV_DIR)..."
+	@test -d $(VIRTUALENV_DIR) || $(VIRTUALENV_EXE) $(VIRTUALENV_DIR)
+	@. $(ACTIVATE); pip$(PY_VERSION) install --upgrade pip
+	@touch $(ACTIVATE)
+
+sdl-check: venv
 	@echo "Checking license headers in files..."
 	@. $(ACTIVATE); bash -c "python3 lib_search.py . > missing_headers.txt"
 	@if ! grep -FRq "All files have headers" missing_headers.txt; then\
