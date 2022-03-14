@@ -17,10 +17,10 @@
 |models_settings.plugin_config| Adds OpenVINO plugin configuration for tuning the performance. Value `{\"PERFORMANCE_HINT\":\"LATENCY\"}` optimizes the inference latency with a single client scenario|
 |models_settings.batch_size| change the model batch size |
 |models_settings.shape| shape is optional and takes precedence over batch_size. The shape argument changes the model that is enabled in the model server to fit the parameters. shape accepts three forms of the values: a tuple, such as (-1,3,100-200,224) - The tuple defines the shape to use for all incoming requests for models with a single input. Each dimension can be a static value `3`, a range `100-200` or `-1` which is undefined value. A dictionary of shapes, such as {"input1":"(1,3,224,224)","input2":"(1,3,50,50)", "input3":"auto"} set shape for multiple inputs|
-|models_settings.model_version_policy: '{"latest": { "num_versions":1 }}'
+|models_settings.model_version_policy| '{"latest": { "num_versions":1 }}'|
 |models_settings.layout| Change layout of the model input or output with image data; NCHW:NHWC changes the layout from NCHW to NHWC|
-|models_settings.target_device: "CPU"
-|models_settings.is_stateful| set `true` it the model is stateful
+|models_settings.target_device| Any supported OpenVINO target device like CPU/GPU/HDDL/MULTI/HETERO/AUTO|
+|models_settings.is_stateful| set `true` it the model is stateful|
 |models_settings.idle_sequence_cleanup| If set to true, model will be subject to periodic sequence cleaner scans. See idle sequence cleanup|
 |models_settings.low_latency_transformation| If set to true, model server will apply low latency transformation on model load|
 |models_settings.max_sequence_number|Determines how many sequences can be handled concurrently by a model instance.|
@@ -41,3 +41,5 @@
 |models_repository.s3_compat_api_endpoint| S3 compatibility api endpoint, use it with Minio storage for models|
 |models_repository.gcp_creds_secret_name| secret resource including GCP credentials, use it with google storage for models; create it via `kubectl create secret generic <secret name> --from-file gcp-creds.json`|
 |models_repository.azure_storage_connection_string|Connection string to the Azure Storage authentication account, use it with Azure storage for models|
+
+Check an example of the [fully functional ModelServer resource](../config/samples/intel_v1alpha1_ovms.yaml)

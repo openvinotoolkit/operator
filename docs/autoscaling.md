@@ -49,3 +49,9 @@ In the example above, VPA can respond to Out Of Memory errors any update the res
 
 Learn more about [verical autoscaler](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler)
 
+***
+
+Check also:
+- [performance tuning](./recommendations.md)
+- [installing and managing model servers](./modelserver.md)
+- [model server parameters](./modelserver_params.md)

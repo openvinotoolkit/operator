@@ -4,21 +4,21 @@
 
 New instance of the OpenVINO model server can be managed both in Openshift and in upstream Kubernetes via a custom resource `ModelServer`.
 
-All the paramters are divided into categories:
+All the [ModeServer parameters](./modelserver_params.md) are grouped in the following categories:
 - models settings - configures the model or models used by the model server
 - deployment parameters - specification of the Kubernetes deployment
 - server settings - model server settings common for all models
 - models repository - storage type and credentials configuration
 - service parameters - Kubernetes service specification
 
-A prerequisite for the deployment is creating a [model sepository](https://docs.openvino.ai/latest/ovms_docs_models_repository.html). It could be hosted on the cloud storage (S3, google cloud storage or azure blob) or it could be a local cluster persistent volume.
+A prerequisite for the model server deployment is creating a [model repository](https://docs.openvino.ai/latest/ovms_docs_models_repository.html). It could be hosted on the cloud storage (S3, google cloud storage or azure blob) or it could be a local cluster persistent volume.
 
-Here you can see a functional example of the the ModelServer definition: [intel_v1alpha1_ovms.yaml](../config/samples/intel_v1alpha1_ovms.yaml)
+Here you can see a fully functional example of the the ModelServer definition: [intel_v1alpha1_ovms.yaml](../config/samples/intel_v1alpha1_ovms.yaml)
 
 A complete list of all the parameters is documneted on [modelserver_params.md](./modelserver_params.md)
 
 
-On OpenShift, it is possible also to configure it in a graphical user interface on the web console.
+On OpenShift, it is possible also to configure the model server in a graphical user interface on the web console.
 
 ![new ovms](./modelserver.png)
 
@@ -162,6 +162,8 @@ Image images/peacock.jpeg has been classified as peacock with 99.97820258140564%
 Image images/airliner.jpeg has been classified as airliner with 49.202319979667664% confidence
 Image images/golden_retriever.jpeg has been classified as golden retriever with 88.68610262870789% confidence
 ```
+
+***
 
 Check also:
 - [performance tuning](./recommendations.md)

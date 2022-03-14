@@ -7,16 +7,17 @@ It is recommended to remove all those custom records before upgrading the operat
 
 ## Openshift
 
-In the OpenShift [web console](https://docs.openshift.com/container-platform/4.10/web_console/web-console.html) navigate to OperatorHub menu. Search for "OpenVINO" and select "OpenVINO™ Toolkit Operator". Then, click the `Install` button.
+In the OpenShift [web console](https://docs.openshift.com/container-platform/4.10/web_console/web-console.html) navigate to OperatorHub menu. Search for "OpenVINO™ Toolkit Operator". Then, click the `Install` button.
 
 ![installation](install.png)
 
 ## Kubernetes
 
-Operator can be installed from the [OperatorHub](https://operatorhub.io/operator).
+Operator can be installed in Kubernetes cluster from the [OperatorHub](https://operatorhub.io/operator).
 
 Find the `OpenVINO Model Server Operator` and click 'Install' button.
 
+***
 
 ## Building and installation from sources
 
@@ -25,5 +26,5 @@ Check the [developer guide](developer_guide.md) if you would like to build the o
 ***
 
 Check also:
-- Deploying model servers via the operator
-- Integrating OpenVINO notbook image wit Openshift RedHat Data Science operator 
+- [Deploying model servers via the operator](./modelserver.md)
+- [Integrating OpenVINO notbook image wit Openshift RedHat Data Science operator](./notebook_in_rhods.md)
