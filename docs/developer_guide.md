@@ -24,10 +24,10 @@ make run
 
 ## Build docker image
 ```bash
-make docker-build IMG=registry.toolbox.iotg.sclab.intel.com/cpp/operator:latest
+make docker-build
 ```
 
-## Install CRD
+## Install CRDs
 ```bash
 make install
 ```
@@ -41,7 +41,9 @@ make deploy IMG=registry.toolbox.iotg.sclab.intel.com/cpp/operator:latest
 ## OLM development flow
 ```
 make cluster_clean
-make all
+make build_all_images
+make deploy_catalog
+make deploy_operator
 ```
 
 ## K8S release process
