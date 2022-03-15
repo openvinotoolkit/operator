@@ -15,7 +15,7 @@ A prerequisite for the model server deployment is creating a [model repository](
 
 Here you can see a fully functional example of the the ModelServer definition: [intel_v1alpha1_ovms.yaml](../config/samples/intel_v1alpha1_ovms.yaml)
 
-A complete list of all the parameters is documneted on [modelserver_params.md](./modelserver_params.md)
+A complete list of all the parameters is documented on [modelserver_params.md](./modelserver_params.md)
 
 
 On OpenShift, it is possible also to configure the model server in a graphical user interface on the web console.

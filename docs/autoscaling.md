@@ -1,6 +1,6 @@
 # Autoscaling for the model server deployments
 
-Beside static assignment of the cluster resources for the model server instnace, it is possible to adjust it automatically based on the current load.
+Beside static assignment of the cluster resources for the model server instance, it is possible to adjust it automatically based on the current load.
 
 The operator can support horizontal autoscaller or vertical autoscaller both in Openshift and upstream Kubernetes.
 

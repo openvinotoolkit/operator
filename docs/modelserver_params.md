@@ -3,14 +3,14 @@
 | Parameter        | Description  |
 | ------------- |-------------|
 |image_name| model server docker image. The default is the latest public docker image |
-|deployment_parameters.replicas| number if model server replicas to be used. In case if enabled autoscaling, it defines the the initial number of replicas|
+|deployment_parameters.replicas| number if model server replicas to be used. In case if enabled autoscaling, it defines the initial number of replicas|
 |deployment_parameters.openshift_service_mesh| When the value is `true`, it adds the annotations enabling the models server deployment for [OpenShift Service Mesh](https://docs.openshift.com/container-platform/4.10/service_mesh/v2x/ossm-about.html)|
 |service_parameters.grpc_port| gRPC service port; the default value is 8080|
 |service_parameters.rest_port| REST API service port; the default value is 8081|
 |service_parameters.service_type| [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types); the default value is ClusterIP|
 |models_settings.single_model_mode| set `true` if one one model should be deployed; value `false` indicate that config.json file should be used to configure mulitple models |
 |models_settings.config_configmap_name| Config map hosting the config.json file|
-|models_settings.model_config_path| Path the the config file in case it was mounted in the container via a persistent volume claim |
+|models_settings.model_config_path| Path to the config file in case it was mounted in the container via a persistent volume claim |
 |models_settings.model_name| Model name to be used on the client side in the remote calls |
 |models_settings.model_path| Path to the model folder in the model repository; for example `gs://ovms-public-eu/resnet50-binary` |
 |models_settings.nireq| The size of internal request queue. When set to 0 or no value is set value is calculated automatically based on available resources|
