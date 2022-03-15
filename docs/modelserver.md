@@ -22,7 +22,7 @@ On OpenShift, it is possible also to configure the model server in a graphical u
 
 ![new ovms](./modelserver.png)
 
-*Note* Model server can have a static number of replicas or automatics scaling could be also configured.
+*Note* Model server can have a static number of replicas or automatic scaling could be also configured.
 [Learn more about it](./autoscaling.md)
 
 ## Using the model server
