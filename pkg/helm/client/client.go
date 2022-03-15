@@ -36,7 +36,7 @@ import (
 	"strings"
 
 	"github.com/operator-framework/operator-lib/handler"
-	"github.com/openvinotoolkit/openshift_operator/pkg/util/k8sutil"
+	"github.com/openvinotoolkit/operator/pkg/util/k8sutil"
 	"helm.sh/helm/v3/pkg/kube"
 	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"

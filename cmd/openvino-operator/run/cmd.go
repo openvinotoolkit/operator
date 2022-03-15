@@ -52,13 +52,13 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/manager/signals"
 	crmetrics "sigs.k8s.io/controller-runtime/pkg/metrics"
 
-	"github.com/openvinotoolkit/openshift_operator/pkg/helm/controller"
-	"github.com/openvinotoolkit/openshift_operator/pkg/helm/flags"
-	"github.com/openvinotoolkit/openshift_operator/pkg/helm/metrics"
-	"github.com/openvinotoolkit/openshift_operator/pkg/helm/release"
-	"github.com/openvinotoolkit/openshift_operator/pkg/helm/watches"
-	"github.com/openvinotoolkit/openshift_operator/pkg/util/k8sutil"
-	sdkVersion "github.com/openvinotoolkit/openshift_operator/pkg/version"
+	"github.com/openvinotoolkit/operator/pkg/helm/controller"
+	"github.com/openvinotoolkit/operator/pkg/helm/flags"
+	"github.com/openvinotoolkit/operator/pkg/helm/metrics"
+	"github.com/openvinotoolkit/operator/pkg/helm/release"
+	"github.com/openvinotoolkit/operator/pkg/helm/watches"
+	"github.com/openvinotoolkit/operator/pkg/util/k8sutil"
+	sdkVersion "github.com/openvinotoolkit/operator/pkg/version"
 )
 
 var log = logf.Log.WithName("cmd")

@@ -38,7 +38,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	ver "github.com/openvinotoolkit/openshift_operator/pkg/version"
+	ver "github.com/openvinotoolkit/operator/pkg/version"
 )
 
 var _ = Describe("Running a version command", func() {

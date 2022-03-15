@@ -1,4 +1,4 @@
-module github.com/openvinotoolkit/openshift_operator
+module github.com/openvinotoolkit/operator
 
 go 1.17
 

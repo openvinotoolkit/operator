@@ -36,8 +36,8 @@ import (
 	"github.com/spf13/cobra"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 
-	"github.com/openvinotoolkit/openshift_operator/cmd/openvino-operator/run"
-	"github.com/openvinotoolkit/openshift_operator/cmd/openvino-operator/version"
+	"github.com/openvinotoolkit/operator/cmd/openvino-operator/run"
+	"github.com/openvinotoolkit/operator/cmd/openvino-operator/version"
 )
 
 func main() {
