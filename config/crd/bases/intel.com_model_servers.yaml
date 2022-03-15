@@ -167,7 +167,7 @@ spec:
                       type: string
                       default: '{"latest": { "num_versions":1 }}'
                     layout:
-                      description: Resets model layout
+                      description: defines model input/output layouts
                       type: string
                     nireq:
                       description: Size of inference request queue for model executions
@@ -188,6 +188,13 @@ spec:
                       description: Determines how many sequences can be processed concurrently by one model instance. When that value is reached, attempt to start a new sequence will result in error.
                       type: integer
                       format: int32
+                    cache_dir:
+                      description: location of the cache storage
+                      type: string
+                    allow_cache:
+                      description: enable the model cache for models with auto shape or auto batch
+                      type: boolean
+                      default: false
                 server_settings:
                   type: object
                   properties:
