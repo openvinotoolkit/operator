@@ -536,9 +536,9 @@ func getGithubRef(values map[string]interface{}) (string, error) {
 		uri = val
 	}
 	url, e := getAPIUrl(uri, values["git_ref"].(string))
-	println("url", url)
 	if e != nil {
-		return "", errors.New("can not create github api request")
+		log.Error(e, "Can not create github api request")
+		return "", e
 	}
 	_, err := client.R().SetResult(&GithubResponseobj).Get(url)
 	if err != nil {
@@ -554,7 +554,7 @@ func getAPIUrl(uri string, branch string) (string, error) {
 	if match != nil {
 		return "https://api.github.com/repos/" + match[1] + "/commits/" + branch, nil
 	}
-	return "", errors.New("invalid uri" + uri)
+	return "", errors.New("invalid uri " + uri)
 }
 
 func getReplicasStatus(ctx context.Context, releaseName string, namespace string) int {
