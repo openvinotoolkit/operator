@@ -9,7 +9,7 @@ Simply create a `Notebook` resource in the namespace `redhat-ods-applications`, 
 ![notebook](./notebook.png)
 
 
-The `Create Notebook` button in the web console will trigger building the docker container image and create an ImageStream. This will add `openvino-notebook` image from the Jupyter Spawner drop-down menu. The [image](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/Dockerfile) is maintained by Intel.
+The `Create Notebook` button in the web console will trigger building the docker container image and create an ImageStream. This will add Openvino Toolkit image to the Jupyter Spawner choice list. The [image](https://github.com/openvinotoolkit/openvino_notebooks/blob/main/Dockerfile) is maintained by Intel.
 
 ![spawner](./spawner.png)
 
