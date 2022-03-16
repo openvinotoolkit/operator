@@ -27,4 +27,4 @@ Check the [developer guide](developer_guide.md) if you would like to build the o
 
 Check also:
 - [Deploying model servers via the operator](./modelserver.md)
-- [Integrating OpenVINO notbook image wit Openshift RedHat Data Science operator](./notebook_in_rhods.md)
+- [Integrating OpenVINO notebook image with Openshift RedHat Data Science operator](./notebook_in_rhods.md)

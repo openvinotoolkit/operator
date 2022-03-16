@@ -8,13 +8,13 @@ The Operator also integrates with the JupyterHub Spawner in Red Hat OpenShift Da
 
 [Operator installation](docs/operator_installation.md)
 
-[Installing and managing OpenVINO model server via the opertor](docs/modelserver.md)
+[Installing and managing OpenVINO model server via the operator](docs/modelserver.md)
 
 [Model server parameters](docs/modelserver_params.md)
 
 [Autoscalability](docs/autoscaling.md)
 
-[Perfotmance tuning](docs/recommendations.md)
+[Performance tuning](docs/recommendations.md)
 
 [OpenVINO notebook integration with RHODS](docs/notebook_in_rhods.md)
 

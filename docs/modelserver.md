@@ -4,7 +4,7 @@
 
 New instance of the OpenVINO model server can be managed both in Openshift and in upstream Kubernetes via a custom resource `ModelServer`.
 
-All the [ModeServer parameters](./modelserver_params.md) are grouped in the following categories:
+All the [ModelServer parameters](./modelserver_params.md) are grouped in the following categories:
 - models settings - configures the model or models used by the model server
 - deployment parameters - specification of the Kubernetes deployment
 - server settings - model server settings common for all models

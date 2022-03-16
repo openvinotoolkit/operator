@@ -15,7 +15,7 @@ The `Create Notebook` button in the web console will trigger building the docker
 
 The docker image tag visible in the JupyterHub is mapped to the `Notebook` resource name. 
 
-When in the `Notebook` resource specification, there is selected option `auto_update_image`, the operator will be checking for updates the github repository of the OpenVINO notebook on a speficied branch. When changes will be detected, the operator will update the `BuildConfig` and will trigger new docker image building. It can ensure the image is up-to-date. Newly created image tag will be composed with the `Notebook` resource name and the building date suffix. By default, the operator is connecting with github once in 2h. This frequency can be adjusted using parameter `reconcile_duration_multiplier`.
+When in the `Notebook` resource specification, there is selected option `auto_update_image`, the operator will be checking for updates the GitHub repository of the OpenVINO notebook on a specified branch. When changes will be detected, the operator will update the `BuildConfig` and will trigger new docker image building. It can ensure the image is up-to-date. Newly created image tag will be composed with the `Notebook` resource name and the building date suffix. By default, the operator is connecting with GitHub once in 2h. This frequency can be adjusted using parameter `reconcile_duration_multiplier`.
 
 Check the explanation of all the [notebook custom resource parameters](./notebook_params.md)
 
