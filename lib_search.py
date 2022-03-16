@@ -41,7 +41,7 @@ def check_dir(start_dir):
     no_header = []
 
     exclude_files = ['.git', '.venv', '__pycache__', '.vscode', '.tgz', '.md', '.groovy', 'NOTES.txt', '.mod', '.sum',
-                     '.yaml', '.helmignore', '.tpl', 'missing_headers.txt', 'coverage.out']
+                     '.yaml', '.helmignore', '.tpl', 'missing_headers.txt', 'coverage.out','.png']
 
     exclude_directories = ['build']
 

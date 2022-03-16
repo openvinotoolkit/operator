@@ -1,0 +1,12 @@
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ovms-sample-scaling
+spec:
+  maxReplicas: 10
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: intel.com/v1alpha1
+    kind: ModelServer
+    name: ovms-sample
+  targetCPUUtilizationPercentage: 50

@@ -51,7 +51,7 @@ models_repository:
   storage_type: google
   models_host_path: ""
   models_volume_claim: ""
-  security_context: {}
+  run
   aws_secret_access_key: ""
   aws_access_key_id: ""
   aws_region: ""

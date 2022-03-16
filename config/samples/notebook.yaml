@@ -3,5 +3,5 @@ kind: Notebook
 metadata:
   name: v2022.1
 spec:
-  auto_update_image: true
+  auto_update_image: false
   git_ref: main
