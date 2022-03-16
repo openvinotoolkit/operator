@@ -192,6 +192,11 @@ platform-build-software: PLATFORM_BUILD_DIR PLATFORM_BUILD_MODE $(PLATFORM_BUILD
 	@echo PLATFORM_PACKAGE_DIR: packages files directory
 	@echo PLATFORM_BUILD_MODE: build targets
 	@echo PLATFORM_OPTS: yaml file with all platform opts for installation
+	@echo  ${OPERATOR_IMAGE}:${IMAGE_TAG} 
+	@docker save ${OPERATOR_IMAGE}:${IMAGE_TAG}  -o $(PLATFORM_INSTALLER_DIR)/package.tar 
+	@gzip $(PLATFORM_INSTALLER_DIR)/package.tar 
+	@mkdir -p $(PLATFORM_INSTALLER_DIR)/dependencies/images/
+	@ln -s $(PLATFORM_INSTALLER_DIR)/package.tar.gz $(PLATFORM_INSTALLER_DIR)/dependencies/images/package.tar.gz
 
 platform-install-software: PLATFORM_KUBECONFIG PLATFORM_INSTALLER_DIR PLATFORM_INSTALLATION_MODE $(PLATFORM_INSTALLATION_MODE)
 	@echo ========== Target installs platform software on the top of the kubernetes ===============
