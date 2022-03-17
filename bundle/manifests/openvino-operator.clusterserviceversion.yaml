@@ -136,7 +136,7 @@ spec:
           - description: >-
               By default, the batch size is derived from the model, defined through the OpenVINO Model Optimizer. batch_size is useful for sequential inference requests of the same batch size.
               Some models, such as object detection, don't work correctly with the batch_size parameter. With these models, the output's first dimension doesn't represent the batch size. You can set the batch size for these models by using network reshaping and setting the shape parameter appropriately.
-              The default option of using the Model Optimizer to determine the batch size uses the size of the first dimension in the first input for the size. For example, if the input shape is (1, 3, 225, 225), the batch size is set to 1. If you set batch_size to a numerical value, the model batch size is changed when the service starts.
+              The default option of using the Model Optimizer to determine the batch size uses the size of the first dimension in the first input for the size. For example, if the input shape is (1, 3, 225, 225), the batch size is set to 1. If you set batch_size to a numerical value or range of values, the model batch size is changed when the service starts.
               batch_size also accepts a value of auto. If you use auto, then the served model batch size is set according to the incoming data at run time. The model is reloaded each time the input data changes the batch size. You might see a delayed response upon the first request.
             displayName: Batch size
             path: models_settings.batch_size
@@ -163,8 +163,8 @@ spec:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
           - description: >-
-              layout is optional argument which allows to change the layout of model input and output tensors. Only NCHW and NHWC layouts are supported.
-              When specified with single string value - layout change is only applied to single model input. To change multiple model inputs or outputs, you can specify json object with mapping, such as: {"input1":"NHWC","input2":"NHWC","output1":"NHWC"}.
+              layout is optional argument which allows to change the layout of model input and output tensors.
+            When specified with single string value - layout change is only applied to single model input. To change multiple model inputs or outputs, you can specify json object with mapping, such as: {"input1":"NHWC:NCHW","input2":"NHWC:NCHW","output1":"NHWC:NCHW"}.
               If not specified, layout is inherited from model.
             displayName: Layout
             path: models_settings.layout
@@ -231,7 +231,7 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:cluster'
 
-          - description: Aws access key_id
+          - description: Aws access key id
             displayName: aws_access_key_id with access to the s3 bucket
             path: models_repository.aws_access_key_id
             x-descriptors:
