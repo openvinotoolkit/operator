@@ -193,8 +193,8 @@ platform-build-software: PLATFORM_BUILD_DIR PLATFORM_BUILD_MODE $(PLATFORM_BUILD
 	@echo PLATFORM_BUILD_MODE: build targets
 	@echo PLATFORM_OPTS: yaml file with all platform opts for installation
 	@echo  $(OPERATOR_IMAGE):$(IMAGE_TAG)
-	@docker save $(OPERATOR_IMAGE):$(IMAGE_TAG) | pigz > $(PLATFORM_INSTALLER_DIR)/dependencies/images/openvino_operator_$(IMAGE_TAG).tar.gz && test $${PIPESTATUS[0]} -eq 0
-	@cp $(PLATFORM_INSTALLER_DIR)/dependencies/images/openvino_operator_$(IMAGE_TAG).tar.gz $(PLATFORM_INSTALLER_DIR)/package.tar.gz
+	@docker save $(OPERATOR_IMAGE):$(IMAGE_TAG) | pigz > $(PLATFORM_PACKAGE_DIR)/dependencies/images/openvino_operator_$(IMAGE_TAG).tar.gz && test $${PIPESTATUS[0]} -eq 0
+	@cp $(PLATFORM_PACKAGE_DIR)/dependencies/images/openvino_operator_$(IMAGE_TAG).tar.gz $(PLATFORM_PACKAGE_DIR)/package.tar.gz
 
 platform-install-software: PLATFORM_KUBECONFIG PLATFORM_INSTALLER_DIR PLATFORM_INSTALLATION_MODE $(PLATFORM_INSTALLATION_MODE)
 	@echo ========== Target installs platform software on the top of the kubernetes ===============
