@@ -61,6 +61,27 @@ func TestAutoUpdateEnabled(t *testing.T){
 	}
 	b1 = autoUpdateEnabled(values)
 	assert.EqualValues(t, b1, false)
+
+	values = map[string]interface{}{
+		"auto_update_image": true,
+		"git_ref": "",
+	}
+	b1 = autoUpdateEnabled(values)
+	assert.EqualValues(t, b1, false)
+
+	values = map[string]interface{}{
+		"auto_update_image": "incorrect type",
+		"git_ref": "main",
+	}
+	b1 = autoUpdateEnabled(values)
+	assert.EqualValues(t, b1, false)
+
+	values = map[string]interface{}{
+		"auto_update_image": true,
+		"git_ref": 1234,
+	}
+	b1 = autoUpdateEnabled(values)
+	assert.EqualValues(t, b1, false)
 }
 
 func TestHasAnnotation(t *testing.T) {
