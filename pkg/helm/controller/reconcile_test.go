@@ -16,10 +16,73 @@ package controller
 
 import (
 	"testing"
-
+	"errors"
 	"github.com/stretchr/testify/assert"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
+
+func TestGetAPIUrl(t *testing.T){
+
+	url1, er1 := getAPIUrl("https://github.com/openvinotoolkit/openvino_notebooks", "main")
+	assert.EqualValues(t, url1, "https://api.github.com/repos/openvinotoolkit/openvino_notebooks/commits/main")
+	assert.NoError(t, er1)
+
+	url2, er2 := getAPIUrl("https://github.com/fork/notebooks", "master")
+	assert.EqualValues(t, url2, "https://api.github.com/repos/fork/notebooks/commits/master")
+	assert.NoError(t, er2)
+
+	url3, er3 := getAPIUrl("https://github.com/invalid", "master")
+	assert.EqualValues(t, url3, "")
+	assert.Equal(t, er3, errors.New("invalid uri https://github.com/invalid"))
+
+	url4, er4 := getAPIUrl("https://www.invalid.com/openvinotoolkit/openvino_notebooks", "branch")
+	assert.EqualValues(t, url4, "")
+	assert.Equal(t, er4, errors.New("invalid uri https://www.invalid.com/openvinotoolkit/openvino_notebooks"))
+
+}
+
+func TestAutoUpdateEnabled(t *testing.T){
+	values := map[string]interface{}{
+		"auto_update_image": true,
+		"git_ref": "main",
+	}
+	b1 := autoUpdateEnabled(values)
+	assert.EqualValues(t, b1, true)
+
+	values = map[string]interface{}{
+		"auto_update_image": true,
+	}
+	b1 = autoUpdateEnabled(values)
+	assert.EqualValues(t, b1, false)
+
+	values = map[string]interface{}{
+		"auto_update_image": false,
+		"git_ref": "main",
+	}
+	b1 = autoUpdateEnabled(values)
+	assert.EqualValues(t, b1, false)
+
+	values = map[string]interface{}{
+		"auto_update_image": true,
+		"git_ref": "",
+	}
+	b1 = autoUpdateEnabled(values)
+	assert.EqualValues(t, b1, false)
+
+	values = map[string]interface{}{
+		"auto_update_image": "incorrect type",
+		"git_ref": "main",
+	}
+	b1 = autoUpdateEnabled(values)
+	assert.EqualValues(t, b1, false)
+
+	values = map[string]interface{}{
+		"auto_update_image": true,
+		"git_ref": 1234,
+	}
+	b1 = autoUpdateEnabled(values)
+	assert.EqualValues(t, b1, false)
+}
 
 func TestHasAnnotation(t *testing.T) {
 	upgradeForceTests := []struct {
