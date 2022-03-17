@@ -125,7 +125,7 @@ spec:
               shape is optional and takes precedence over batch_size. The shape argument changes the model that is enabled in the model server to fit the parameters.
               shape accepts three forms of the values: auto - the model server reloads the model with the shape that matches the input data matrix,
               a tuple, such as (1,3,224,224) - the tuple defines the shape to use for all incoming requests for models with a single input,
-              a dictionary of shapes, such as {"input1":"(1,3,224,224)","input2":"(1,3,50,50)", "input3":"auto"}
+              a dictionary of shapes, such as {"input1":"(1,3,224,224)","input2":"(1,3,50:70,50:70)", "input3":"auto"}
               - this option defines the shape of every included input in the model.
               Some models don't support the reshape operation.
               If the model can't be reshaped, it remains in the original parameters and all requests with incompatible input format result in an error.
