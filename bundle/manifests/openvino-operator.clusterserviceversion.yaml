@@ -16,7 +16,7 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "image_name": "registry.access.redhat.com/intel/openvino_notebooks:latest",
+            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:latest",
             "deployment_parameters": {
               "replicas": 1
             },
