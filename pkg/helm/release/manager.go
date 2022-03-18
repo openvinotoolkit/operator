@@ -59,8 +59,8 @@ import (
 	"k8s.io/cli-runtime/pkg/resource"
 	"k8s.io/client-go/discovery"
 
-	"github.com/openvinotoolkit/openshift_operator/pkg/helm/internal/types"
-	"github.com/openvinotoolkit/openshift_operator/pkg/helm/manifestutil"
+	"github.com/openvinotoolkit/operator/pkg/helm/internal/types"
+	"github.com/openvinotoolkit/operator/pkg/helm/manifestutil"
 )
 
 // Manager manages a Helm release. It can install, upgrade, reconcile,

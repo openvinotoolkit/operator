@@ -33,7 +33,7 @@ package metrics
 import (
 	"github.com/prometheus/client_golang/prometheus"
 
-	sdkVersion "github.com/openvinotoolkit/openshift_operator/pkg/version"
+	sdkVersion "github.com/openvinotoolkit/operator/pkg/version"
 )
 
 const (

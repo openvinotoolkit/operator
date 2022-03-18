@@ -55,9 +55,9 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 
 	resty "github.com/go-resty/resty/v2"
-	"github.com/openvinotoolkit/openshift_operator/pkg/helm/internal/diff"
-	"github.com/openvinotoolkit/openshift_operator/pkg/helm/internal/types"
-	"github.com/openvinotoolkit/openshift_operator/pkg/helm/release"
+	"github.com/openvinotoolkit/operator/pkg/helm/internal/diff"
+	"github.com/openvinotoolkit/operator/pkg/helm/internal/types"
+	"github.com/openvinotoolkit/operator/pkg/helm/release"
 )
 
 // blank assignment to verify that HelmOperatorReconciler implements reconcile.Reconciler
