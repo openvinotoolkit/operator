@@ -163,8 +163,7 @@ spec:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
           - description: >-
-              layout is optional argument which allows to change the layout of model input and output tensors.
-            When specified with single string value - layout change is only applied to single model input. To change multiple model inputs or outputs, you can specify json object with mapping, such as: {"input1":"NHWC:NCHW","input2":"NHWC:NCHW","output1":"NHWC:NCHW"}.
+              layout is optional argument which allows to change the layout of model input and output tensors. When specified with single string value - layout change is only applied to single model input. To change multiple model inputs or outputs, you can specify json object with mapping, such as: {"input1":"NHWC:NCHW","input2":"NHWC:NCHW","output1":"NHWC:NCHW"}.
               If not specified, layout is inherited from model.
             displayName: Layout
             path: models_settings.layout
