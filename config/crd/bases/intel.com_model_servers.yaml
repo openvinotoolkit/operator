@@ -167,7 +167,7 @@ spec:
                       type: string
                       default: '{"latest": { "num_versions":1 }}'
                     layout:
-                      description: defines model input/output layouts
+                      description: Defines model input/output layouts
                       type: string
                     nireq:
                       description: Size of inference request queue for model executions
