@@ -18,34 +18,28 @@ import os
 import sys
 import re
 
-COPYRIGHT = re.compile(r'Copyright')
-INTEL_COPYRIGHT = re.compile(r'Copyright (\(c\) )?(201(8|9)-)?20(20|19|18) Intel Corporation')
+COPYRIGHT = re.compile(r'(C|c)opyright (\((c|C)\) )?(20(0|1|2)([0-9])-)?(20(0|1|2)([0-9]),)*20(0|1|2)([0-9])(,)? ([a-z]|[A-Z]|[0-9]| )*')
 
 def check_header(fd):
-    result = False
     detected = False
     try:
         for line in fd:
             if COPYRIGHT.findall(line):
                 detected = True
-                if INTEL_COPYRIGHT.findall(line):
-                    result = True
-                    break
+                break
     except:
         print("ERROR: Cannot parse file:" + str(fd))
-    return detected, result
+    return detected
 
 def check_dir(start_dir):
-    ok = []
-    not_ok = []
     no_header = []
 
-    exclude_files = ['.git', '.venv', '__pycache__', '.vscode', '.tgz', '.md', '.groovy', 'NOTES.txt', '.mod', '.sum',
-                     '.yaml', '.helmignore', '.tpl', 'missing_headers.txt', 'coverage.out','.png']
+    exclude_files = ['.yaml', '__pycache__', '.vscode', '.venv', '.groovy', '.git', 'LICENSE', 'COPYING', '.md', '.png', 'NOTES.txt', '.mod', '.sum', '.tgz',
+                     '.tpl', '.helmignore', 'missing_headers.txt', 'coverage.out']
 
     exclude_directories = ['build']
 
-    for (d_path, dir_set, file_set) in os.walk(start_dir):
+    for (d_path, _, file_set) in os.walk(start_dir):
         for f_name in file_set:
             
             skip = False
@@ -62,15 +56,10 @@ def check_dir(start_dir):
 
             if not [test for test in exclude_files if test in fpath]:
                 with open(fpath, 'r') as fd:
-                    header_detected, result = check_header(fd)
-                    if header_detected:
-                        if result:
-                            ok.append(fpath)
-                        else:
-                            not_ok.append(fpath)
-                    else:
+                    header_detected = check_header(fd)
+                    if not header_detected:
                         no_header.append(fpath)
-    return not_ok, no_header
+    return no_header
 
 def main():
     if len(sys.argv) < 2:
@@ -80,7 +69,7 @@ def main():
         print('Provided start dir:' + start_dir)
 
     print("Check for missing headers")
-    external_component_set, no_header_set = check_dir(start_dir)
+    no_header_set = check_dir(start_dir)
 
     if len(no_header_set) == 0:
         print('Success: All files have headers')
