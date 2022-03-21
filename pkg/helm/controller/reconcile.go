@@ -435,7 +435,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 			if gitRepositoryUpdateRequired(previousRelease.Config, upgradedRelease.Config) {
 				log.Info("New repository or branch detected - updating commit value")
 				notebookValues := manager.GetValues()
-				ref, err := getGithubRef(notebookValues) // On error during getting new commit sha, set empty string
+				ref, _ := getGithubRef(notebookValues) // On error during getting new commit sha, set empty string
 				updateCommit(ref, notebookValues, manager, o, ctx, r)
 				err = r.updateResourceStatus(ctx, o, status)
 				if err != nil {
@@ -558,7 +558,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		log.Error(err, "Failed to update resource status")
 	}
 
-	return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
+	return reconcile.Result{}, err
 }
 
 func gitRepositoryUpdateRequired(previousReleaseConfig map[string]interface{}, upgradedReleaseConfig map[string]interface{}) bool {
@@ -572,10 +572,7 @@ func gitRepositoryUpdateRequired(previousReleaseConfig map[string]interface{}, u
 
 func gitCommitUpdateRequired(previousReleaseConfig map[string]interface{}, upgradedReleaseConfig map[string]interface{}) bool {
 	gitCommitShaChanged := previousReleaseConfig["commit"] != upgradedReleaseConfig["commit"]
-	if gitCommitShaChanged { 
-		return true 
-	}
-	return false
+	return gitCommitShaChanged 
 }
 
 func getNotebookUpdateTimeframe( values map[string]interface{}) time.Duration {
