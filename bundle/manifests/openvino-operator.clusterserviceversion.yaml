@@ -16,7 +16,7 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:latest",
+            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:v2022.1",
             "deployment_parameters": {
               "replicas": 1
             },
@@ -50,7 +50,7 @@ metadata:
               "rest_workers": 0
             },
             "models_repository": {
-              "https_proxy": "http://proxy-mu.intel.com:911",
+              "https_proxy": "",
               "http_proxy": "",
               "storage_type": "google",
               "models_host_path": "",
@@ -88,6 +88,8 @@ spec:
     owned:
       - kind: ModelServer
         name: modelservers.intel.com
+        description: Provides inference serving through gRPC & REST
+        displayName: Model Server
         specDescriptors:
           - description: >-
               Select this option for serving a single model.
@@ -97,7 +99,7 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
 
-          - description: Config map with the model server configuration file. If this field is empty, specify required parameters in `model_settings` section. Configuration config.json file can be created as describe on https://github.com/openvinotoolkit/model_server Create the config_map with this file via a command `oc create configmap ovms-config --from-file config.json`
+          - description: Config map with the model server configuration file. If this field is empty, specify required parameters in `model_settings` section. Configuration config.json file can be created as described [here](https://docs.openvino.ai/latest/ovms_docs_multiple_models.html?highlight=config%20json) Create the config_map with this file via a command `oc create configmap ovms-config --from-file config.json`
             displayName: Config map
             path: models_settings.config_configmap_name
             x-descriptors:
@@ -204,12 +206,11 @@ spec:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
 
-          - description: Persistent Volume Claim with models repository
+          - description: Configuration for available storage types
             displayName: Storage type
             path: models_repository.storage_type
 
-          - description: Persistent Volume Claim with models repository to be mounted as /models
-            displayName: Persistent Volume Claim
+          - displayName: Persistent Volume Claim
             path: models_repository.models_volume_claim
             x-descriptors:
               - 'urn:alm:descriptor:io.kubernetes:PersistentVolumeClaim'
@@ -230,26 +231,22 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:cluster'
 
-          - description: Aws access key id
-            displayName: aws_access_key_id with access to the s3 bucket
+          - displayName: Aws access key id
             path: models_repository.aws_access_key_id
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:S3'
-          - description: Aws secret access key
-            displayName: aws_secret_access_key
+          - displayName: Aws secret access key
             path: models_repository.aws_secret_access_key
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:password'
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:S3'
-          - description: Aws region
-            displayName: Aws region
+          - displayName: Aws region
             path: models_repository.aws_region
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:S3'
-          - description: S3 compatible API endpoint
-            displayName: s3_compat_api_endpoint
+          - displayName: S3 compatible API endpoint
             path: models_repository.s3_compat_api_endpoint
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
@@ -262,8 +259,7 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:io.kubernetes:Secret'
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:google'
-          - description: Azure storage settings
-            displayName: azure_storage_connection_string
+          - displayName: Azure storage connection string
             path: models_repository.azure_storage_connection_string
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
@@ -274,26 +270,25 @@ spec:
             path: deployment_parameters.replicas
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:podCount'
-          - description: node affinity
+          - description: Determine where a pod can be placed
             displayName: Node affinity
             path: deployment_parameters.node_affinity
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:nodeAffinity'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
-          - description: pod affinity
+          - description: Define affinity towards specific pods
             displayName: pod_affinity
             path: deployment_parameters.pod_affinity
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:podAffinity'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
-          - description: pod antiaffinity
+          - description: Define anti-affinity towards specific pods
             displayName: pod_antiaffinity
             path: deployment_parameters.pod_antiaffinity
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:podAntiAffinity'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
-          - description: update strategy
-            displayName: update_strategy
+          - displayName: Update strategy
             path: deployment_parameters.update_strategy
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:updateStrategy'
@@ -319,17 +314,17 @@ spec:
 
       - kind: Notebook
         name: notebooks.intel.com
+        description: A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit
+        displayName: Notebook
         specDescriptors:
           - description: >-
               Git reference in the repository https://github.com/openvinotoolkit/openvino_notebooks.
-              The docker image will be build using that code version.
+              The docker image will be built using that source code version.
             displayName: Git reference
             path: git_ref
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
-          - description: >-
-              Automatic update of the image
-            displayName: Automatic image updates
+          - displayName: Automatic image updates
             path: auto_update_image
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
@@ -356,11 +351,11 @@ spec:
   description: |
     OpenVINO Toolkit Operator manages OpenVINO components in OpenShift.
 
-    Currently there are components ModelServer and Notebook.
+    Currently there available components are ModelServer and Notebook.
 
     # Model Server
-    [OpenVINO™ Model Server](https://github.com/openvinotoolkit/model_server) (OVMS) is a scalable, high-performance solution for serving machine learning models optimized for Intel® architectures. The server provides an inference service via gRPC or REST API - making it easy to deploy new algorithms and AI experiments using the same architecture as [TensorFlow Serving](https://github.com/tensorflow/serving) for any models trained in a framework that is supported by [OpenVINO](https://software.intel.com/en-us/openvino-toolkit).
-    Model Server configuration is identical with a [Helm chart](https://github.com/openvinotoolkit/operator/tree/initial/helm-charts) for OVMS. It supports all the parameters from the helm chart.
+    [OpenVINO™ Model Server](https://github.com/openvinotoolkit/model_server) (OVMS) is a scalable, high-performance solution for serving machine learning models optimized for Intel® architectures. The server provides an inference service via gRPC or REST API for any models trained in a framework that is supported by [OpenVINO](https://software.intel.com/en-us/openvino-toolki://docs.openvino.ai/latest/index.html).
+    Model Server configuration parameters is explained [here](https://github.com/openvinotoolkit/operator/blob/main/docs/modelserver_params.md).
     ## Using the cluster
     OpenVINO Model Server can be consumed as a `Service`. It is called like with `ModelServer` resource with `-ovms` suffix.
     The suffix is ommited when `ovms` phrase is included in the name.
@@ -374,19 +369,18 @@ spec:
     NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
     model-server-sample-ovms   ClusterIP   172.25.199.210   <none>        8080/TCP,8081/TCP   8h
     ```
-    ## Before you start
-    Depending on the deployment configuration there might be pre-requisites for additional records to be created in the cluster.
     ## References
     OpenVINO Model Server on [Github](https://github.com/openvinotoolkit/model_server)
+
     OpenVINO Model Server Operator on [Github](https://github.com/openvinotoolkit/operator)
 
     # Notebook
     The Notebook resource integrates JupyterHub from OpenShift Data Science or Open Data Hub with a container image that includes [developer
     tools](https://github.com/openvinotoolkit/openvino/blob/master/docs/install_guides/pypi-openvino-dev.md)
-    from the OpenVINO toolkit and a set of Jupyter notebook tutorials. It enables selecting a defined image `openvino-notebook` from
-    the Jupyter Spawner drop-down menu.
+    from the OpenVINO toolkit and a set of Jupyter notebook tutorials. It enables selecting a defined image `OpenVINO™ Toolkit` from
+    the Jupyter Spawner choice list.
 
-    Create the `Notebook` resource in the same project with JupyterHub and RedHat OpenShift Data Science operator.
+    Create the `Notebook` resource in the same project with JupyterHub and RedHat OpenShift Data Science operator as seen in [documentation](https://github.com/openvinotoolkit/operator/blob/main/docs/notebook_in_rhods.md).
     It builds the image in the cluster based on Dockerfile from [openvino_notebooks](https://github.com/openvinotoolkit/openvino_notebooks).
 
   displayName: OpenVINO Toolkit Operator

@@ -71,6 +71,7 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     openshift_service_mesh:
+                      description: If selected deployed pods will get annotations for integration with Red Hat Service Mesh
                       type: boolean
                       default: false
                     resources:
@@ -81,12 +82,14 @@ spec:
                           type: object
                           properties:
                             cpu:
+                              description: Example values: "0.5", "1"
                               type: string
                             memory:
+                              description: Example values: "0.5Mi", "500M", "12Gi"
                               type: string
                             xpu_device:
                               description: >-
-                                The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes
+                                The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes. Only integer values are allowed.
                               type: string
                             xpu_device_quantity:
                               type: string
@@ -95,12 +98,14 @@ spec:
                           type: object
                           properties:
                             cpu:
+                              description: Example values: "0.5", "1"
                               type: string
                             memory:
+                              description: Example values: "0.5Mi", "500M", "12Gi"
                               type: string
                             xpu_device:
                               description: >-
-                                The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes
+                                The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes. Only integer values are allowed.
                               type: string
                             xpu_device_quantity:
                               type: string
@@ -206,12 +211,12 @@ spec:
                         - INFO
                         - WARNING
                         - ERROR
-                    grpc_workers:
+                    gRPC workers:
                       description: Number of gRPC servers. Default 1. Increase for multi client, high throughput scenarios
                       type: integer
                       format: int32
                       default: 1
-                    rest_workers:
+                    REST workers:
                       description: Number of worker threads in REST server - has no effect if rest_port is not set. Default value depends on number of CPUs.
                       type: integer
                       format: int32
@@ -250,13 +255,10 @@ spec:
                          In openshift, you might need to create Security Context Constraints to allow grant permissions for changing the context.
                     aws_secret_access_key:
                       type: string
-                      description: Aws secret access key
                     aws_access_key_id:
                       type: string
-                      description: Aws access key
                     aws_region:
                       type: string
-                      description: Aws region
                     s3_compat_api_endpoint:
                       type: string
                       description: Optional for AWS s3 storage and mandatory for Minio and other s3 compatible storage types
