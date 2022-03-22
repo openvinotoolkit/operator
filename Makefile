@@ -230,7 +230,7 @@ venv:$(ACTIVATE)
 $(ACTIVATE):
 	@echo "Updating virtualenv dependencies in: $(VIRTUALENV_DIR)..."
 	@test -d $(VIRTUALENV_DIR) || $(VIRTUALENV_EXE) $(VIRTUALENV_DIR)
-	@. $(ACTIVATE); pip$(PY_VERSION) install --upgrade pip
+	@. $(ACTIVATE); pip install --upgrade pip
 	@touch $(ACTIVATE)
 
 sdl-check: venv
