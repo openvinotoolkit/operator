@@ -82,10 +82,12 @@ spec:
                           type: object
                           properties:
                             cpu:
-                              description: Example values: "0.5", "1"
+                              description: >-
+                                Example values "0.5", "1"
                               type: string
                             memory:
-                              description: Example values: "0.5Mi", "500M", "12Gi"
+                              description: >-
+                                Example values "0.5Mi", "500M", "12Gi"
                               type: string
                             xpu_device:
                               description: >-
@@ -98,10 +100,12 @@ spec:
                           type: object
                           properties:
                             cpu:
-                              description: Example values: "0.5", "1"
+                              description: >-
+                                Example values: "0.5", "1"
                               type: string
                             memory:
-                              description: Example values: "0.5Mi", "500M", "12Gi"
+                              description: >-
+                                Example values: "0.5Mi", "500M", "12Gi"
                               type: string
                             xpu_device:
                               description: >-
