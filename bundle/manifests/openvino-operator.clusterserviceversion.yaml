@@ -337,6 +337,12 @@ spec:
               - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
           - description: >-
               HIDDEN FIELD
+            displayName: HIDDEN FIELD latest_update_date
+            path: latest_update_date
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:hidden'
+          - description: >-
+              HIDDEN FIELD
             displayName: HIDDEN FIELD git_uri
             path: git_uri
             x-descriptors:

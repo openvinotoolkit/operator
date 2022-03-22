@@ -24,14 +24,14 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: openvino-notebook:{{ .Release.Name }}
+      name: {{ template "notebook.fullname" . }}:{{ .Values.latest_update_date }}
   source:
     git:
       uri: {{ .Values.git_uri}}
 {{- if .Values.commit }}
-      ref: "{{ .Values.commit }}"
+      ref: {{ .Values.commit }}
 {{- else }}
-      ref: "{{ .Values.git_ref }}"
+      ref: {{ .Values.git_ref }}
 {{ end }}
     type: Git
   postCommit: {}
