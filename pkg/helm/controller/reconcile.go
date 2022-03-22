@@ -653,7 +653,7 @@ func getGithubRef(values map[string]interface{}) (string, error) {
 	url, err := getAPIUrl(uri, values["git_ref"].(string))
 	if err != nil {
 		log.Error(err, "Cannot create github api request")
-		return "", errors.New("can not create github api request")
+		return "", errors.New("cannot create github api request")
 	}
 	_, err = client.R().SetResult(&GithubResponseobj).Get(url)
 	if err != nil {
