@@ -16,7 +16,7 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:v2022.1",
+            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:latest",
             "deployment_parameters": {
               "replicas": 1
             },
@@ -80,7 +80,7 @@ metadata:
     categories: "AI/Machine Learning"
     operators.operatorframework.io/builder: operator-sdk-v1.7.1+git
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-  name: openvino-operator.v0.0.1
+  name: openvino-operator.v1.0.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -99,7 +99,7 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
 
-          - description: Config map with the model server configuration file. If this field is empty, specify required parameters in `model_settings` section. Configuration config.json file can be created as described [here](https://docs.openvino.ai/latest/ovms_docs_multiple_models.html?highlight=config%20json) Create the config_map with this file via a command `oc create configmap ovms-config --from-file config.json`
+          - description: Config map with the model server configuration file. If this field is empty, specify required parameters in `model_settings` section. Configuration config.json file can be created as described as described on https://docs.openvino.ai/latest/ovms_docs_multiple_models.html Create the config_map with this file via a command `oc create configmap ovms-config --from-file config.json`
             displayName: Config map
             path: models_settings.config_configmap_name
             x-descriptors:
@@ -158,7 +158,7 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
           - description: >-
-              How the model versions should be managed. Possible formats: `{ "all": {} }`, `{ "latest": { "num_versions":2 }}`, `{ "specific": { "versions":[1, 3] } }`
+              How the model versions should be managed. Possible formats: { "all": {} }, { "latest": { "num_versions":2 }}, { "specific": { "versions":[1, 3] } }
             displayName: Model version policy
             path: models_settings.model_version_policy
             x-descriptors:
@@ -206,7 +206,7 @@ spec:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
 
-          - description: Configuration for available storage types
+          - description: Configuration for available storage types https://docs.openvino.ai/latest/ovms_docs_cloud_storage.html
             displayName: Storage type
             path: models_repository.storage_type
 
@@ -265,25 +265,24 @@ spec:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:azure'
 
-          - description: Replicas
-            displayName: Number of replicas
+          - displayName: Replicas
             path: deployment_parameters.replicas
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:podCount'
-          - description: Determine where a pod can be placed
+          - description: Determine the node for scheduling
             displayName: Node affinity
             path: deployment_parameters.node_affinity
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:nodeAffinity'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
           - description: Define affinity towards specific pods
-            displayName: pod_affinity
+            displayName: Pod affinity
             path: deployment_parameters.pod_affinity
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:podAffinity'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
           - description: Define anti-affinity towards specific pods
-            displayName: pod_antiaffinity
+            displayName: Pod antiaffinity
             path: deployment_parameters.pod_antiaffinity
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:podAntiAffinity'
@@ -294,19 +293,19 @@ spec:
               - 'urn:alm:descriptor:com.tectonic.ui:updateStrategy'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
           - description: Number of gRPC servers. Default 1. Increase for multi client, high throughput scenarios
-            displayName: grpc_workers
+            displayName: GRPC workers
             path: server_settings.grpc_workers
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
           - description: Number of worker threads in REST server - has no effect if rest_port is not set. Default value depends on number of CPUs.
-            displayName: rest_workers
+            displayName: Rest workers
             path: server_settings.rest_workers
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
           - description: >-
               Time interval between two consecutive sequence cleaner scans.
               Default is 5. Zero value disables sequence cleaner.
-            displayName: sequence_cleaner_poll_wait_minutes
+            displayName: Sequence cleaner poll wait minutes
             path: server_settings.sequence_cleaner_poll_wait_minutes
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
@@ -314,7 +313,7 @@ spec:
 
       - kind: Notebook
         name: notebooks.intel.com
-        description: A collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit
+        description: Adds a collection of ready-to-run Jupyter notebooks for learning and experimenting with the OpenVINO™ Toolkit to Red Hat® OpenShift® Data Science
         displayName: Notebook
         specDescriptors:
           - description: >-
@@ -369,10 +368,6 @@ spec:
     NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
     model-server-sample-ovms   ClusterIP   172.25.199.210   <none>        8080/TCP,8081/TCP   8h
     ```
-    ## References
-    OpenVINO Model Server on [Github](https://github.com/openvinotoolkit/model_server)
-
-    OpenVINO Model Server Operator on [Github](https://github.com/openvinotoolkit/operator)
 
     # Notebook
     The Notebook resource integrates JupyterHub from OpenShift Data Science or Open Data Hub with a container image that includes [developer
@@ -382,6 +377,11 @@ spec:
 
     Create the `Notebook` resource in the same project with JupyterHub and RedHat OpenShift Data Science operator as seen in [documentation](https://github.com/openvinotoolkit/operator/blob/main/docs/notebook_in_rhods.md).
     It builds the image in the cluster based on Dockerfile from [openvino_notebooks](https://github.com/openvinotoolkit/openvino_notebooks).
+
+    ## References
+    OpenVINO Model Server on [Github](https://github.com/openvinotoolkit/model_server)
+
+    OpenVINO Model Server Operator on [Github](https://github.com/openvinotoolkit/operator)
 
   displayName: OpenVINO Toolkit Operator
   icon:
