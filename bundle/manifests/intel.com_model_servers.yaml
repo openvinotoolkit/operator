@@ -71,6 +71,7 @@ spec:
                       type: object
                       x-kubernetes-preserve-unknown-fields: true
                     openshift_service_mesh:
+                      description: If selected deployed pods will get annotations for integration with Red Hat Service Mesh
                       type: boolean
                       default: false
                     resources:
@@ -81,12 +82,16 @@ spec:
                           type: object
                           properties:
                             cpu:
+                              description: >-
+                                Example values: "1", "4", "12"
                               type: string
                             memory:
+                              description: >-
+                                Example values "500M", "1.5Gi", "12Gi"
                               type: string
                             xpu_device:
                               description: >-
-                                The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes
+                                The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes. Only integer values are allowed.
                               type: string
                             xpu_device_quantity:
                               type: string
@@ -95,16 +100,20 @@ spec:
                           type: object
                           properties:
                             cpu:
+                              description: >-
+                                Example values: "1", "4", "12"
                               type: string
                             memory:
+                              description: >-
+                                Example values "500M", "1.5Gi", "12Gi"
                               type: string
                             xpu_device:
                               description: >-
-                                The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes
+                                The device must be supported by the device plugin. Learn more on https://github.com/intel/intel-device-plugins-for-kubernetes. Only integer values are allowed.
                               type: string
                             xpu_device_quantity:
                               type: string
-                              default: "1"                                    
+                              default: "1"
                 service_parameters:
                   type: object
                   description: Fill service settings
@@ -126,7 +135,7 @@ spec:
                       enum:
                         - ClusterIP
                         - NodePort
-                        - Loadbalancer                
+                        - Loadbalancer
                 models_settings:
                   type: object
                   description: Fill model settings if model config is not used
@@ -140,7 +149,7 @@ spec:
                     config_configmap_name:
                       type: string
                     config_path:
-                      type: string                  
+                      type: string
                     model_name:
                       description: Name of the model loaded to Model Server
                       type: string
@@ -167,7 +176,7 @@ spec:
                       type: string
                       default: '{"latest": { "num_versions":1 }}'
                     layout:
-                      description: Resets model layout
+                      description: Defines model input/output layouts
                       type: string
                     nireq:
                       description: Size of inference request queue for model executions
@@ -175,7 +184,7 @@ spec:
                       format: int32
                     is_stateful:
                       type: boolean
-                      default: false                      
+                      default: false
                     idle_sequence_cleanup:
                       description: Flag indicating if model is subject to sequence cleaner scans
                       type: boolean
@@ -247,16 +256,13 @@ spec:
                        type: string
                        description: >-
                          Set the group ID if access to the model repository is restricted. Model server will start with this security context.
-                         In openshift, you might need to create Security Context Constraints to allow grant permissions for changing the context.              
+                         In openshift, you might need to create Security Context Constraints to allow grant permissions for changing the context.
                     aws_secret_access_key:
                       type: string
-                      description: Aws secret access key
                     aws_access_key_id:
                       type: string
-                      description: Aws access key
                     aws_region:
                       type: string
-                      description: Aws region
                     s3_compat_api_endpoint:
                       type: string
                       description: Optional for AWS s3 storage and mandatory for Minio and other s3 compatible storage types
