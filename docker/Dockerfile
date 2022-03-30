@@ -36,7 +36,7 @@ RUN GOOS=linux GOARCH=$TARGETARCH make build
 RUN GOOS=linux GOARCH=$TARGETARCH make test-unit
 
 # Final image.
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.4
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.5
 
 ENV HOME=/opt/openvino \
     USER_NAME=openvino \
