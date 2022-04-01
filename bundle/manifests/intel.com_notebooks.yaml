@@ -49,6 +49,7 @@ spec:
                 reconcile_duration_multiplier:
                   description: Increases the reconcile duration. It can reduce due frequency of syncs with github code changes.
                   type: integer
+                  default: 120
             status:
               description: Status defines the observed state of Notebook
               type: object

@@ -646,7 +646,7 @@ func getGithubRef(values map[string]interface{}) (string, error) {
 	// Create a Resty Client
 	client := resty.New()
 	var GithubResponseobj GithubResponse
-	uri := "https://github.com/openvinotoolkit/notebook"
+	uri := "https://github.com/openvinotoolkit/openvino_notebooks"
 	if val, ok := values["git_uri"].(string); ok {
 		uri = val
 	}
