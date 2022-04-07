@@ -38,7 +38,7 @@ spec:
                   type: boolean
                   default: false
                 latest_update_date:
-                  description: The date of the latest notebooks update in format Year-Month-Day. Not used if auto_update_image not set. 
+                  description: The date of the latest notebooks update in format Year-Month-Day. Not used if auto_update_image not set
                   type: string
                 commit:
                   description: Git commit reference in notebook repository to build the docker image

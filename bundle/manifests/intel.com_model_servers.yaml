@@ -253,8 +253,8 @@ spec:
                         In openshift, you might need to create Security Context Constraints to allow grant permissions for changing the context.
                       type: string
                     runAsGroup:
-                       type: string
-                       description: >-
+                      type: string
+                      description: >-
                          Set the group ID if access to the model repository is restricted. Model server will start with this security context.
                          In openshift, you might need to create Security Context Constraints to allow grant permissions for changing the context.
                     aws_secret_access_key:
@@ -297,4 +297,3 @@ status:
     plural: ""
   conditions: null
   storedVersions: null
-
