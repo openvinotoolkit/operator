@@ -124,11 +124,12 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		}
 
 		if _, ok := currentNotebookSpec["commit"]; !ok {
-			log.Info("Notebooks auto update enabled. Setting initial notebooks build commit SHA")
+			log.Info("Setting initial notebooks build commit SHA")
 			ref, err := getGithubRef(currentNotebookSpec)
 			if err == nil {
 				currentNotebookSpec["commit"] = ref
 			} else {
+				log.Info("Could not retrieve the initial commit SHA. Setting to empty string.")
 				currentNotebookSpec["commit"] = ""
 			}
 		}
@@ -270,15 +271,15 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 				"Chart value %q overridden to %q by operator's watches.yaml", k, v)
 		}
 
-		notebookError := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
+		err = ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
 
-		if notebookError != "" {
+		if err != nil {
 			log.Error(err, "Failed to install release")
 			status.SetCondition(types.HelmAppCondition{
 				Type:    types.ConditionReleaseFailed,
 				Status:  types.StatusTrue,
 				Reason:  types.PreconditionError,
-				Message: notebookError,
+				Message: err.Error(),
 			})
 			if err := r.updateResourceStatus(ctx, o, status); err != nil {
 				log.Error(err, "Failed to update status after install release failure")
@@ -362,15 +363,15 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 				"Chart value %q overridden to %q by operator's watches.yaml", k, v)
 		}
 
-		notebookError := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
+		err = ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
 
-		if notebookError != "" {
+		if err != nil {
 			log.Error(err, "Failed to upgrade release")
 			status.SetCondition(types.HelmAppCondition{
 				Type:    types.ConditionReleaseFailed,
 				Status:  types.StatusTrue,
 				Reason:  types.PreconditionError,
-				Message: notebookError,
+				Message: err.Error(),
 			})
 			if err := r.updateResourceStatus(ctx, o, status); err != nil {
 				log.Error(err, "Failed to update status after upgrade release failure")
@@ -473,15 +474,15 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 	// no longer being attempted.
 	status.RemoveCondition(types.ConditionReleaseFailed)
 
-	notebookError := ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
+	err = ValidateNotebook(ctx,r.GVK.Kind, request.Namespace)
 
-	if notebookError != "" {
+	if err != nil {
 		log.Error(err, "Failed to reconcile release")
 		status.SetCondition(types.HelmAppCondition{
 			Type:    types.ConditionReleaseFailed,
 			Status:  types.StatusTrue,
 			Reason:  types.PreconditionError,
-			Message: notebookError,
+			Message: err.Error(),
 		})
 		if err := r.updateResourceStatus(ctx, o, status); err != nil {
 			log.Error(err, "Failed to update status after reconcile release failure")
@@ -737,18 +738,18 @@ func RHODSNotInstalled(ctx context.Context) bool {
 }
 
 // Returns error message if the release is for Notebook resource without the preconditinos met
-func ValidateNotebook(ctx context.Context, kind string, namespace string) string {
+func ValidateNotebook(ctx context.Context, kind string, namespace string) error {
 	if kind != "Notebook"{
-		return ""
+		return nil
 	}
 	if namespace != "redhat-ods-applications"{
-		return "Notebook resource should be created in redhat-ods-applications project to integrate notebook image with the Jupyterhub"
+		return errors.New("notebook resource should be created in redhat-ods-applications project to integrate notebook image with the jupyter hub")
 	}else{
 		if  RHODSNotInstalled(ctx) {
-			return "RHODS operator is required to deploy the notebook image integration with the JupyterHub"
+			return errors.New("rhods operator is required to deploy the notebook image integration with the jupyter hub")
 		}
 	}
-	return ""
+	return nil
 }
 
 // returns the boolean representation of the annotation string
