@@ -737,7 +737,7 @@ func RHODSNotInstalled(ctx context.Context) bool {
 	return false
 }
 
-// Returns error message if the release is for Notebook resource without the preconditinos met
+// Returns error if the release is for Notebook resource without the preconditions met
 func ValidateNotebook(ctx context.Context, kind string, namespace string) error {
 	if kind != "Notebook"{
 		return nil
