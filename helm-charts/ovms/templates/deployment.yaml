@@ -149,6 +149,15 @@ spec:
                {{- if eq .Values.models_settings.is_stateful true}}
                "--stateful",
                {{- end }}
+               {{- if eq .Values.models_settings.idle_sequence_cleanup false }}
+               "--idle_sequence_cleanup=false",
+               {{- end }}
+               {{- if eq .Values.models_settings.low_latency_transformation true }}
+               "--low_latency_transformation",
+               {{- end }}
+               {{- if .Values.models_settings.max_sequence_number }}
+               "--max_sequence_number", '{{ Values.models_settings.max_sequence_number }}',
+               {{- end }}
         {{- end }}
                "--log_level", "{{ .Values.server_settings.log_level }}",
                {{- if .Values.server_settings.file_system_poll_wait_seconds }}
