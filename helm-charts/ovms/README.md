@@ -237,7 +237,7 @@ cd operator/helm-charts/ovms
 export AWS_ACCESS_KEY_ID=minioadmin
 export AWS_SECRET_ACCESS_KEY=minioadmin
 export AWS_REGION=us-east-1
-export S3_COMPAT_API_ENDPOINT=http://10.91.120.115:9000
+export S3_COMPAT_API_ENDPOINT=http://mys3.example.com:9000
 helm install ovms-pipeline ovms --set models_settings.config_configmap_name=ovms-pipeline,models_settings.single_model_mode=false,models_repository.aws_access_key_id=$AWS_ACCESS_KEY_ID,models_repository.aws_secret_access_key=$AWS_SECRET_ACCESS_KEY,models_repository.aws_region=us-east-1,models_repository.s3_compat_api_endpoint=$S3_COMPAT_API_ENDPOINT
 
 $ kubectl get service
