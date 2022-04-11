@@ -122,12 +122,12 @@ of the node IP address. `ClusterIP` would keep the OVMS service internal to the 
 
 
 ## Demo of Using Model Server with a single model
-In this demonstration, it is assumed there is available a Kubernetes or OpenShift cluster with configured security context in the KUBECONFIG. Helm 3.5 binary and kubectl 1.23 should be also installed to run the commands.
+In this demonstration, it is assumed there is available a Kubernetes or OpenShift cluster with configured security context in the KUBECONFIG. Helm 3 binary and kubectl 1.23 should be also installed to run the commands.
 An examplary model server instance with a public ResNet model can be deployed via a commands:
 ```
 git clone https://github.com/openvinotoolkit/operator
 cd operator/helm-charts/ovms
-helm install ovms-app ovms --set models_settings.model_name=resnet,models_settings.model_path=gs://ovms-public-eu/resnet50-binary
+helm install ovms-app ovms --set models_settings.model_name=resnet,models_settings.model_path=gs://ovms-public-eu/resnet50-tf
 ```
 
 Now that the server is running you can send HTTP or gRPC requests to perform inference. 
