@@ -1,6 +1,6 @@
-# OpenVINO Model Server deployment via a heml chart
-Provided here helm chart can be used to install OpenVINO Model Server in a Kubernetes cluster. 
-It has the same parameters like the operator so it could be used directly as an alternative deployment method.
+# OpenVINO Model Server deployment via a helm chart
+The helm chart provided here can be used to install OpenVINO Model Server in a Kubernetes cluster. 
+It has the same parameters as the operator so it could be used directly as an alternative deployment method.
 The helm chart is managing the Model Server instance which represents a kubernetes deployment and a kubernetes service with exposed REST and gRPC inference endpoints. This guide assumes you already have a functional Kubernetes cluster and helm installed (see below for instructions on installing helm).
 The steps below describe how to setup a model repository, use helm to launch the inference server and then send inference requests to the running server.
 
@@ -86,7 +86,7 @@ You can restrict assigned cluster resources to the OVMS container by setting the
 - `deployment_parameters.resources.requests.memory` - reserved memory allocation
 - `deployment_parameters.resources.requests.xpu_device` - accelerator name like configured in the device plugin - should be the same like set in limits or empty
 - `deployment_parameters.resources.requests.xpu_device_quantity` - number of accelerators - should be the same like set in limits or empty
-By default, there are no restrictions but that parameter could be used to reduce the CPU and memory allocation. Below is the snippet example from the [values.yaml](https://github.com/openvinotoolkit/model_server/blob/releases/2022/1/deploy/ovms/values.yaml) file:
+By default, there are no restrictions, but that parameter could be used to reduce the CPU and memory allocation. Below is the snippet example from the [values.yaml](https://github.com/openvinotoolkit/model_server/blob/releases/2022/1/deploy/ovms/values.yaml) file:
 ```yaml
 deployment_parameters:
   resources:
@@ -103,9 +103,9 @@ deployment_parameters:
       gpu.intel.com/i915: 1
 ```
 ### Security Context
-OVMS, by default, starts with the security context of `ovms` account which has pid 5000 and gid 5000. In some cases it can prevent importing models
+OVMS, by default, starts with the security context of `ovms` account which has the pid 5000 and gid 5000. In some cases, it can prevent importing models
 stored on the file system with restricted access.
-It might require adjusting the security context of OVMS service. It can be changed using a parameters  `models_repository.runAsUser` and `models_repository.runAsGroup`.
+It might require adjusting the security context of OVMS service. It can be changed using the parameters  `models_repository.runAsUser` and `models_repository.runAsGroup`.
 An example of the values is presented below:
 ```yaml
 models_repository:
@@ -122,8 +122,8 @@ of the node IP address. `ClusterIP` would keep the OVMS service internal to the 
 
 
 ## Demo of Using Model Server with a single model
-In this demonstration, it is assumed there is available a Kubernetes or OpenShift cluster with configured security context in the KUBECONFIG. Helm 3.5 binary and kubectl 1.23 should be also installed to run the commands.
-An examplary model server instance with a public ResNet model can be deployed via a commands:
+In this demonstration, it is assumed that there is a Kubernetes or OpenShift cluster available with configured security context in the KUBECONFIG. Helm 3.5 binary and kubectl 1.23 should be also installed to run the commands.
+An exemplary model server instance with a public ResNet model can be deployed via a commands:
 ```
 git clone https://github.com/openvinotoolkit/operator
 cd operator/helm-charts/ovms
@@ -165,7 +165,7 @@ curl http://ovms-app:8081/v1/config
  ]
 }
 ```
-Here is how you can test prediction via gRPC interface.
+Here you can test prediction via gRPC interface.
 Inside the containers run the following commands to install the client package and download an image to classify:
 ```
 pip install ovmsclient
@@ -190,8 +190,8 @@ python client.py
 Detected class: 310
 ```
 
-## Demo - deployment of the Model Server with a Vehicle anaysis pipeline
-This demonstration deploys in Kubernetes the model server serving a directed acyclic graph with [vehicle analysis](https://github.com/openvinotoolkit/model_server/tree/main/demos/vehicle_analysis_pipeline/python)
+## Demo - deployment of the Model Server with a Vehicle analysis pipeline
+This demonstration deploys the model server serving a directed acyclic graph with [vehicle analysis](https://github.com/openvinotoolkit/model_server/tree/main/demos/vehicle_analysis_pipeline/python) in Kubernetes.
 Requirements:
 - Kubernetes or OpenShift cluster with configured security context in the KUBECONFIG
 - helm 3.5
@@ -206,7 +206,7 @@ git clone https://github.com/openvinotoolkit/model_server
 cd model_server/demos/vehicle_analysis_pipeline/python
 make
 ```
-The command above download the models and builds the customer library for the pipeline and place them in workspace folder. Copy the models to the shared storage accessible in the cluster. Here is S3 server alias is `mys3`:
+The command above downloads the models and builds the customer library for the pipeline and places them in workspace folder. Copy the models to the shared storage accessible in the cluster. Here the S3 server alias is `mys3`:
 ```
 mc cp --recursive workspace/vehicle-detection-0202 mys3/models-repository/
 mc cp --recursive workspace/vehicle-attributes-recognition-barrier-0042 mys3/models-repository/
@@ -216,8 +216,8 @@ mc ls -r mys3
 7.1MiB models-repository/vehicle-detection-0202/1/vehicle-detection-0202.bin
 331KiB models-repository/vehicle-detection-0202/1/vehicle-detection-0202.xml
 ```
-In the initially created model server config file `workspace/config.json` several adjustmentes are need to change the models and custom node library base paths.
-Commands below and setting the models path to S3 bucket and the custom node library to `/config` folder which will be mounted as a Kubernetes configmap.
+In the initially created model server config file `workspace/config.json` several adjustments are needed to change the models and custom node library base paths.
+Commands below set the models path to S3 bucket and the custom node library to `/config` folder which will be mounted as a Kubernetes configmap.
 ```
 sed -i 's/\/workspace\/vehicle-detection-0202/s3:\/\/models-repository\/vehicle-detection-0202/g' workspace/config.json
 sed -i 's/\/workspace\/vehicle-attributes-recognition-barrier-0042/s3:\/\/models-repository\/vehicle-attributes-recognition-barrier-0042/g' workspace/config.json
@@ -291,4 +291,4 @@ release "ovms-pipeline" uninstalled
 
 ***
 Check also:
-- [Model Server paramters explained](../../docs/modelserver_params.md)
+- [Model Server parameters explained](../../docs/modelserver_params.md)
