@@ -149,7 +149,7 @@ Make an interactive session on the docker container with python installed:
 kubectl create deployment client-test --image=python:3.8.13 -- sleep infinity
 kubectl exec -it $(kubectl get pod -o jsonpath="{.items[0].metadata.name}" -l app=client-test) -- bash
 ```
-REST API response can be verified with a simple `curl` command listing the served models:
+REST API response can be verified inside the client container with a simple `curl` command listing the served models:
 ```
 curl http://ovms-app:8081/v1/config
 {
@@ -167,7 +167,7 @@ curl http://ovms-app:8081/v1/config
  ]
 }
 ```
-Here you can test prediction via gRPC interface.
+You can also test a prediction via gRPC interface.
 Inside the containers run the following commands to install the client package and download an image to classify:
 ```
 pip install ovmsclient
@@ -196,11 +196,9 @@ Detected class: 310
 This demonstration deploys the model server serving a directed acyclic graph with [vehicle analysis](https://github.com/openvinotoolkit/model_server/tree/main/demos/vehicle_analysis_pipeline/python) in Kubernetes.
 Requirements:
 - Kubernetes or OpenShift cluster with configured security context in the KUBECONFIG
-- helm 3.5
+- helm 3
 - kubectl 1.23
-- mc binary and access to S3 compatible bucket
-
-- models [vehicle-detection-0202](https://github.com/openvinotoolkit/open_model_zoo/blob/2022.1.0/models/intel/vehicle-detection-0202/README.md) and [vehicle-attributes-recognition-barrier-0042](https://github.com/openvinotoolkit/open_model_zoo/blob/2022.1.0/models/intel/vehicle-attributes-recognition-barrier-0042/README.md) placed in a models repository accessible in the cluster
+- mc binary and access to S3 compatible bucket - [quick start with Minio](https://docs.min.io/docs/minio-quickstart-guide.html)
 
 Prepare all dependencies for the pipeline with a vehicle analysis pipelines:
 ```
@@ -218,7 +216,7 @@ mc ls -r mys3
 7.1MiB models-repository/vehicle-detection-0202/1/vehicle-detection-0202.bin
 331KiB models-repository/vehicle-detection-0202/1/vehicle-detection-0202.xml
 ```
-In the initially created model server config file `workspace/config.json` several adjustments are needed to change the models and custom node library base paths.
+In the initially created model server config file `workspace/config.json`, several adjustments are needed to change the models and custom node library base paths.
 Commands below set the models path to S3 bucket and the custom node library to `/config` folder which will be mounted as a Kubernetes configmap.
 ```
 sed -i 's/\/workspace\/vehicle-detection-0202/s3:\/\/models-repository\/vehicle-detection-0202/g' workspace/config.json
@@ -232,7 +230,7 @@ kubectl create configmap ovms-pipeline --from-file=config.json=workspace/config.
 --from-file=libcustom_node_model_zoo_intel_object_detection.so=workspace/lib/libcustom_node_model_zoo_intel_object_detection.so
 ```
 
-From the context of the helm chart folder in the operator repo deploy the model server:
+From the context of the helm chart folder in the operator repo deploy the model server. Change the credentials and S3 endpoint as needed in your environment:
 ```
 git clone https://github.com/openvinotoolkit/operator
 cd operator/helm-charts/ovms
