@@ -23,6 +23,9 @@ BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 # TARGET_PLATFORM can be k8s or openshift
 TARGET_PLATFORM =? k8s
 
+# TEST_BUILD can be used to include functionality of notebook integration to k8s build
+TEST_BUILD =? 0
+
 # Build-time variables to inject into binaries
 export GIT_COMMIT = $(shell git rev-parse HEAD)
 export K8S_VERSION = 1.20.2
@@ -77,7 +80,15 @@ test-unit: ## Run unit tests
 	go test -coverprofile=coverage.out -covermode=count -short $(TEST_PKGS)
 
 docker-build: ## Build docker image with the manager.
+ifeq ($(TARGET_PLATFORM), openshift)
 	docker build -t ${OPERATOR_IMAGE}:${IMAGE_TAG} --build-arg https_proxy=$(https_proxy) --build-arg http_proxy=$(http_proxy) -f docker/Dockerfile .
+else
+ifeq ($(TEST_BUILD), 1)
+	docker build -t ${OPERATOR_IMAGE}:${IMAGE_TAG} --progress=plain --build-arg drop_notebook=0 --build-arg https_proxy=$(https_proxy) --build-arg http_proxy=$(http_proxy) -f docker/Dockerfile .
+else
+	docker build -t ${OPERATOR_IMAGE}:${IMAGE_TAG} --progress=plain --build-arg drop_notebook=1 --build-arg https_proxy=$(https_proxy) --build-arg http_proxy=$(http_proxy) -f docker/Dockerfile .
+endif
+endif
 
 docker-push: ## Push docker image with the manager.
 	docker push ${OPERATOR_IMAGE}:${IMAGE_TAG} 
@@ -97,6 +108,7 @@ ifeq ($(TARGET_PLATFORM), openshift)
 else
 	echo "Building kubernetes bundle"
 	sed -i "s|registry.connect.redhat.com/intel/ovms-operator:0.2.0|$(OPERATOR_IMAGE):$(IMAGE_TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+ifeq ($(TEST_BUILD), 1)
 	docker build -t $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -f bundle/Dockerfile bundle
 	sed -i "s|$(OPERATOR_IMAGE):$(IMAGE_TAG)|registry.connect.redhat.com/intel/ovms-operator:1.0.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 endif

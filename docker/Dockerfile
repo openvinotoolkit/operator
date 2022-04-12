@@ -53,12 +53,14 @@ ENV HOME=/opt/openvino \
 RUN echo "${USER_NAME}:x:${USER_UID}:0:${USER_NAME} user:${HOME}:/sbin/nologin" >> /etc/passwd
 
 WORKDIR ${HOME}
-USER ${USER_UID}
+
 
 COPY --from=builder /workspace/build/openvino-operator /usr/local/bin/openvino-operator
 COPY watches.yaml watches.yaml
+RUN if [ "$drop_notebook" == 1 ] ; then true ; else exit 0 ; fi ; sed -i '6,9d' watches.yaml
 COPY helm-charts helm-charts
 COPY LICENSE .
 COPY licenses /licenses
 
+USER ${USER_UID}
 ENTRYPOINT ["/usr/local/bin/openvino-operator", "run", "--watches-file=./watches.yaml"]
