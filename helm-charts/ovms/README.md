@@ -12,7 +12,7 @@ Please refer to [Helm installation guide](https://helm.sh/docs/intro/install).
 ### Deploy OpenVINO Model Server with a Single Model
 Deploy Model Server using _helm_. Please include the required model name and model path. You can also adjust other parameters defined in [values.yaml](values.yaml).
 ```shell script
-helm install ovms-app ovms --set models_settings.model_name=resnet50-binary-0001,models_settings.model_path=gs://models-repository
+helm install ovms-app ovms --set models_settings.model_name=<model_name>,models_settings.model_path=gs://<bucket>/<model>
 ```
 Use _kubectl_ to see the status and wait until the Model Server pod is running:
 ```shell script
@@ -22,7 +22,7 @@ ovms-app-5fd8d6b845-w87jl   1/1     Running   0          27s
 ```
 By default, Model Server is deployed with 1 instance. If you would like to scale up additional replicas, override the value in values.yaml file or by passing _--set_ flag to _helm install_:
 ```shell script
-helm install ovms-app ovms --set models_settings.model_name=resnet50-binary-0001,models_settings.model_path=gs://models-repository,deployment_parameters.replicas=3
+helm install ovms-app ovms --set models_settings.model_name=<model_name>,models_settings.model_path=gs://<bucket>/<model>,deployment_parameters.replicas=3
 ```
 
 ### Deploy OpenVINO Model Server with Multiple Models Defined in a Configuration File
@@ -43,25 +43,27 @@ Bucket permissions can be set with the _GOOGLE_APPLICATION_CREDENTIALS_ environm
 * Generate Google service account JSON file with permissions: _Storage Legacy Bucket Reader_, _Storage Legacy Object Reader_, _Storage Object Viewer_. Name a file for example: _gcp-creds.json_ 
 (you can follow these instructions to [create a Service Account](https://cloud.google.com/docs/authentication/getting-started#creating_a_service_account) and download JSON)
 * Create a Kubernetes secret from this JSON file:
-      $ kubectl create secret generic gcpcreds --from-file gcp-creds.json
+```shell script
+kubectl create secret generic gcpcreds --from-file gcp-creds.json
+```
 * When deploying Model Server, provide the model path to GCS bucket and name for the secret created above. Make sure to provide `gcp_creds_secret_name` when deploying:
 ```shell script
-helm install ovms-app ovms --set models_settings.model_name=resnet50-binary-0001,models_settings.model_path=gs://models-repository/model,models_repository.gcp_creds_secret_name=gcpcreds
+helm install ovms-app ovms --set models_settings.model_name=<model_name>,models_settings.model_path=gs://<bucket>y/<model>,models_repository.gcp_creds_secret_name=gcpcreds
 ```
 ### S3
 For S3 you must provide an AWS Access Key ID, the content of that key (AWS Secret Access Key) and the AWS region when deploying: `aws_access_key_id`, `aws_secret_access_key` and `aws_region` (see below).
 ```shell script
-helm install ovms-app ovms --set models_settings.model_name=icnet-camvid-ava-0001,models_settings.model_path=s3://models-repository/model,models_repository.aws_access_key_id=<...>,models_repository.aws_secret_access_key=<...>,models_repository.aws_region=eu-central-1
+helm install ovms-app ovms --set models_settings.model_name=<model_name>,models_settings.model_path=s3://<bucket>/<model>,models_repository.aws_access_key_id=<...>,models_repository.aws_secret_access_key=<...>,models_repository.aws_region=<...>
 ```
 In case you would like to use custom S3 service with compatible API (e.g. MinIO), you need to also provide endpoint 
 to that service. Please provide it by supplying `s3_compat_api_endpoint`:
 ```shell script
-helm install ovms-app ovms --set models_settings.model_name=icnet-camvid-ava-0001,models_settings.model_path=s3://models-repository/model,models_repository.aws_access_key_id=<...>,models_repository.aws_secret_access_key=<...>,models_repository.s3_compat_api_endpoint=<...>
+helm install ovms-app ovms --set models_settings.model_name=icnet-camvid-ava-0001,models_settings.model_path=s3://<bucket>/<model>,models_repository.aws_access_key_id=<...>,models_repository.aws_secret_access_key=<...>,models_repository.s3_compat_api_endpoint=<...>
 ```
 ### Azure Storage
 Use OVMS with models stored on azure blob storage by providing `azure_storage_connection_string` parameter. Model path should follow `az` scheme like below:
 ```shell script
-helm install ovms-app ovms --set models_settings.model_name=resnet,models_settings.model_path=az://bucket/model_path,models_repository.azure_storage_connection_string="DefaultEndpointsProtocol=https;AccountName=azure_account_name;AccountKey=smp/hashkey==;EndpointSuffix=core.windows.net"
+helm install ovms-app ovms --set models_settings.model_name=resnet,models_settings.model_path=az://<container>/<model_path>,models_repository.azure_storage_connection_string="DefaultEndpointsProtocol=https;AccountName=azure_account_name;AccountKey=smp/hashkey==;EndpointSuffix=core.windows.net"
 ```
  
 ### Local Node Storage
@@ -77,7 +79,7 @@ That opens a possibility of storing the models for OVMS on all Kubernetes [suppo
 In the helm set the parameter `models_repository.models_volume_claim` with the name of the `PersistentVolumeClaim` record with the models. While set, it will be mounted as `/models` folder inside the OVMS container.
 Note that parameter `models_repository.models_volume_claim` is mutually exclusive with `models_repository.models_host_path`. Only one of them should be set.
 ### Assigning Resource Specs
-You can restrict assigned cluster resources to the OVMS container by setting the parameters:
+By default, there are no restrictions, but can restrict assigned cluster resources to the OVMS container by setting the parameters:
 - `deployment_parameters.resources.limits.cpu` - maximum cpu allocation
 - `deployment_parameters.resources.limits.memory` - maximum memory allocation
 - `deployment_parameters.resources.limits.xpu_device` - accelerator name like configured in the device plugin
@@ -86,7 +88,7 @@ You can restrict assigned cluster resources to the OVMS container by setting the
 - `deployment_parameters.resources.requests.memory` - reserved memory allocation
 - `deployment_parameters.resources.requests.xpu_device` - accelerator name like configured in the device plugin - should be the same like set in limits or empty
 - `deployment_parameters.resources.requests.xpu_device_quantity` - number of accelerators - should be the same like set in limits or empty
-By default, there are no restrictions, but that parameter could be used to reduce the CPU and memory allocation. Below is the snippet example from the [values.yaml](https://github.com/openvinotoolkit/model_server/blob/releases/2022/1/deploy/ovms/values.yaml) file:
+Below is the snippet example from the helm chart values.yaml file:
 ```yaml
 deployment_parameters:
   resources:
@@ -119,16 +121,14 @@ the [service type](https://kubernetes.io/docs/concepts/services-networking/servi
 In the cloud environment you might set `LoadBalancer` type to expose the service externally. `NodePort` could expose a static port
 of the node IP address. `ClusterIP` would keep the OVMS service internal to the cluster applications.  
     
-
-
 ## Demo of Using Model Server with a single model
 
 In this demonstration, it is assumed there is available a Kubernetes or OpenShift cluster with configured security context in the KUBECONFIG. Helm 3 binary and kubectl 1.23 should be also installed to run the commands.
-An examplary model server instance with a public ResNet model can be deployed via a commands:
+An examplary model server instance with a public [ResNet model](https://github.com/openvinotoolkit/open_model_zoo/tree/master/models/public/resnet-50-tf) can be deployed via a commands:
 
 ```
 git clone https://github.com/openvinotoolkit/operator
-cd operator/helm-charts/ovms
+cd operator/helm-charts
 helm install ovms-app ovms --set models_settings.model_name=resnet,models_settings.model_path=gs://ovms-public-eu/resnet50-tf
 ```
 
@@ -233,7 +233,7 @@ kubectl create configmap ovms-pipeline --from-file=config.json=workspace/config.
 From the context of the helm chart folder in the operator repo deploy the model server. Change the credentials and S3 endpoint as needed in your environment:
 ```
 git clone https://github.com/openvinotoolkit/operator
-cd operator/helm-charts/ovms
+cd operator/helm-charts
 export AWS_ACCESS_KEY_ID=minioadmin
 export AWS_SECRET_ACCESS_KEY=minioadmin
 export AWS_REGION=us-east-1
