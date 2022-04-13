@@ -191,6 +191,7 @@ Run the prediction via a command:
 python client.py
 Detected class: 310
 ```
+Class 310 represents a bee in the [Imagenet dataset](https://image-net.org/).
 
 ## Demo - deployment of the Model Server with a Vehicle analysis pipeline
 This demonstration deploys the model server serving a directed acyclic graph with [vehicle analysis](https://github.com/openvinotoolkit/model_server/tree/main/demos/vehicle_analysis_pipeline/python) in Kubernetes.
