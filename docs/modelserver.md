@@ -82,49 +82,49 @@ curl http://ovms-sample.ovms:8081/v1/models/resnet/metadata
    "signatureDef": {
     "serving_default": {
      "inputs": {
-      "0": {
+      "map/TensorArrayStack/TensorArrayGatherV3:0": {
        "dtype": "DT_FLOAT",
        "tensorShape": {
         "dim": [
          {
-          "size": "1",
+          "size": "-1",
           "name": ""
          },
          {
-          "size": "3",
+          "size": "-1",
           "name": ""
          },
          {
-          "size": "224",
+          "size": "-1",
           "name": ""
          },
          {
-          "size": "224",
+          "size": "-1",
           "name": ""
          }
         ],
         "unknownRank": false
        },
-       "name": "0"
+       "name": "map/TensorArrayStack/TensorArrayGatherV3:0"
       }
      },
      "outputs": {
-      "1463": {
+      "softmax_tensor": {
        "dtype": "DT_FLOAT",
        "tensorShape": {
         "dim": [
          {
-          "size": "1",
+          "size": "-1",
           "name": ""
          },
          {
-          "size": "1000",
+          "size": "1001",
           "name": ""
          }
         ],
         "unknownRank": false
        },
-       "name": "1463"
+       "name": "softmax_tensor"
       }
      },
      "methodName": ""
@@ -144,23 +144,26 @@ There are a few different ways to use the AI inference endpoints created by the 
   or `ingress` [resource](https://kubernetes.io/docs/concepts/services-networking/ingress/) in opensource Kubernetes linked with the ModelServer service.
   In OpenShift, this operation could be done from the web console.
   
-Check out the [model_server clients snippets](https://docs.openvino.ai/latest/ovms_docs_clients.html) and [code samples](https://github.com/openvinotoolkit/model_server/tree/main/client/python/samples) to see how your applications can generate gRPC or REST API calls to the AI inference endpoints.
+Check out the [model_server clients snippets](https://docs.openvino.ai/latest/ovms_docs_clients.html) and [code samples](https://github.com/openvinotoolkit/model_server/tree/main/client/python/ovmsclient/samples) to see how your applications can generate gRPC or REST API calls to the AI inference endpoints.
 
-The output below shows the `resnet_grpc_predict.py` example client connecting to a `ModelServer` resource serving a ResNet image classification model. The command below takes --grpc_address set to the service name so it will work from the cluster pod.
+The output below shows the `grpc_predict_binary_resnet.py` example client connecting to a `ModelServer` resource serving a ResNet image classification model. The command below takes --grpc_address set to the service name so it will work from the cluster pod.
 If the client is external to the cluster, replace the address with the external DNS name or external IP and adjust the --grpc_port parameter as needed.
 
 ```bash
-python resnet_grpc_predict.py --grpc_port 9000 --grpc_address ovms-sample.ovms --images_dir images --model_name resnet
-Image images/magnetic_compass.jpeg has been classified as magnetic compass with 99.99372959136963% confidence
-Image images/pelican.jpeg has been classified as pelican with 99.17410612106323% confidence
-Image images/gorilla.jpeg has been classified as gorilla, Gorilla gorilla with 98.07604551315308% confidence
-Image images/snail.jpeg has been classified as snail with 99.97051358222961% confidence
-Image images/zebra.jpeg has been classified as zebra with 99.4793951511383% confidence
-Image images/arctic-fox.jpeg has been classified as Arctic fox, white fox, Alopex lagopus with 93.65214705467224% confidence
-Image images/bee.jpeg has been classified as bee with 96.6326653957367% confidence
-Image images/peacock.jpeg has been classified as peacock with 99.97820258140564% confidence
-Image images/airliner.jpeg has been classified as airliner with 49.202319979667664% confidence
-Image images/golden_retriever.jpeg has been classified as golden retriever with 88.68610262870789% confidence
+git clone https://github.com/openvinotoolkit/model_server
+cd model_server/client/python/ovmsclient/samples
+pip install -r requirements.txt
+python grpc_predict_binary_resnet.py --images_dir ../../../../demos/common/static/images/ --service_url ovms-sample:8080 --model_name resnet
+Image ../../../../demos/common/static/images/magnetic_compass.jpeg has been classified as magnetic compass
+Image ../../../../demos/common/static/images/pelican.jpeg has been classified as pelican
+Image ../../../../demos/common/static/images/gorilla.jpeg has been classified as gorilla, Gorilla gorilla
+Image ../../../../demos/common/static/images/snail.jpeg has been classified as snail
+Image ../../../../demos/common/static/images/zebra.jpeg has been classified as zebra
+Image ../../../../demos/common/static/images/arctic-fox.jpeg has been classified as Arctic fox, white fox, Alopex lagopus
+Image ../../../../demos/common/static/images/bee.jpeg has been classified as bee
+Image ../../../../demos/common/static/images/peacock.jpeg has been classified as peacock
+Image ../../../../demos/common/static/images/airliner.jpeg has been classified as airliner
+Image ../../../../demos/common/static/images/golden_retriever.jpeg has been classified as golden retriever
 ```
 
 ***
