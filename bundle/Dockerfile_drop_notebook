@@ -35,6 +35,7 @@ LABEL operators.operatorframework.io.test.config.v1=tests/scorecard/
 LABEL operators.operatorframework.io.bundle.channel.default.v1=alpha
 LABEL com.redhat.openshift.versions="v4.6"
 
-COPY manifests/intel.com_model_servers.yaml manifests/openvino-operator-controller-manager_v1_serviceaccount.yaml manifests/openvino-operator-controller-manager-metrics-service_v1_service.yaml manifests/openvino-operator-manager-config_v1_configmap.yaml manifests/openvino-operator-metrics-reader_rbac.authorization.k8s.io_v1_clusterrole.yaml manifests/openvino-operator.clusterserviceversion.yaml /manifests/
+COPY manifests/intel.com_model_servers.yaml manifests/openvino-operator-controller-manager_v1_serviceaccount.yaml manifests/openvino-operator-controller-manager-metrics-service_v1_service.yaml manifests/openvino-operator-manager-config_v1_configmap.yaml manifests/openvino-operator-metrics-reader_rbac.authorization.k8s.io_v1_clusterrole.yaml /manifests/
+COPY manifests/withoutNotebook/openvino-operator.clusterserviceversion.yaml /manifests/
 COPY metadata /metadata/
 COPY tests/scorecard /tests/scorecard/
