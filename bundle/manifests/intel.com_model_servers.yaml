@@ -118,12 +118,12 @@ spec:
                   type: object
                   description: Fill service settings
                   properties:
-                    port_grpc:
+                    grpc_port:
                       description: gRPC service port
                       type: integer
                       format: int32
                       default: 8080
-                    port_rest:
+                    rest_port:
                       description: REST service port
                       type: integer
                       format: int32

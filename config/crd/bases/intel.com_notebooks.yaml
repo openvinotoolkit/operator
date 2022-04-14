@@ -49,9 +49,11 @@ spec:
                 git_uri:
                   description: Git reposiory to be used for image building
                   type: string
+                  default: https://github.com/openvinotoolkit/openvino_notebooks
                 reconcile_duration_multiplier:
                   description: Increases the reconcile duration. It can reduce due frequency of synns with github code changes.
                   type: integer
+                  default: 120
             status:
               description: Status defines the observed state of Notebook
               type: object

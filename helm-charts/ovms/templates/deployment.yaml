@@ -46,8 +46,10 @@ spec:
         chart: {{ template "ovms.chart" . }}
         app: {{ template "ovms.fullname" . }}
     spec:
-{{- if .Values.deployment_parameters.node_affinity }}    
+{{- if or .Values.deployment_parameters.node_affinity .Values.deployment_parameters.pod_affinity .Values.deployment_parameters.pod_antiaffinity }}    
       affinity:
+{{- end }}
+{{- if .Values.deployment_parameters.node_affinity }} 
         nodeAffinity:
 {{ toYaml  .Values.deployment_parameters.node_affinity | indent 10 }}
 {{- end }}
@@ -146,6 +148,15 @@ spec:
                {{- end }}
                {{- if eq .Values.models_settings.is_stateful true}}
                "--stateful",
+               {{- if eq .Values.models_settings.idle_sequence_cleanup false }}
+               "--idle_sequence_cleanup=false",
+               {{- end }}
+               {{- if eq .Values.models_settings.low_latency_transformation true }}
+               "--low_latency_transformation",
+               {{- end }}
+               {{- if .Values.models_settings.max_sequence_number }}
+               "--max_sequence_number", '{{ .Values.models_settings.max_sequence_number }}',
+               {{- end }}
                {{- end }}
         {{- end }}
                "--log_level", "{{ .Values.server_settings.log_level }}",

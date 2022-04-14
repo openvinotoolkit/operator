@@ -16,7 +16,7 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:latest",
+            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:2022.1",
             "deployment_parameters": {
               "replicas": 1
             },
@@ -29,7 +29,7 @@ metadata:
               "config_configmap_name": "",
               "model_config": "",
               "model_name": "resnet",
-              "model_path": "gs://ovms-public-eu/resnet50-binary",
+              "model_path": "gs://ovms-public-eu/resnet50-tf",
               "nireq": 0,
               "plugin_config": "{\"CPU_THROUGHPUT_STREAMS\":1}",
               "batch_size": "",
