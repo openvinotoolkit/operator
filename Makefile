@@ -112,6 +112,7 @@ ifeq ($(TEST_BUILD), 1)
 	docker build -t $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -f bundle/Dockerfile bundle
 	sed -i "s|$(OPERATOR_IMAGE):$(IMAGE_TAG)|registry.connect.redhat.com/intel/ovms-operator:1.0.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 endif
+endif
 
 bundle_push:
 ifeq ($(TARGET_PLATFORM), openshift)

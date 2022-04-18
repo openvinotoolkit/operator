@@ -14,9 +14,10 @@
 # limitations under the License.
 #
 
-FROM scratch
+FROM ubuntu
 
 ARG drop_notebook=0
+ARG manifest_path=manifests/withNotebook/
 
 # Core bundle labels.
 LABEL operators.operatorframework.io.bundle.mediatype.v1=registry+v1
@@ -36,6 +37,6 @@ LABEL operators.operatorframework.io.bundle.channel.default.v1=alpha
 LABEL com.redhat.openshift.versions="v4.6"
 
 COPY manifests/intel.com_model_servers.yaml manifests/openvino-operator-controller-manager_v1_serviceaccount.yaml manifests/openvino-operator-controller-manager-metrics-service_v1_service.yaml manifests/openvino-operator-manager-config_v1_configmap.yaml manifests/openvino-operator-metrics-reader_rbac.authorization.k8s.io_v1_clusterrole.yaml /manifests/
-COPY manifests/withNotebook/openvino-operator.clusterserviceversion.yaml manifests/withNotebook/intel.com_notebooks.yaml /manifests/
+COPY ${manifest_path} /manifests/
 COPY metadata /metadata/
 COPY tests/scorecard /tests/scorecard/
