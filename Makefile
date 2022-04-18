@@ -102,18 +102,19 @@ ifeq ($(TARGET_PLATFORM), openshift)
 	echo "Building openshift bundle"
 	sed -i "s|registry.connect.redhat.com/intel/ovms-operator:0.2.0|$(OPERATOR_IMAGE):$(IMAGE_TAG)|" bundle/manifests/withNotebook/openvino-operator.clusterserviceversion.yaml
 	sed -i "s|gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0|registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.8.0|" bundle/manifests/withNotebook/openvino-operator.clusterserviceversion.yaml
-	docker build -t $(BUNDLE_REPOSITORY):$(IMAGE_TAG) -f bundle/Dockerfile bundle
+	docker build -t $(BUNDLE_REPOSITORY):$(IMAGE_TAG) -f bundle/Dockerfile --build-arg manifest_path=manifests/withNotebook/ bundle
 	sed -i "s|$(OPERATOR_IMAGE):$(IMAGE_TAG)|registry.connect.redhat.com/intel/ovms-operator:0.2.0|" bundle/manifests/withNotebook/openvino-operator.clusterserviceversion.yaml
 	sed -i "s|registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.8.0|gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0|" bundle/manifests/withNotebook/openvino-operator.clusterserviceversion.yaml
 else
 	echo "Building kubernetes bundle"
 	sed -i "s|registry.connect.redhat.com/intel/ovms-operator:0.2.0|$(OPERATOR_IMAGE):$(IMAGE_TAG)|" bundle/manifests/withoutNotebook/openvino-operator.clusterserviceversion.yaml
 ifeq ($(TEST_BUILD), 1)
-	docker build -t $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -f bundle/Dockerfile bundle
+	docker build -t $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -f bundle/Dockerfile --build-arg manifest_path=manifests/withNotebook/ bundle
+	sed -i "s|$(OPERATOR_IMAGE):$(IMAGE_TAG)|registry.connect.redhat.com/intel/ovms-operator:0.2.0|" bundle/manifests/withNotebook/openvino-operator.clusterserviceversion.yaml
 else
-	docker build -t $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -f bundle/Dockerfile_drop_notebook bundle
-endif
+	docker build -t $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -f bundle/Dockerfile --build-arg manifest_path=manifests/withoutNotebook/ bundle
 	sed -i "s|$(OPERATOR_IMAGE):$(IMAGE_TAG)|registry.connect.redhat.com/intel/ovms-operator:0.2.0|" bundle/manifests/withoutNotebook/openvino-operator.clusterserviceversion.yaml
+endif
 endif
 
 bundle_push:
