@@ -23,7 +23,9 @@ BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 # TARGET_PLATFORM can be k8s or openshift
 TARGET_PLATFORM =? k8s
 
-# ADD_NOTEBOOK_K8S can be used to remove functionality of notebook 
+# ADD_NOTEBOOK_K8S can be used to add functionality of notebook in K8S bundle 
+# version for openshift testing purposes. Testing requires mocked resources 
+# of buildconfig and images stream 
 ADD_NOTEBOOK_K8S =? 0
 
 # Build-time variables to inject into binaries
