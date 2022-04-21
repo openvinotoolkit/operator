@@ -37,7 +37,6 @@ RUN GOOS=linux GOARCH=$TARGETARCH make test-unit
 
 # Final image.
 FROM registry.access.redhat.com/ubi8/ubi-minimal:8.5
-ARG drop_notebook=0
 
 ENV HOME=/opt/openvino \
     USER_NAME=openvino \
@@ -50,7 +49,7 @@ WORKDIR ${HOME}
 
 COPY --from=builder /workspace/build/openvino-operator /usr/local/bin/openvino-operator
 COPY watches.yaml watches.yaml
-RUN if [ "$drop_notebook" == 1 ] ; then true ; else exit 0 ; fi ; sed -i '6,9d' watches.yaml
+COPY watches_k8s.yaml watches_k8s.yaml
 COPY helm-charts helm-charts
 COPY LICENSE .
 COPY licenses /licenses

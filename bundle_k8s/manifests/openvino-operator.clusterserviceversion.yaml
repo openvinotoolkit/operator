@@ -15,7 +15,7 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:latest",
+            "image_name": "openvino/model_server:2022.1",
             "deployment_parameters": {
               "replicas": 1
             },
@@ -28,7 +28,7 @@ metadata:
               "config_configmap_name": "",
               "model_config": "",
               "model_name": "resnet",
-              "model_path": "gs://ovms-public-eu/resnet50-binary",
+              "model_path": "gs://ovms-public-eu/resnet50-tf",
               "nireq": 0,
               "plugin_config": "{\"CPU_THROUGHPUT_STREAMS\":1}",
               "batch_size": "",
@@ -86,14 +86,12 @@ spec:
             path: models_settings.single_model_mode
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
-
           - description: Config map with the model server configuration file. If this field is empty, specify required parameters in `model_settings` section. Configuration config.json file can be created as described as described on https://docs.openvino.ai/latest/ovms_docs_multiple_models.html Create the config_map with this file via a command `oc create configmap ovms-config --from-file config.json`
             displayName: Config map
             path: models_settings.config_configmap_name
             x-descriptors:
               - 'urn:alm:descriptor:io.kubernetes:ConfigMap'
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:false'
-
           - description: Path to the configuration file. Set if it is differenet from the default /config/config.json mounted from the config_map resource
             displayName: Config path
             path: models_settings.config_path
@@ -193,11 +191,9 @@ spec:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.is_stateful:true'
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
-
           - description: Configuration for available storage types https://docs.openvino.ai/latest/ovms_docs_cloud_storage.html
             displayName: Storage type
             path: models_repository.storage_type
-
           - displayName: Persistent Volume Claim
             path: models_repository.models_volume_claim
             x-descriptors:
@@ -218,7 +214,6 @@ spec:
             path: models_repository.runAsGroup
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:cluster'
-
           - displayName: Aws access key id
             path: models_repository.aws_access_key_id
             x-descriptors:
@@ -239,7 +234,6 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:S3'
-
           - description: >-
               Secret name including Google Cloud Storage access token. Create the secret resource using the command `oc create secret generic gcpcreds --from-file gcp-creds.json`
             displayName: GCP credentials secret name
@@ -252,7 +246,6 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:text'
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_repository.storage_type:azure'
-
           - displayName: Replicas
             path: deployment_parameters.replicas
             x-descriptors:
@@ -311,11 +304,11 @@ spec:
     The suffix is ommited when `ovms` phrase is included in the name.
     The service exposes gRPC and REST API interfaces to run inference requests.
     ```
-    oc get pods
+    kubectl get pods
     NAME                                        READY   STATUS    RESTARTS   AGE
     model-server-sample-ovms-586f6f76df-dpps4   1/1     Running   0          8h
 
-    oc get services
+    kubectl get services
     NAME                       TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)             AGE
     model-server-sample-ovms   ClusterIP   172.25.199.210   <none>        8080/TCP,8081/TCP   8h
     ```
@@ -345,18 +338,6 @@ spec:
           - secrets
           verbs:
           - '*'
-        - apiGroups:
-            - image.openshift.io
-          resources:
-            - imagestreams
-          verbs:
-            - '*'
-        - apiGroups:
-            - build.openshift.io
-          resources:
-            - buildconfigs
-          verbs:
-            - '*'
         - apiGroups:
           - ""
           resources:
@@ -444,7 +425,8 @@ spec:
                   - --metrics-bind-address=127.0.0.1:8080
                   - --leader-elect
                   - --leader-election-id=ovms-operator
-                image: registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator:4d6eb24
+                  - --watches-file watches_k8s.yaml
+                image: quay.io/openvino/ovms-operator:1.0.0
                 livenessProbe:
                   httpGet:
                     path: /healthz
