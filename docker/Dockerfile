@@ -57,7 +57,7 @@ WORKDIR ${HOME}
 
 COPY --from=builder /workspace/build/openvino-operator /usr/local/bin/openvino-operator
 COPY watches.yaml watches.yaml
-RUN if [ "$drop_notebook" == 1 ] ; then true ; else exit 0 ; fi ; sed -i '6,9d' watches.yaml
+COPY watches_k8s.yaml watches_k8s.yaml
 COPY helm-charts helm-charts
 COPY LICENSE .
 COPY licenses /licenses
