@@ -22,7 +22,7 @@ Start the operator
 make run
 ```
 
-Start the operator
+Start the operator for Kubernetes
 ```bash
 make run_k8s
 ```
@@ -46,7 +46,7 @@ make deploy IMG=registry.toolbox.iotg.sclab.intel.com/cpp/operator:latest
 ## OLM development flow
 ```
 make cluster_clean
-make build_all_images DROP_NOTEBOOK=0
+make build_all_images
 make deploy_catalog
 make deploy_operator
 ```
