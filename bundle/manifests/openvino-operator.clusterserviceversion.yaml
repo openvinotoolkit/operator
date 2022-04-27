@@ -78,7 +78,7 @@ metadata:
       ]
     capabilities: Basic Install
     categories: "AI/Machine Learning"
-    operators.operatorframework.io/builder: operator-sdk-v1.7.1+git
+    operators.operatorframework.io/builder: operator-sdk-v1.19.1+git
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
   name: openvino-operator.v1.0.0
   namespace: placeholder
@@ -511,7 +511,7 @@ spec:
                   - --metrics-bind-address=127.0.0.1:8080
                   - --leader-elect
                   - --leader-election-id=ovms-operator
-                image: registry.connect.redhat.com/intel/ovms-operator:0.2.0
+                image: registry.connect.redhat.com/intel/ovms-operator:1.0.0
                 livenessProbe:
                   httpGet:
                     path: /healthz
@@ -585,9 +585,15 @@ spec:
   - AI Inference OpenVINO
   links:
   - name: OpenVINO Toolkit Operator
-    url: https://github.com/openvinotoolkit/openshift_operator
+    url: https://github.com/openvinotoolkit/operator
+  - name: OpenVINO Model Server
+    url: https://github.com/openvinotoolkit/model_server
+  - name: OpenVINO Notebooks
+    url: https://github.com/openvinotoolkit/openvino_notebooks
+  maintainers:
+  - name: Operator Support
+    email: openvino-operator-support@intel.com
   maturity: alpha
   provider:
     name: Intel
-    url: https://github.com/openvinotoolkit/model_server
   version: 1.0.0
