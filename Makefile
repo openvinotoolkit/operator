@@ -23,9 +23,13 @@ BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 # TARGET_PLATFORM can be k8s or openshift
 TARGET_PLATFORM =? k8s
 
+# ADD_NOTEBOOK_K8S can be used to add functionality of notebook in K8S bundle 
+# version for openshift testing purposes. Testing requires mocked resources 
+# of buildconfig and images stream 
+ADD_NOTEBOOK_K8S =? 0
+
 # Build-time variables to inject into binaries
 export GIT_COMMIT = $(shell git rev-parse HEAD)
-export K8S_VERSION = 1.20.2
 
 # Build settings
 export TOOLS_DIR = tools/bin
@@ -71,6 +75,9 @@ build: ## Build operator-sdk, ansible-operator, and helm-operator.
 run: build # Run against the configured Kubernetes cluster in ~/.kube/config
 	./$(BUILD_DIR)/openvino-operator run
 
+run_k8s: build # Run against the configured Kubernetes cluster in ~/.kube/config
+	./$(BUILD_DIR)/openvino-operator run --watches-file watches_k8s.yaml
+
 .PHONY: test-unit
 TEST_PKGS = $(shell go list ./...)
 test-unit: ## Run unit tests
@@ -91,14 +98,20 @@ ifeq ($(TARGET_PLATFORM), openshift)
 	echo "Building openshift bundle"
 	sed -i "s|registry.connect.redhat.com/intel/ovms-operator:1.0.0|$(OPERATOR_IMAGE):$(IMAGE_TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 	sed -i "s|gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0|registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.9.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
-	docker build -t $(BUNDLE_REPOSITORY):$(IMAGE_TAG) -f bundle/Dockerfile bundle
+	docker build -t $(BUNDLE_REPOSITORY):$(IMAGE_TAG) -f bundle/Dockerfile  bundle
 	sed -i "s|$(OPERATOR_IMAGE):$(IMAGE_TAG)|registry.connect.redhat.com/intel/ovms-operator:1.0.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 	sed -i "s|registry.redhat.io/openshift4/ose-kube-rbac-proxy:v4.9.0|gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 else
 	echo "Building kubernetes bundle"
-	sed -i "s|registry.connect.redhat.com/intel/ovms-operator:0.2.0|$(OPERATOR_IMAGE):$(IMAGE_TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+ifeq ($(ADD_NOTEBOOK_K8S), 1)
+	sed -i "s|quay.io/openvino/ovms-operator:1.0.0|$(OPERATOR_IMAGE):$(IMAGE_TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 	docker build -t $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -f bundle/Dockerfile bundle
-	sed -i "s|$(OPERATOR_IMAGE):$(IMAGE_TAG)|registry.connect.redhat.com/intel/ovms-operator:1.0.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+	sed -i "s|$(OPERATOR_IMAGE):$(IMAGE_TAG)|quay.io/openvino/ovms-operator:1.0.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+else
+	sed -i "s|quay.io/openvino/ovms-operator:1.0.0|$(OPERATOR_IMAGE):$(IMAGE_TAG)|" bundle_k8s/manifests/openvino-operator.clusterserviceversion.yaml
+	docker build -t $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -f bundle_k8s/Dockerfile bundle_k8s
+	sed -i "s|$(OPERATOR_IMAGE):$(IMAGE_TAG)|quay.io/openvino/ovms-operator:1.0.0|" bundle_k8s/manifests/openvino-operator.clusterserviceversion.yaml
+endif
 endif
 
 bundle_push:

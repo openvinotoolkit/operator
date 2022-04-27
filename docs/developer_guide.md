@@ -22,6 +22,11 @@ Start the operator
 make run
 ```
 
+Start the operator for Kubernetes
+```bash
+make run_k8s
+```
+
 ## Build docker image
 ```bash
 make docker-build
@@ -48,10 +53,10 @@ make deploy_operator
 
 ## K8S release process
 ```
-make docker-build OPERATOR_IMAGE=quay.io/openvino/ovms-operator IMAGE_TAG=<version>
+make docker-build OPERATOR_IMAGE=quay.io/openvino/ovms-operator IMAGE_TAG=<version> 
 make docker-push OPERATOR_IMAGE=quay.io/openvino/ovms-operator IMAGE_TAG=<version>
 ```
-Make a PR to https://github.com/k8s-operatorhub/community-operators/tree/main/operators/ovms-operator with the [bundle](../bundle) content.
+Make a PR to https://github.com/k8s-operatorhub/community-operators/tree/main/operators/ovms-operator with the [bundle](../bundle_k8s) content.
 
 ## Openshift development flow
 
@@ -71,7 +76,7 @@ Certify new version of the operator image
 ```
 make bundle_build OPERATOR_IMAGE=registry.connect.redhat.com/intel/ovms-operator IMAGE_TAG=0.3.0
 ```
-Certify the bundle image
+Make a PR to https://github.com/redhat-openshift-ecosystem/certified-operators with the [bundle](../bundle) content.
 
 
 
