@@ -66,7 +66,7 @@ metadata:
       ]
     capabilities: Basic Install
     categories: "AI/Machine Learning"
-    operators.operatorframework.io/builder: operator-sdk-v1.7.1+git
+    operators.operatorframework.io/builder: operator-sdk-v1.19.1+git
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
   name: openvino-operator.v1.0.0
   namespace: placeholder
@@ -292,7 +292,7 @@ spec:
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
         version: v1alpha1
   description: |
-    OpenVINO Toolkit Operator manages OpenVINO components in OpenShift.
+    OpenVINO Toolkit Operator manages OpenVINO components in Kubernetes.
 
     Currently there available components are ModelServer.
 
@@ -425,7 +425,7 @@ spec:
                   - --metrics-bind-address=127.0.0.1:8080
                   - --leader-elect
                   - --leader-election-id=ovms-operator
-                  - --watches-file watches_k8s.yaml
+                  - --watches-file=watches_k8s.yaml
                 image: quay.io/openvino/ovms-operator:1.0.0
                 livenessProbe:
                   httpGet:
@@ -500,9 +500,13 @@ spec:
   - AI Inference OpenVINO
   links:
   - name: OpenVINO Toolkit Operator
-    url: https://github.com/openvinotoolkit/openshift_operator
+    url: https://github.com/openvinotoolkit/operator
+  - name: OpenVINO Model Server
+    url: https://github.com/openvinotoolkit/model_server
+  maintainers:
+  - name: Operator Support
+    email: openvino-operator-support@intel.com
   maturity: alpha
   provider:
     name: Intel
-    url: https://github.com/openvinotoolkit/model_server
   version: 1.0.0

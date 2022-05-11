@@ -41,7 +41,7 @@ spec:
             metadata:
               type: object
             spec:
-              description: Spec defines the desired state of Ovms
+              description: Spec defines the desired state of the Model Server
               type: object
               required:
                 - image_name
@@ -50,7 +50,7 @@ spec:
                   description: Model Server docker image to be used
                   type: string
                   default: >-
-                    registry.connect.redhat.com/intel/openvino-model-server:latest
+                    openvino/model_server:2022.1
                 deployment_parameters:
                   description: Cluster deployment parameters to be applied to the Model Server
                   type: object
@@ -253,8 +253,8 @@ spec:
                         In openshift, you might need to create Security Context Constraints to allow grant permissions for changing the context.
                       type: string
                     runAsGroup:
-                       type: string
-                       description: >-
+                      type: string
+                      description: >-
                          Set the group ID if access to the model repository is restricted. Model server will start with this security context.
                          In openshift, you might need to create Security Context Constraints to allow grant permissions for changing the context.
                     aws_secret_access_key:
