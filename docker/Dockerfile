@@ -44,7 +44,7 @@ LABEL name="OpenVINO toolkit operator" \
       version="1.0.0" \
       release="1.0" \
       summary="OpenVINO(TM) Toolkit Operator" \
-      description="An Operator for managing OpenVINO Toolkit in OpenShift"
+      description="An Operator for managing OpenVINO Toolkit in OpenShift and Kubernetes"
 
 ENV HOME=/opt/openvino \
     USER_NAME=openvino \
@@ -63,4 +63,4 @@ COPY LICENSE .
 COPY licenses /licenses
 
 USER ${USER_UID}
-ENTRYPOINT ["/usr/local/bin/openvino-operator", "run", "--watches-file=./watches.yaml"]
+ENTRYPOINT ["/usr/local/bin/openvino-operator", "run"]
