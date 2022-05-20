@@ -3,8 +3,6 @@
 *Note:* Operator, starting from version 1.0 includes non-compatible changes in the CRD records of `ModelServer` and `Notebook`.
 It is recommended to remove all those custom records before upgrading the operator from v0.2 to v1.0.
 
-*Note:* This repository includes operator v1.0 which is to be published soon. The source code for older versions is stored in the [model server repo](https://github.com/openvinotoolkit/model_server/tree/main/extras)
-
 ## Openshift
 
 In the OpenShift [web console](https://docs.openshift.com/container-platform/4.10/web_console/web-console.html) navigate to OperatorHub menu. Search for "OpenVINO™ Toolkit Operator". Then, click the `Install` button.
