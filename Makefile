@@ -129,7 +129,7 @@ ifeq ($(TARGET_PLATFORM), openshift)
     fi
 	docker tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) $(CATALOG_REPOSITORY):$(BRANCH)-latest 
 else
-	sudo opm index add --bundles $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG)  -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG)
+	sudo opm index add --bundles quay.io/operatorhubio/ovms-operator:v0.1.0,quay.io/operatorhubio/ovms-operator:v0.2.0,$(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG)
 	docker tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG) $(CATALOG_REPOSITORY)-k8s:$(BRANCH)-latest 	
 endif
 
@@ -284,3 +284,4 @@ help: ## Show this help screen.
 	@echo 'Available targets are:'
 	@echo ''
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-25s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
