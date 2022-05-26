@@ -1,6 +1,7 @@
 # Openshift and Kubernetes operator
 
-The Operator installs and manages [OpenVINO model servers](https://github.com/openvinotoolkit/model_server) in an OpenShift cluster and upstream Kubernetes. It enables inference execution at scale and exposing AI models via gRPC and REST API interfaces.
+The Operator installs and manages [OpenVINO model servers](https://github.com/openvinotoolkit/model_server) in an OpenShift cluster and upstream Kubernetes. It enables inference execution at scale and exposes AI models via gRPC and REST API interfaces.
+The operator is using a [model server helm chart](helm-charts/ovms/) which can be also used directly.
 
 The Operator also integrates with the JupyterHub Spawner in Red Hat OpenShift Data Science and Open Data Hub. See detailed instructions below.
 
@@ -19,6 +20,8 @@ The Operator also integrates with the JupyterHub Spawner in Red Hat OpenShift Da
 [OpenVINO notebook integration with RHODS](docs/notebook_in_rhods.md)
 
 [Notebook parameters](docs/notebook_params.md)
+
+[Helm chart](helm-charts/ovms/README.md)
 
 
 ## Contact
