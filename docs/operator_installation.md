@@ -2,7 +2,8 @@
 
 *Note:* Operator, starting from version 1.0 includes non-compatible changes in the CRD records of `ModelServer` and `Notebook`.
 It is recommended to remove all those custom records before upgrading the operator from v0.2 to v1.0. 
-*Note:* Source code of the versions prior to 1.0.0 is stored in [repo](https://github.com/openvinotoolkit/model_server/tree/v2022.1/extras)
+
+*Note:* Source code of the versions prior to 1.0.0 is stored in a [github repo](https://github.com/openvinotoolkit/model_server/tree/v2022.1/extras)
 
 ## Openshift
 
