@@ -102,7 +102,8 @@ That assumes using adequate Kubernetes device plugin from [Intel Device Plugin f
 deployment_parameters:
   resources:
     limits:
-      gpu.intel.com/i915: 1
+      xpu_device: gpu.intel.com/i915
+      xpu_device_quantity: "1"
 ```
 ### Security Context
 OVMS, by default, starts with the security context of `ovms` account which has the pid 5000 and gid 5000. In some cases, it can prevent importing models
