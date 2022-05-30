@@ -32,7 +32,7 @@ spec:
   replicas: {{ .Values.deployment_parameters.replicas }}
 {{- if .Values.deployment_parameters.update_strategy }}
   strategy:
-{{ toYaml  .Values.models_repository.update_strategy | indent 4 }}
+{{ toYaml  .Values.deployment_parameters.update_strategy | indent 4 }}
 {{- end }}  
   template:
     metadata:
