@@ -49,6 +49,14 @@ pipeline {
             }
         }
 
-
+        stage("Run on commit tests") {
+          steps {
+              sh """
+              env
+              """
+              echo shortCommit
+              build job: "ovms-operator/utils-common/ovms-o-test-on-commit", parameters: [[$class: 'StringParameterValue', name: 'OVMSCCOMMIT', value: shortCommit]]
+          }    
+        }
     }
 }
