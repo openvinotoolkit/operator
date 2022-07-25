@@ -48,7 +48,6 @@ pipeline {
                 sh 'make build_all_images'
             }
         }
-
         stage("Run on commit tests") {
           steps {
               sh """
