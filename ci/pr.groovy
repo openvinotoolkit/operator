@@ -48,13 +48,15 @@ pipeline {
                 sh 'make build_all_images'
             }
         }
+
+
         stage("Run on commit tests") {
           steps {
               sh """
               env
               """
               echo shortCommit
-              build job: "ovms-operator/utils-common/ovms-o-test-on-commit", parameters: [[$class: 'StringParameterValue', name: 'OVMSCCOMMIT', value: shortCommit]]
+              build job: "ovms-operator/utils-common/ovms-o-test-on-commit"
           }    
         }
     }
