@@ -56,7 +56,7 @@ pipeline {
               env
               """
               echo shortCommit
-              build job: "ovms-operator/utils-common/ovms-o-test-on-commit"
+              build job: "ovms-operator/utils-common/ovms-o-test-on-commit", parameters: [[$class: 'StringParameterValue', name: 'OVMSOCOMMIT', value: shortCommit]]
           }    
         }
     }
