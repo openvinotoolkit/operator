@@ -49,7 +49,6 @@ pipeline {
             }
         }
 
-
         stage("Run on commit tests") {
           steps {
               sh """
