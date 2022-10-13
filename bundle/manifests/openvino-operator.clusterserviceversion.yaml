@@ -597,3 +597,4 @@ spec:
   provider:
     name: Intel
   version: 1.1.0
+  replaces: openvino-operator.v1.0.0
