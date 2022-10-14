@@ -10,7 +10,7 @@
 |service_parameters.service_type| [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types); the default value is ClusterIP|
 |models_settings.single_model_mode| set `true` if one one model should be deployed; value `false` indicate that config.json file should be used to configure mulitple models |
 |models_settings.config_configmap_name| Config map hosting the config.json file|
-|models_settings.model_config_path| Path to the config file in case it was mounted in the container via a persistent volume claim |
+|models_settings.config_path| Path to the config file in case it was mounted in the container via a persistent volume claim |
 |models_settings.model_name| Model name to be used on the client side in the remote calls |
 |models_settings.model_path| Path to the model folder in the model repository; for example `gs://ovms-public-eu/resnet50-binary` |
 |models_settings.nireq| The size of internal request queue. When set to 0 or no value is set value is calculated automatically based on available resources|
