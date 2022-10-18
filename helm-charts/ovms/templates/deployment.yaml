@@ -66,12 +66,19 @@ spec:
         image: {{ .Values.image_name }}
         ports:
         - containerPort: 8080
+          name: grpc
         - containerPort: 8081
+          name: rest
+        livenessProbe:
+          httpGet:
+            path: /v2/health/live
+            port: rest
         readinessProbe:
-          tcpSocket:
-            port: 8080
           initialDelaySeconds: 5
-          periodSeconds: 10
+          periodSeconds: 5
+          httpGet:
+            path: /v2/health/ready
+            port: rest
         {{- if or .Values.models_repository.gcp_creds_secret_name .Values.models_repository.aws_access_key_id .Values.models_repository.aws_secret_access_key .Values.models_repository.aws_region .Values.models_repository.s3_compat_api_endpoint .Values.models_repository.http_proxy .Values.models_repository.https_proxy .Values.models_repository.no_proxy .Values.models_repository.azure_storage_connection_string }}
         env:
         {{- end }}
