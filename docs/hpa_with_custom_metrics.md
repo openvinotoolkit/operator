@@ -8,7 +8,7 @@ For OpenVINO Model Server this can be really useful as many times CPU utilizatio
 
 In this guide we proposed following metrics to configure autoscaler with:
 
-- latency (mean or median)
+- mean latency
 - currently processed requests / execution streams number ratio
 
 While both react similarly to the changing load, auto scaling based on latency requires knowledge about the model and environment where the inference happens to properly set thresholds that trigger scaling. 
@@ -179,6 +179,8 @@ spec:
     apiVersion: intel.com/v1alpha1
     kind: ModelServer
     name: demo
+  minReplicas: 1
+  maxReplicas: 3
   metrics:
   - type: Pods
     pods:
@@ -194,4 +196,10 @@ spec:
       stabilizationWindowSeconds: 120
 ```
 
-That was the last step. Now you can run workloads of different intensity and see changing replicas number.
+That was the last step. Now you can run workloads of different intensity and see how the autoscaler works by checking out it's status:
+
+![hpa_status](./hpa_status.png)
+
+... or looking on the model behavior on the dashboards:
+
+![hpa_scaling_visualize](./hpa_scaling_visualize.png)
