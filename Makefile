@@ -227,10 +227,10 @@ PLATFORM_%:
 	fi
 
 style:
-	docker run --rm -v $$(pwd):/app -w /app -e https_proxy=$(https_proxy) golangci/golangci-lint:v1.44.0 golangci-lint run -E stylecheck --disable-all -v --timeout 3m0s
+	docker run --rm -v $$(pwd):/app -w /app -e https_proxy=$(https_proxy) golangci/golangci-lint:v1.50 golangci-lint run -E stylecheck --disable-all -v --timeout 3m0s
 
 lint:
-	docker run --rm -v $$(pwd):/app -w /app -e https_proxy=$(https_proxy) golangci/golangci-lint:v1.44.0 golangci-lint run --skip-dirs ../go/pkg/mod -v --timeout 3m0s
+	docker run --rm -v $$(pwd):/app -w /app -e https_proxy=$(https_proxy) golangci/golangci-lint:v1.50 golangci-lint run --skip-dirs ../go/pkg/mod -v --timeout 3m0s
 
 VIRTUALENV_EXE := python3 -m virtualenv -p python3
 VIRTUALENV_DIR := .venv
