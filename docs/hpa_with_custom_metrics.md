@@ -25,7 +25,7 @@ In order to use custom metrics, they need to be enabled in the model server conf
      {
         "config": {
              "name": "resnet50-int8",
-             "base_path": "s3://test/models/resnet50-tf-int8",
+             "base_path": "s3://test/models/resnet50-tf-int8"
         }
      }
  ],
@@ -35,7 +35,7 @@ In order to use custom metrics, they need to be enabled in the model server conf
          {
              "enable" : true,
              "metrics_list":
-                 [ "ovms_requests_success",
+                 ["ovms_requests_success",
                  "ovms_requests_fail",
                  "ovms_inference_time_us",
                  "ovms_wait_for_infer_req_time_us",
@@ -132,17 +132,17 @@ rules:
 After changing the configuration, restart the deployment. Check if custom metrics are available from the API:
 
 ```bash
-kubectl get --raw /apis/custom.metrics.k8s.io/v1beta2
+kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1
 ```
 
 You can also request specific metric:
 ```bash
-kubectl get --raw /apis/custom.metrics.k8s.io/v1beta2/namespaces/ovms-demo/pods/*/ovms_requests_streams_ratio | jq
+kubectl get --raw /apis/custom.metrics.k8s.io/v1beta1/namespaces/ovms-demo/pods/*/ovms_requests_streams_ratio | jq
 {
   "kind": "MetricValueList",
-  "apiVersion": "custom.metrics.k8s.io/v1beta2",
+  "apiVersion": "custom.metrics.k8s.io/v1beta1",
   "metadata": {
-    "selfLink": "/apis/custom.metrics.k8s.io/v1beta2/namespaces/ovms-demo/pods/%2A/ovms_requests_streams_ratio"
+    "selfLink": "/apis/custom.metrics.k8s.io/v1beta1/namespaces/ovms-demo/pods/%2A/ovms_requests_streams_ratio"
   },
   "items": [
     {
@@ -200,6 +200,6 @@ That was the last step. Now you can run workloads of different intensity and see
 
 ![hpa_status](./hpa_status.png)
 
-... or looking on the model behavior on the dashboards:
+... or looking at the model behavior on the dashboards:
 
 ![hpa_scaling_visualize](./hpa_scaling_visualize.png)
