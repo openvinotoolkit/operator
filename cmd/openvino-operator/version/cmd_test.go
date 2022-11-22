@@ -32,8 +32,8 @@ package version
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
+	"io"
 	"runtime"
 
 	. "github.com/onsi/ginkgo"
@@ -62,7 +62,7 @@ var _ = Describe("Running a version command", func() {
 				run()
 				w.Close()
 			}()
-			stdout, err := ioutil.ReadAll(r)
+			stdout, err := io.ReadAll(r)
 			Expect(err).To(BeNil())
 			stdoutString := string(stdout)
 			version := ver.GitVersion
