@@ -1,5 +1,7 @@
 # Horizontal Autoscaling with Custom Metrics
 
+![autoscaling_animation](./autoscaling_animation.gif)
+
 Natively Horizontal Pod Autoscaler can scale based on CPU and memory usage, but it's possible to make it work with custom metrics provided by the application to be scaled.
 
 For OpenVINO Model Server this can be really useful as many times CPU utilization is not a very good indicator for scaling. Additionally, model server can load models on other devices like GPU and in that case, using natively available metrics will not work at all. Custom metrics can be used to configure reliable and hardware agnostic horizontal autoscaling.  
