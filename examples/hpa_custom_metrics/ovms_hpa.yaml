@@ -1,0 +1,25 @@
+kind: HorizontalPodAutoscaler
+apiVersion: autoscaling/v2
+metadata:
+  name: ovms-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: intel.com/v1alpha1
+    kind: ModelServer
+    name: demo
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+  - type: Pods
+    pods:
+      metric:
+        name: ovms_requests_streams_ratio
+      target:
+        type: AverageValue
+        averageValue: 1
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 120
+    scaleUp:
+      stabilizationWindowSeconds: 120
+
