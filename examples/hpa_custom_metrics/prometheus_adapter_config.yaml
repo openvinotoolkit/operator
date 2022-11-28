@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: adapter-config
+  namespace: default
+data:
+  config.yaml: |+
+    rules:
+    - seriesQuery: 'ovms_current_requests'
+      resources:
+        overrides:
+          namespace:
+            resource: namespace
+          pod:
+            resource: pod
+      name:
+        matches: "ovms_current_requests"
+        as: "ovms_requests_streams_ratio"
+      metricsQuery: avg(avg_over_time(ovms_current_requests{<<.LabelMatchers>>}[1m]) / avg_over_time(ovms_streams{<<.LabelMatchers>>}[1m])) by (<<.GroupBy>>)
