@@ -29,8 +29,9 @@ Horizontal autoscaling can be also enabled in the CLI both in Openshift and in K
 Alternatively, HPA resource can be just imported from the [yaml file](./horizontal_example.yaml):
 ```kubectl apply -f horizontal_example.yaml```
 
-Learn more about [horizontal autoscaller](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+*Learn more about [horizontal autoscaller](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)*
 
+Scaling based on CPU utilization is not the best way to scale OpenVINO Model Server though. Model Server provides its own performance metrics that tend to be a better choice while configuring autoscaling. Learn how to set up [horizontal  autoscaling with OpenVINO Model Server custom metrics](./hpa_with_custom_metrics.md).
 
 ## Vertical Pod Autoscaler
 
@@ -47,7 +48,7 @@ Just like with the horizontal autoscaler, `targetRef` should reference the Model
 
 In the example above, VPA can respond to Out Of Memory errors any update the resource allocation to required RAM value. 
 
-Learn more about [vertical autoscaler](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler)
+*Learn more about [vertical autoscaler](https://github.com/kubernetes/autoscaler/tree/master/vertical-pod-autoscaler)*
 
 ***
 
