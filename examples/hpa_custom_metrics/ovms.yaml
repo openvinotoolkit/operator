@@ -1,0 +1,19 @@
+apiVersion: intel.com/v1alpha1
+kind: ModelServer
+metadata:
+  name: demo
+spec:
+  image_name: 'openvino/model_server:2022.2'
+  service_parameters:
+    grpc_port: 8080
+    rest_port: 8081
+  models_settings:
+    single_model_mode: false
+    config_configmap_name: 'ovms-config'
+    config_path: '/config/ovms_config.json'
+  server_settings:
+    file_system_poll_wait_seconds: 0
+    log_level: INFO
+  deployment_parameters:
+    replicas: 1
+
