@@ -709,9 +709,8 @@ func getReplicasStatus(ctx context.Context, releaseName string, namespace string
 	return int(deploy.Items[0].Status.AvailableReplicas)
 }
 
-func RHODSNotInstalled(ctx context.Context) bool {
-	fieldSelector := "metadata.name=rhods-operator"
-	rhodsNamespace := "redhat-ods-operator"
+func DeploymentNotInstalled(ctx context.Context, deploymentName string, namespaceName string) bool {
+	fieldSelector := "metadata.name="+ deploymentName
 	cfg, err := config.GetConfig()
 	if err != nil {
 		log.Error(err, "Can not get api config")
@@ -724,16 +723,16 @@ func RHODSNotInstalled(ctx context.Context) bool {
 	}
 	listOptions:= metav1.ListOptions{FieldSelector: fieldSelector}
 	k8sclient := clientset.AppsV1()
-	deploy, err := k8sclient.Deployments(rhodsNamespace).List(ctx, listOptions)
+	deploy, err := k8sclient.Deployments(namespaceName).List(ctx, listOptions)
 	if err != nil {
 		log.Error(err, "Can not list deployments")
 		return true
 	}
 	if len(deploy.Items) == 0 {
-		log.Info("RHODS operator is not detected")
+		log.Info(deploymentName + " operator is not detected")
 		return true
 	}
-	log.Info("RHODS installation detected")
+	log.Info(deploymentName + " installation detected")
 	return false
 }
 
@@ -744,10 +743,9 @@ func ValidateNotebook(ctx context.Context, kind string, namespace string) error 
 	}
 	if namespace != "redhat-ods-applications"{
 		return errors.New("notebook resource should be created in redhat-ods-applications project to integrate notebook image with the jupyter hub")
-	}else{
-		if  RHODSNotInstalled(ctx) {
-			return errors.New("rhods operator is required to deploy the notebook image integration with the jupyter hub")
-		}
+	}
+	if  DeploymentNotInstalled(ctx, "rhods-operator", "redhat-ods-operator") || DeploymentNotInstalled(ctx, "opendatahub-operator", "openshift-operators") {
+		return errors.New("RHODS operator or ODH operator is required to deploy the notebook image integration with the jupyter hub")
 	}
 	return nil
 }
