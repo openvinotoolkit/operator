@@ -124,8 +124,8 @@ endif
 catalog_build:
 ifeq ($(TARGET_PLATFORM), openshift)
 	docker -v | grep -q podman ; if [ $$? -eq 0 ]; then \
-	opm index add --bundles $(BUNDLE_REPOSITORY):$(IMAGE_TAG) --from-index registry.redhat.io/redhat/certified-operator-index:v4.8 -c podman --tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) ;\
-	else sudo opm index add --bundles $(BUNDLE_REPOSITORY):$(IMAGE_TAG) --from-index registry.redhat.io/redhat/certified-operator-index:v4.8 -c docker --tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) ;\
+	opm index add --bundles $(BUNDLE_REPOSITORY):$(IMAGE_TAG) --from-index registry.redhat.io/redhat/certified-operator-index:v4.10 -c podman --tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) ;\
+	else sudo opm index add --bundles $(BUNDLE_REPOSITORY):$(IMAGE_TAG) --from-index registry.redhat.io/redhat/certified-operator-index:v4.10 -c docker --tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) ;\
     fi
 	docker tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) $(CATALOG_REPOSITORY):$(BRANCH)-latest 
 else
