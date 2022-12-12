@@ -710,7 +710,7 @@ func getReplicasStatus(ctx context.Context, releaseName string, namespace string
 }
 
 func DeploymentNotInstalled(ctx context.Context, deploymentName string, namespaceName string) bool {
-	fieldSelector := "metadata.name="+ deploymentName
+	fieldSelector := "metadata.name=" + deploymentName
 	cfg, err := config.GetConfig()
 	if err != nil {
 		log.Error(err, "Can not get api config")
@@ -745,7 +745,7 @@ func ValidateNotebook(ctx context.Context, kind string, namespace string) error 
 		return errors.New("notebook resource should be created in redhat-ods-applications project to integrate notebook image with the jupyter hub")
 	}
 	if  DeploymentNotInstalled(ctx, "rhods-operator", "redhat-ods-operator") || DeploymentNotInstalled(ctx, "opendatahub-operator", "openshift-operators") {
-		return errors.New("RHODS operator or ODH operator is required to deploy the notebook image integration with the jupyter hub")
+		return errors.New("RHODS operator or ODH operator is required to deploy the notebook image integration with the JupyterHub")
 	}
 	return nil
 }
