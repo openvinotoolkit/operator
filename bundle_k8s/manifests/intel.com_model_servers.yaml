@@ -204,7 +204,6 @@ spec:
                       description: Time interval between config and model versions changes detections
                       type: integer
                       format: int32
-                      default: 0
                     log_level:
                       description: Serving log level
                       type: string
@@ -228,7 +227,6 @@ spec:
                       description: Time interval between two consecutive sequence cleaner scans. Default is 5. Zero value disables sequence cleaner.
                       type: integer
                       format: int32
-                      default: 5
                 models_repository:
                   type: object
                   description: Access definition for model storage
