@@ -167,18 +167,14 @@ spec:
                {{- end }}
         {{- end }}
                "--log_level", "{{ .Values.server_settings.log_level }}",
-               {{- if or (.Values.server_settings.file_system_poll_wait_seconds) (eq .Values.server_settings.file_system_poll_wait_seconds 0)}}
                "--file_system_poll_wait_seconds", "{{ .Values.server_settings.file_system_poll_wait_seconds }}",
-               {{- end }}
                {{- if .Values.server_settings.grpc_workers }}
                "--grpc_workers", "{{ .Values.server_settings.grpc_workers }}",
                {{- end }}
                {{- if .Values.server_settings.rest_workers }}
                "--rest_workers", "{{ .Values.server_settings.rest_workers }}",
                {{- end }}
-               {{- if or (.Values.server_settings.sequence_cleaner_poll_wait_minutes) (eq .Values.server_settings.sequence_cleaner_poll_wait_minutes 0)  }}
                "--sequence_cleaner_poll_wait_minutes", "{{ .Values.server_settings.sequence_cleaner_poll_wait_minutes }}",
-               {{- end }}                            
                "--port", "8080",
                "--rest_port", "8081"]
         {{- if or .Values.models_repository.gcp_creds_secret_name .Values.models_settings.config_configmap_name .Values.models_repository.models_host_path .Values.models_repository.models_volume_claim}}
