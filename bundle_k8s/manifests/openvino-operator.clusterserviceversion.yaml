@@ -30,7 +30,7 @@ metadata:
               "model_name": "resnet",
               "model_path": "gs://ovms-public-eu/resnet50-tf",
               "nireq": 0,
-              "plugin_config": "{\"CPU_THROUGHPUT_STREAMS\":1}",
+              "plugin_config": "{\"PERFORMANCE_HINT\":\"LATENCY\"}",
               "batch_size": "",
               "shape": "",
               "model_version_policy": "{\"latest\": { \"num_versions\":1 }}",
