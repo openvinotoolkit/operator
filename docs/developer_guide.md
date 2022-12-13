@@ -4,7 +4,7 @@
 - docker
 - opm https://github.com/operator-framework/operator-registry/releases
 - operator-sdk https://github.com/operator-framework/operator-sdk/releases
-- golang 1.17
+- golang 1.19
 - make
 - kubectl
 - ubuntu20 or redhat8 OS
