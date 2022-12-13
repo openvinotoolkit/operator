@@ -170,7 +170,7 @@ spec:
                     plugin_config:
                       description: A dictionary of plugin configuration keys and their values
                       type: string
-                      default: '{"CPU_THROUGHPUT_STREAMS":"1"}'
+                      default: '{"PERFORMANCE_HINT":"LATENCY"}'
                     model_version_policy:
                       description: Model version policy
                       type: string
@@ -204,7 +204,7 @@ spec:
                       description: Time interval between config and model versions changes detections
                       type: integer
                       format: int32
-                      default: 0
+                      default: 1
                     log_level:
                       description: Serving log level
                       type: string
