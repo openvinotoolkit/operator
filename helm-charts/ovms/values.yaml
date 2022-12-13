@@ -57,3 +57,6 @@ models_repository:
   s3_compat_api_endpoint: ""
   gcp_creds_secret_name: ""
   azure_storage_connection_string: ""
+monitoring:
+  metrics_enable: false
+  metrics_list: ""
