@@ -158,6 +158,19 @@ spec:
             path: models_settings.layout
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+          - description: >-
+              Enable, if you wish model server to collect metrics.
+            displayName: Collect metrics
+            path: monitoring.metrics_enable
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+          - description: >-
+              Specify list of metrics to be collected. If left blank, the default set of metrics will be collected.
+            displayName: Collected metrics list
+            path: monitoring.metrics_list
+            x-descriptors:
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
+              - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:monitoring.metrics_enable:true'
           - description: Size of the queue of inference requests
             displayName: Nireq
             path: models_settings.nireq
