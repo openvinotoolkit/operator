@@ -61,7 +61,7 @@ Make a PR to https://github.com/k8s-operatorhub/community-operators/tree/main/op
 ## Openshift development flow
 
 ```
-make build_all_images TARGET_PLARFORM=openshift
+make build_all_images TARGET_PLATFORM=openshift
 make deploy_catalog TARGET_PLATFORM=openshift
 
 ```
