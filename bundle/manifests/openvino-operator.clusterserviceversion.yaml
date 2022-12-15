@@ -16,7 +16,7 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:2022.1",
+            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:2022.3",
             "deployment_parameters": {
               "replicas": 1
             },
