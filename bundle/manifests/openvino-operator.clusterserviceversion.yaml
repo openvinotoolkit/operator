@@ -5,7 +5,7 @@ metadata:
     alm-examples-metadata: >-
       {
       "model-server-sample":{"description":"Example of the model server configuration"},
-      "v2022.1":{"description":"Default notebook configuration"}
+      "v2022.3":{"description":"Default notebook configuration"}
       }
     alm-examples: |-
       [
@@ -68,7 +68,7 @@ metadata:
           "apiVersion": "intel.com/v1alpha1",
           "kind": "Notebook",
           "metadata": {
-            "name": "v2022.1"
+            "name": "v2022.3"
           },
           "spec": {
             "git_ref": "main",
