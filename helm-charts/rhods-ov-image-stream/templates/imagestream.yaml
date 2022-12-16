@@ -41,8 +41,8 @@ spec:
     - name: {{ .Values.latest_update_date }}
       annotations:
         opendatahub.io/notebook-python-dependencies: >-
-          [{"name":"JupyterLab","version":"3.0.14"},{"name":"Notebook","version":"6.3.0"}]
-        opendatahub.io/notebook-software: '[{"name":"Python","version":"v3.8.6"}]'
+          [{"name":"JupyterLab","version":"3.5.0"},{"name":"Notebook","version":"6.5.2"}]
+        opendatahub.io/notebook-software: '[{"name":"Python","version":"v3.8"}]'
 {{- if ne .Values.build_locally "true" }}
       from:
         kind: DockerImage
