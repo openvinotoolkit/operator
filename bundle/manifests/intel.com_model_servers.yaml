@@ -280,7 +280,7 @@ spec:
                       type: string
                 monitoring:
                   type: object
-                  description: Configuration of service and model monitoring. This works only for single model mode. For serving multiple models, metrcs are enabled via configuration file.
+                  description: Configuration of service and model monitoring. This works only for single model mode. For serving multiple models, metrics are enabled via configuration file.
                   properties:
                     metrics_enable:
                       type: boolean
