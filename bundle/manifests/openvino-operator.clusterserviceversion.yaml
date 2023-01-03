@@ -16,7 +16,7 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "image_name": "registry.connect.redhat.com/intel/openvino-model-server:2022.3",
+            "image_name": "registry.connect.redhat.com/intel/openvino-model-server@sha256:c98cefa0ecad370de312a4a5fdcbc4e20ec2902e1e72bff28b812a4fcb4e5da6",
             "deployment_parameters": {
               "replicas": 1
             },
@@ -178,7 +178,8 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
           - description: >-
-              Specify list of metrics to be collected. If left blank, the default set of metrics will be collected.
+              Specify list of metrics to be collected. If left blank, the default set of metrics will be collected. 
+              See the [full list of available metrics](https://docs.openvino.ai/latest/ovms_docs_metrics.html#available-metrics-families)
             displayName: Collected metrics list
             path: monitoring.metrics_list
             x-descriptors:
