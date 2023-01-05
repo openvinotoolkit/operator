@@ -744,7 +744,7 @@ func ValidateNotebook(ctx context.Context, kind string, namespace string) error 
 	if namespace != "redhat-ods-applications"{
 		return errors.New("notebook resource should be created in redhat-ods-applications project to integrate notebook image with the jupyter hub")
 	}
-	if  DeploymentNotInstalled(ctx, "rhods-operator", "redhat-ods-operator") || DeploymentNotInstalled(ctx, "opendatahub-operator", "openshift-operators") {
+	if  DeploymentNotInstalled(ctx, "rhods-operator", "redhat-ods-operator") && DeploymentNotInstalled(ctx, "opendatahub-operator", "openshift-operators") {
 		return errors.New("RHODS operator or ODH operator is required to deploy the notebook image integration with the JupyterHub")
 	}
 	return nil
