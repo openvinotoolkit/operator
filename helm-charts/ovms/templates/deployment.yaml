@@ -165,6 +165,12 @@ spec:
                "--max_sequence_number", '{{ .Values.models_settings.max_sequence_number }}',
                {{- end }}
                {{- end }}
+               {{- if eq .Values.monitoring.metrics_enable true }}
+               "--metrics_enable",
+               {{- end }}
+               {{- if .Values.monitoring.metrics_list}}
+               "--metrics_list", '{{ .Values.monitoring.metrics_list }}',
+               {{- end }}
         {{- end }}
                "--log_level", "{{ .Values.server_settings.log_level }}",
                "--file_system_poll_wait_seconds", "{{ .Values.server_settings.file_system_poll_wait_seconds }}",

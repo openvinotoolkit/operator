@@ -4,7 +4,7 @@
 - docker
 - opm https://github.com/operator-framework/operator-registry/releases
 - operator-sdk https://github.com/operator-framework/operator-sdk/releases
-- golang 1.17
+- golang 1.19
 - make
 - kubectl
 - ubuntu20 or redhat8 OS
@@ -61,7 +61,7 @@ Make a PR to https://github.com/k8s-operatorhub/community-operators/tree/main/op
 ## Openshift development flow
 
 ```
-make build_all_images TARGET_PLARFORM=openshift
+make build_all_images TARGET_PLATFORM=openshift
 make deploy_catalog TARGET_PLATFORM=openshift
 
 ```

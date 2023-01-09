@@ -50,7 +50,7 @@ spec:
                   description: Model Server docker image to be used
                   type: string
                   default: >-
-                    registry.connect.redhat.com/intel/openvino-model-server:latest
+                    registry.connect.redhat.com/intel/openvino-model-server@sha256:c98cefa0ecad370de312a4a5fdcbc4e20ec2902e1e72bff28b812a4fcb4e5da6
                 deployment_parameters:
                   description: Cluster deployment parameters to be applied to the Model Server
                   type: object
@@ -278,6 +278,21 @@ spec:
                     http_proxy:
                       description: http proxy to connect to the cloud storage
                       type: string
+                monitoring:
+                  type: object
+                  description: >- 
+                    Configuration of service and model monitoring. This works only for single model mode. For serving multiple models, metrics are enabled via configuration file.
+                    Learn more about metrics: https://docs.openvino.ai/latest/ovms_docs_metrics.html#metrics
+                  properties:
+                    metrics_enable:
+                      type: boolean
+                      default: false
+                    metrics_list:
+                      type: string
+                      description: >-
+                        Comma-separated list of metrics to be enabled. Full list of available metrics can be found on: 
+                        https://docs.openvino.ai/latest/ovms_docs_metrics.html#available-metrics-families
+                      default: ""
               x-kubernetes-preserve-unknown-fields: true
             status:
               description: Status defines the observed state of Ovms
