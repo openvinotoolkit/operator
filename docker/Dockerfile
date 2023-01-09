@@ -41,8 +41,8 @@ FROM registry.access.redhat.com/ubi8/ubi-minimal:8.7
 LABEL name="OpenVINO toolkit operator" \
       maintainer="dariusz.trawinski@intel.com" \
       vendor="Intel Corporation" \
-      version="1.0.0" \
-      release="1.0" \
+      version="1.1.0" \
+      release="1.1" \
       summary="OpenVINO(TM) Toolkit Operator" \
       description="An Operator for managing OpenVINO Toolkit in OpenShift and Kubernetes"
 
