@@ -205,7 +205,6 @@ ifneq ($(no_proxy),)
 else
 	sed -i "s|<no_proxy>|''|" tests/operator-subscription.yaml
 endif
-	cat tests/operator-subscription.yaml
 	kubectl apply -f tests/operator-subscription.yaml
 	sleep 15
 	kubectl get clusterserviceversion --all-namespaces
