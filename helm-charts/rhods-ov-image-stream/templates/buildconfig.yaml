@@ -19,6 +19,7 @@ apiVersion: build.openshift.io/v1
 metadata:
   labels:
     build: openvino-notebook
+    opendatahub.io/build_type: notebook_image
   name: {{ template "notebook.fullname" . }}
 spec:
   output:
