@@ -190,15 +190,23 @@ ifeq ($(TARGET_PLATFORM), openshift)
 else
 	kubectl create ns operator || true
 	kubectl apply -f tests/operator-group.yaml
-ifeq ($(ADD_NOTEBOOK_K8S), 1)
-	sed -i "s|<http_proxy>|$(http_proxy)|" tests/operator-subscription-proxy.yaml
-	sed -i "s|<https_proxy>|$(https_proxy)|" tests/operator-subscription-proxy.yaml
-	sed -i "s|<no_proxy>|$(no_proxy)|" tests/operator-subscription-proxy.yaml
-	cat tests/operator-subscription-proxy.yaml
-	kubectl apply -f tests/operator-subscription-proxy.yaml
+ifneq ($(http_proxy),)
+	sed -i "s|<http_proxy>|$(http_proxy)|" tests/operator-subscription.yaml
 else
-	kubectl apply -f tests/operator-subscription.yaml
+	sed -i "s|<http_proxy>|''|" tests/operator-subscription.yaml
 endif
+ifneq ($(https_proxy),)
+	sed -i "s|<https_proxy>|$(https_proxy)|" tests/operator-subscription.yaml
+else
+	sed -i "s|<https_proxy>|''|" tests/operator-subscription.yaml
+endif
+ifneq ($(no_proxy),)
+	sed -i "s|<no_proxy>|$(no_proxy)|" tests/operator-subscription.yaml
+else
+	sed -i "s|<no_proxy>|''|" tests/operator-subscription.yaml
+endif
+	cat tests/operator-subscription.yaml
+	kubectl apply -f tests/operator-subscription.yaml
 	sleep 15
 	kubectl get clusterserviceversion --all-namespaces
 endif
