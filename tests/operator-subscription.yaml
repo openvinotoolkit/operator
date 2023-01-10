@@ -14,6 +14,6 @@ spec:
       value: <no_proxy>
   channel: alpha
   name: ovms-operator
-  startingCSV: openvino-operator.v1.0.0
+  startingCSV: openvino-operator.v1.1.0
   source: my-test-catalog
   sourceNamespace: olm
