@@ -26,7 +26,7 @@ helm install ovms-app ovms --set models_settings.model_name=<model_name>,models_
 ```
 
 ### Deploy OpenVINO Model Server with Multiple Models Defined in a Configuration File
-To serve multiple models, you can run Model Server with a configuration file as described in [model server documentation](https://docs.openvino.ai/latest/ovms_docs_multiple_models.html).
+To serve multiple models, you can run Model Server with a configuration file as described in [model server documentation](https://docs.openvino.ai/latest/ovms_docs_serving_model.html#serving-multiple-models).
 Follow the above documentation to create a configuration file named _config.json_ and fill it with proper information.
 To deploy with config file stored in the Kubernetes ConfigMap:
 * create a ConfigMap resource from this file with a chosen name (here _ovms-config_):

@@ -87,7 +87,7 @@ spec:
             path: models_settings.single_model_mode
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
-          - description: Config map with the model server configuration file. If this field is empty, specify required parameters in `model_settings` section. Configuration config.json file can be created as described as described on https://docs.openvino.ai/latest/ovms_docs_multiple_models.html Create the config_map with this file via a command `oc create configmap ovms-config --from-file config.json`
+          - description: Config map with the model server configuration file. If this field is empty, specify required parameters in `model_settings` section. Configuration config.json file can be created as described as described on https://docs.openvino.ai/latest/ovms_docs_serving_model.html#serving-multiple-models Create the config_map with this file via a command `oc create configmap ovms-config --from-file config.json`
             displayName: Config map
             path: models_settings.config_configmap_name
             x-descriptors:
