@@ -168,7 +168,7 @@ ifeq ($(TARGET_PLATFORM), openshift)
 else
 	kubectl delete --ignore-not-found=true ns operator
 	kubectl get ns olm ; if [ $$? -eq 0 ]; then operator-sdk olm uninstall ; fi
-	operator-sdk olm install --timeout 10m0s
+	operator-sdk olm install --version v0.22.0 --timeout 10m0s
 endif
 
 deploy_catalog:
