@@ -54,7 +54,6 @@ pipeline {
               sh """
               env
               """
-              echo shortCommit
               build job: "ovms-operator/utils-common/ovms-o-test-on-commit", parameters: [[$class: 'StringParameterValue', name: 'OVMSOCOMMIT', value: "${GIT_COMMIT}"]]
           }    
         }
