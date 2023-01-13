@@ -54,7 +54,7 @@ pipeline {
               sh """
               env
               """
-              build job: "ovms-operator/utils-common/ovms-o-test-on-commit", parameters: [[$class: 'StringParameterValue', name: 'OVMSOCOMMIT', value: "${GIT_COMMIT}"]]
+              build job: "ovms-operator/utils-common/ovms-o-test-on-commit", parameters: [[$class: 'StringParameterValue', name: 'CORE_BRANCH', value: "${GIT_COMMIT}"]]
           }    
         }
     }
