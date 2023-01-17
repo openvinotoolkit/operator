@@ -135,7 +135,8 @@ spec:
                       enum:
                         - ClusterIP
                         - NodePort
-                        - Loadbalancer
+                        - LoadBalancer
+                        - ExternalName
                 models_settings:
                   type: object
                   description: Fill model settings if model config is not used
