@@ -10,7 +10,7 @@ data:
          {
             "config": {
                  "name": "resnet50-int8",
-                 "base_path": "gs://ovms-public-eu/resnet50-binary"
+                 "base_path": "gs://<bucket_name>/<model_dir>"
             }
          }
      ],

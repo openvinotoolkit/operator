@@ -135,7 +135,8 @@ spec:
                       enum:
                         - ClusterIP
                         - NodePort
-                        - Loadbalancer
+                        - LoadBalancer
+                        - ExternalName
                 models_settings:
                   type: object
                   description: Fill model settings if model config is not used
@@ -157,7 +158,7 @@ spec:
                     model_path:
                       description: Path to the model files
                       type: string
-                      default: 'gs://ovms-public-eu/resnet50-binary'
+                      default: 'gs://<bucket_name>/<model_dir>'
                     shape:
                       description: Resets models shape (model must support reshaping). If set, batch_size parameter is ignored
                       type: string

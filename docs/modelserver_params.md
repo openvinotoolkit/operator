@@ -12,7 +12,7 @@
 |models_settings.config_configmap_name| Config map hosting the config.json file|
 |models_settings.config_path| Path to the config file in case it was mounted in the container via a persistent volume claim |
 |models_settings.model_name| Model name to be used on the client side in the remote calls |
-|models_settings.model_path| Path to the model folder in the model repository; for example `gs://ovms-public-eu/resnet50-binary` |
+|models_settings.model_path| Path to the model folder in the model repository; for example `gs://<bucket_name>/<model_dir>` |
 |models_settings.nireq| The size of internal request queue. When set to 0 or no value is set value is calculated automatically based on available resources|
 |models_settings.plugin_config| Adds OpenVINO plugin configuration for tuning the performance. Value `{\"PERFORMANCE_HINT\":\"LATENCY\"}` optimizes the inference latency with a single client scenario|
 |models_settings.batch_size| change the model batch size |
