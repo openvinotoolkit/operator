@@ -130,7 +130,7 @@ An examplary model server instance with a public [ResNet model](https://github.c
 ```
 git clone https://github.com/openvinotoolkit/operator
 cd operator/helm-charts
-helm install ovms-app ovms --set models_settings.model_name=resnet,models_settings.model_path=gs://ovms-public-eu/resnet50-tf
+helm install ovms-app ovms --set models_settings.model_name=resnet,models_settings.model_path=gs://<bucket_name>/<model_dir>
 ```
 
 Now that the server is running you can send HTTP or gRPC requests to perform inference. 

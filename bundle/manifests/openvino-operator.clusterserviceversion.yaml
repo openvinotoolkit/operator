@@ -29,7 +29,7 @@ metadata:
               "config_configmap_name": "",
               "config_path": "",
               "model_name": "resnet",
-              "model_path": "gs://ovms-public-eu/resnet50-tf",
+              "model_path": "gs://<bucket_name>/<model_dir>",
               "nireq": 0,
               "plugin_config": "{\"PERFORMANCE_HINT\":\"LATENCY\"}",
               "batch_size": "",
