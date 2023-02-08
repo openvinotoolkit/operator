@@ -178,7 +178,7 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:booleanSwitch'
           - description: >-
-              Specify list of metrics to be collected. If left blank, the default set of metrics will be collected. 
+              Specify list of metrics to be collected. If left blank, the default set of metrics will be collected.
               See the full list of available metrics: https://docs.openvino.ai/latest/ovms_docs_metrics.html#available-metrics-families.
             displayName: Collected metrics list
             path: monitoring.metrics_list
@@ -513,7 +513,7 @@ spec:
                 - --upstream=http://127.0.0.1:8080/
                 - --logtostderr=true
                 - --v=10
-                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
+                image: registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:12f0c23da8a11e77c4aa58bd38143ab34858405c66936296aaebf21b4e61fd92
                 name: kube-rbac-proxy
                 ports:
                 - containerPort: 8443
@@ -524,7 +524,7 @@ spec:
                   - --metrics-bind-address=127.0.0.1:8080
                   - --leader-elect
                   - --leader-election-id=ovms-operator
-                image: registry.connect.redhat.com/intel/ovms-operator:1.1.0
+                image: registry.connect.redhat.com/intel/ovms-operator@sha256:d4c8a211f276a8e666917498149aaf8f19c30695552057a509205480ef15e911
                 livenessProbe:
                   httpGet:
                     path: /healthz
