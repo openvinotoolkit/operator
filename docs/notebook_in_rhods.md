@@ -1,6 +1,6 @@
 ## Integration with OpenShift Data Science and Open Data Hub
 
-OpenVINO operator can enabled the integration of the OpenVINO notebook image with the JupyterHub [Spawner](https://jupyterhub.readthedocs.io/en/stable/reference/spawners.html) in [Red Hat OpenShift Data Science](https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-data-science) and [Open Data Hub](https://opendatahub.io/docs.html). 
+OpenVINO operator can enabled the integration of the OpenVINO notebook image with the JupyterHub [Spawner](https://jupyterhub.readthedocs.io/en/stable/reference/spawners.html) in [Red Hat OpenShift Data Science](https://www.redhat.com/en/technologies/cloud-computing/openshift/openshift-data-science) and [Open Data Hub](https://opendatahub.io). 
 
 *Note* This feature is available only in the Openshift operator. It is not present in the upstream Kubernetes.
 
