@@ -202,6 +202,14 @@ Requirements:
 - kubectl 1.23
 - mc binary and access to S3 compatible bucket - [quick start with Minio](https://docs.min.io/docs/minio-quickstart-guide.html)
 
+---
+### Quick standalone minio setup
+If you don't have a minio in place, you can move forward with simple, standalone setup. Run:
+```
+kubectl apply https://github.com/openvinotoolkit/operator/helm-charts/minio/minio-standalone.yaml
+```
+---
+
 Prepare all dependencies for the pipeline with a vehicle analysis pipelines:
 ```
 git clone https://github.com/openvinotoolkit/model_server
@@ -219,17 +227,15 @@ mc ls -r mys3
 331KiB models-repository/vehicle-detection-0202/1/vehicle-detection-0202.xml
 ```
 In the initially created model server config file `workspace/config.json`, several adjustments are needed to change the models and custom node library base paths.
-Commands below set the models path to S3 bucket and the custom node library to `/config` folder which will be mounted as a Kubernetes configmap.
+Commands below set the models path to S3 bucket.
 ```
 sed -i 's/\/workspace\/vehicle-detection-0202/s3:\/\/models-repository\/vehicle-detection-0202/g' workspace/config.json
 sed -i 's/\/workspace\/vehicle-attributes-recognition-barrier-0042/s3:\/\/models-repository\/vehicle-attributes-recognition-barrier-0042/g' workspace/config.json
-sed -i 's/workspace\/lib/config/g' workspace/config.json
 ```
 
-Next, add both the config file and the custom name library to a config map:
+Next, add the config file  to a config map:
 ```
-kubectl create configmap ovms-pipeline --from-file=config.json=workspace/config.json \
---from-file=libcustom_node_model_zoo_intel_object_detection.so=workspace/lib/libcustom_node_model_zoo_intel_object_detection.so
+kubectl create configmap ovms-pipeline --from-file=config.json=workspace/config.json
 ```
 
 From the context of the helm chart folder in the operator repo deploy the model server. Change the credentials and S3 endpoint as needed in your environment:
@@ -239,7 +245,7 @@ cd operator/helm-charts
 export AWS_ACCESS_KEY_ID=minioadmin
 export AWS_SECRET_ACCESS_KEY=minioadmin
 export AWS_REGION=us-east-1
-export S3_COMPAT_API_ENDPOINT=http://mys3.example.com:9000
+export S3_COMPAT_API_ENDPOINT=http://minio-service:9000
 helm install ovms-pipeline ovms --set models_settings.config_configmap_name=ovms-pipeline,models_settings.single_model_mode=false,models_repository.aws_access_key_id=$AWS_ACCESS_KEY_ID,models_repository.aws_secret_access_key=$AWS_SECRET_ACCESS_KEY,models_repository.aws_region=us-east-1,models_repository.s3_compat_api_endpoint=$S3_COMPAT_API_ENDPOINT
 
 $ kubectl get service
