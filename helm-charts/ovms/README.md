@@ -206,7 +206,7 @@ Requirements:
 ### Quick standalone minio setup
 If you don't have a minio in place, you can move forward with simple, standalone setup. Run:
 ```
-kubectl apply https://github.com/openvinotoolkit/operator/helm-charts/minio/minio-standalone.yaml
+kubectl apply -f https://raw.githubusercontent.com/openvinotoolkit/operator/fix_helm/helm-charts/ovms/minio-standalone.yaml
 ```
 ---
 
