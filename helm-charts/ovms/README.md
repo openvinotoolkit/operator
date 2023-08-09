@@ -218,6 +218,7 @@ make
 ```
 The command above downloads the models and builds the customer library for the pipeline and places them in workspace folder. Copy the models to the shared storage accessible in the cluster. Here the S3 server alias is `mys3`:
 ```
+mc mb  mys3/models-repository
 mc cp --recursive workspace/vehicle-detection-0202 mys3/models-repository/
 mc cp --recursive workspace/vehicle-attributes-recognition-barrier-0042 mys3/models-repository/
 mc ls -r mys3
