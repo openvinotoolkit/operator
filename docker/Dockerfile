@@ -15,7 +15,7 @@
 #
 
 # Build the manager binary
-FROM docker.io/golang:1.19 as builder
+FROM docker.io/golang:1.21 as builder
 ARG TARGETARCH
 
 WORKDIR /workspace
@@ -36,7 +36,7 @@ RUN GOOS=linux GOARCH=$TARGETARCH make build
 RUN GOOS=linux GOARCH=$TARGETARCH make test-unit
 
 # Final image.
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.7
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.8
 ### Required OpenShift Labels 
 LABEL name="OpenVINO toolkit operator" \
       maintainer="dariusz.trawinski@intel.com" \
