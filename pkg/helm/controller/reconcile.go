@@ -68,13 +68,14 @@ type ReleaseHookFunc func(*rpb.Release) error
 
 // HelmOperatorReconciler reconciles custom resources as Helm releases.
 type HelmOperatorReconciler struct {
-	Client          client.Client
-	EventRecorder   record.EventRecorder
-	GVK             schema.GroupVersionKind
-	ManagerFactory  release.ManagerFactory
-	ReconcilePeriod time.Duration
-	OverrideValues  map[string]string
-	releaseHook     ReleaseHookFunc
+	Client                 client.Client
+	EventRecorder          record.EventRecorder
+	GVK                    schema.GroupVersionKind
+	ManagerFactory         release.ManagerFactory
+	ReconcilePeriod        time.Duration
+	OverrideValues         map[string]string
+	SuppressOverrideValues bool
+	releaseHook            ReleaseHookFunc
 }
 
 const (
