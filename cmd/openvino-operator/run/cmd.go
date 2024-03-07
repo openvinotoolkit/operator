@@ -110,8 +110,8 @@ func run(cmd *cobra.Command, f *flags.Flags) {
 		err     error
 	)
 	if f.ManagerConfigPath != "" {
-		cfgLoader := ctrl.ConfigFile().AtPath(f.ManagerConfigPath)
-		if options, err = options.AndFrom(cfgLoader); err != nil {
+		cfgLoader := ctrl.ConfigFile().AtPath(f.ManagerConfigPath) // nolint:staticcheck
+		if options, err = options.AndFrom(cfgLoader); err != nil { // nolint:staticcheck
 			log.Error(err, "Unable to load the manager config file")
 			os.Exit(1)
 		}
