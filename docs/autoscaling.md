@@ -8,7 +8,7 @@ Horizontal autoscaler can tune the number of replicas of the model server servic
 
 Vertical pod autoscaler (VPA) adjusts the amount of resources assigned to each replica. For example, autoscaler can adjust the RAM allocation in case of observed Out Of Memory failures.
 
-## Horinzontal Pod Autoscaler
+## Horizontal Pod Autoscaler
 In Openshift, the horizontal autoscaler is present by default. It is even integrated in the web console interface
 
 ![horizontal](./horizontal.png)
