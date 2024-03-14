@@ -68,13 +68,14 @@ type ReleaseHookFunc func(*rpb.Release) error
 
 // HelmOperatorReconciler reconciles custom resources as Helm releases.
 type HelmOperatorReconciler struct {
-	Client          client.Client
-	EventRecorder   record.EventRecorder
-	GVK             schema.GroupVersionKind
-	ManagerFactory  release.ManagerFactory
-	ReconcilePeriod time.Duration
-	OverrideValues  map[string]string
-	releaseHook     ReleaseHookFunc
+	Client                 client.Client
+	EventRecorder          record.EventRecorder
+	GVK                    schema.GroupVersionKind
+	ManagerFactory         release.ManagerFactory
+	ReconcilePeriod        time.Duration
+	OverrideValues         map[string]string
+	SuppressOverrideValues bool
+	releaseHook            ReleaseHookFunc
 }
 
 const (
@@ -785,7 +786,7 @@ func (r HelmOperatorReconciler) waitForDeletion(ctx context.Context, o client.Ob
 
 	tctx, cancel := context.WithTimeout(ctx, time.Second*5)
 	defer cancel()
-	return wait.PollImmediateUntil(time.Millisecond*10, func() (bool, error) {
+	return wait.PollImmediateUntil(time.Millisecond*10, func() (bool, error) { // nolint:staticcheck
 		err := r.Client.Get(tctx, key, o)
 		if apierrors.IsNotFound(err) {
 			return true, nil

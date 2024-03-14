@@ -136,7 +136,7 @@ func TrimDNS1123Label(label string) string {
 //  -- True: Both Owner and dependent are Namespaced with in same namespace.
 //  -- False: Owner is Namespaced and dependent is Cluster-scoped.
 //  -- False: Both Owner and dependent are Namespaced with different namespaces.
-func SupportsOwnerReference(restMapper meta.RESTMapper, owner, dependent runtime.Object) (bool, error) {
+func SupportsOwnerReference(restMapper meta.RESTMapper, owner, dependent runtime.Object, depNamespace string) (bool, error) {
 	ownerGVK := owner.GetObjectKind().GroupVersionKind()
 	ownerMapping, err := restMapper.RESTMapping(ownerGVK.GroupKind(), ownerGVK.Version)
 	if err != nil {
@@ -159,7 +159,9 @@ func SupportsOwnerReference(restMapper meta.RESTMapper, owner, dependent runtime
 	ownerClusterScoped := ownerMapping.Scope.Name() == meta.RESTScopeNameRoot
 	ownerNamespace := mOwner.GetNamespace()
 	depClusterScoped := depMapping.Scope.Name() == meta.RESTScopeNameRoot
-	depNamespace := mDep.GetNamespace()
+	if depNamespace == "" {
+		depNamespace = mDep.GetNamespace()
+	}
 
 	if ownerClusterScoped {
 		return true, nil
