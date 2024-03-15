@@ -1,7 +1,7 @@
 apiVersion: intel.com/v1alpha1
 kind: ModelServer
 metadata:
-  name: ovms-sample
+  name: ovms-sample-test-invalid
 spec:
   image_name: openvino/model_server:latest
   deployment_parameters:
@@ -15,6 +15,7 @@ spec:
         cpu: "1"
         memory: "400Mi"
   models_settings:
+    model_config: "invalid value"
     single_model_mode: true
     config_configmap_name: ""
     config_path: ""

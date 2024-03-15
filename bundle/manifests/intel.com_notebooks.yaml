@@ -15,7 +15,7 @@ spec:
     - name: v1alpha1
       schema:
         openAPIV3Schema:
-          description: Notebook is the Schema representing the Image streams for RHODS JupyterHub notebooks
+          description: Notebook is the Schema representing the Image streams for AI JupyterHub notebooks
           properties:
             apiVersion:
               description: 'APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
@@ -44,7 +44,7 @@ spec:
                   description: Git commit reference in notebook repository to build the docker image
                   type: string
                 git_uri:
-                  description: Git reposiory to be used for image building
+                  description: Git repository to be used for image building
                   type: string
                   default: https://github.com/openvinotoolkit/openvino_notebooks
                 reconcile_duration_multiplier:

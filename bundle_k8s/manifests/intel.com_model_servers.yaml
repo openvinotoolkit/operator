@@ -50,7 +50,7 @@ spec:
                   description: Model Server docker image to be used
                   type: string
                   default: >-
-                    openvino/model_server:2022.1
+                    openvino/model_server:2024.0
                 deployment_parameters:
                   description: Cluster deployment parameters to be applied to the Model Server
                   type: object
@@ -143,7 +143,7 @@ spec:
                     single_model_mode:
                       description: >-
                         Select this option for serving a single model.
-                        For multi model and DAG deployments, a configuration file `config.json` should be added to a config_map resource
+                        For multi model, MediaPipe and DAG deployments, a configuration file `config.json` and other configuration artifacts should be added to a config_map resource
                       type: boolean
                       default: true
                     config_configmap_name:
@@ -162,7 +162,7 @@ spec:
                       description: Resets models shape (model must support reshaping). If set, batch_size parameter is ignored
                       type: string
                     batch_size:
-                      description: Resets models batchsize, int value or auto. This parameter will be ignored if shape is set
+                      description: Resets models batch size, int value or auto. This parameter will be ignored if shape is set
                       type: string
                     target_device:
                       description: Target device to run the inference
@@ -280,7 +280,7 @@ spec:
                       type: string
                 monitoring:
                   type: object
-                  description: Configuration of service and model monitoring. This works only for single model mode. For serving multiple models, metrics are enabled via configuration file.
+                  description: Configuration of service and model monitoring.
                   properties:
                     metrics_enable:
                       type: boolean
@@ -291,7 +291,7 @@ spec:
                       default: ""
               x-kubernetes-preserve-unknown-fields: true
             status:
-              description: Status defines the observed state of Ovms
+              description: Status defines the observed state of ModelServer
               type: object
               x-kubernetes-preserve-unknown-fields: true
       subresources:
