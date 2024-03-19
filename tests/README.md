@@ -3,7 +3,9 @@
 Before preparing K8S environment, make sure you meet the prerequisites 
 defined in [developer guide](https://github.com/openvinotoolkit/operator/blob/main/docs/developer_guide.md). 
 
-1. Install required CLI tools as described in https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl.
+1. Install required CLI tools as described in [Kubernetes documentation](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl).
+To install specific version, check current stable version using ```apt policy <package_name>```, e.g. ```apt policy kubectl```.
+
 ```
 set -e
 sudo apt-get update
@@ -12,7 +14,6 @@ sudo mkdir -p -m 755 /etc/apt/keyrings
 curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update
-# To check current stable version use: apt policy <package_name>, e.g. apt policy kubectl
 sudo apt-get install -y kubelet=1.28.7-1.1 kubeadm=1.28.7-1.1 kubectl=1.28.7-1.1
 sudo apt-mark hold kubelet kubeadm kubectl
 echo "CLI tools installed"
@@ -20,7 +21,7 @@ echo "CLI tools installed"
 
 2. Setup containerd
 
-Set up Docker's apt repository as described in https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository.
+Set up Docker's apt repository as described in [Docker documentation](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository).
 ```
 sudo apt-get update
 sudo apt-get install ca-certificates curl
