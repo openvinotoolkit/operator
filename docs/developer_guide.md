@@ -5,8 +5,9 @@
 - opm https://github.com/operator-framework/operator-registry/releases
 - operator-sdk https://github.com/operator-framework/operator-sdk/releases
 - olm https://github.com/operator-framework/operator-lifecycle-manager/releases
-- golang 1.19
+- golang 1.21
 - make
+- kubectl
 - Ubuntu20 or RedHat8 OS
 
 ## Building  the operator
