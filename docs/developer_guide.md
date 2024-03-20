@@ -8,7 +8,7 @@
 - golang 1.21
 - make
 - kubectl
-- Ubuntu20 or RedHat8 OS
+- Ubuntu 20.04/Ubuntu 22.04 or RedHat8 OS
 
 ## Building  the operator
 ```

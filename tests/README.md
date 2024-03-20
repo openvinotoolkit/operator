@@ -1,5 +1,7 @@
 ## Preparing K8S environment for tests
 
+NOTE: The procedure was tested for both Ubuntu 20.04 and Ubuntu 22.04.
+
 Before preparing K8S environment, make sure you meet the prerequisites 
 defined in [developer guide](https://github.com/openvinotoolkit/operator/blob/main/docs/developer_guide.md). 
 
