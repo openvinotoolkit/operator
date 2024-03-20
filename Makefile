@@ -129,7 +129,7 @@ ifeq ($(TARGET_PLATFORM), openshift)
     fi
 	docker tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) $(CATALOG_REPOSITORY):$(BRANCH)-latest 
 else
-	sudo opm index add --bundles quay.io/operatorhubio/ovms-operator:v0.1.0,quay.io/operatorhubio/ovms-operator:v0.2.0,quay.io/operatorhubio/ovms-operator:v1.0.0,$(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG)
+	sudo opm index add --bundles quay.io/operatorhubio/ovms-operator:v0.1.0,quay.io/operatorhubio/ovms-operator:v0.2.0,quay.io/operatorhubio/ovms-operator:v1.0.0,quay.io/operatorhubio/ovms-operator:v1.1.0,$(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG)
 	docker tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG) $(CATALOG_REPOSITORY)-k8s:$(BRANCH)-latest 	
 endif
 
@@ -168,7 +168,7 @@ ifeq ($(TARGET_PLATFORM), openshift)
 else
 	kubectl delete --ignore-not-found=true ns operator
 	kubectl get ns olm ; if [ $$? -eq 0 ]; then operator-sdk olm uninstall ; fi
-	operator-sdk olm install --version v0.22.0 --timeout 10m0s
+	operator-sdk olm install --version v0.27.0 --timeout 10m0s
 endif
 
 deploy_catalog:

@@ -67,9 +67,9 @@ metadata:
     containerImage: quay.io/openvino/ovms-operator:1.1.0
     capabilities: Basic Install
     categories: "AI/Machine Learning"
-    operators.operatorframework.io/builder: operator-sdk-v1.19.1+git
+    operators.operatorframework.io/builder: operator-sdk-v1.34.1+git
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-  name: openvino-operator.v1.1.0
+  name: openvino-operator.v1.2.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -522,5 +522,5 @@ spec:
   maturity: alpha
   provider:
     name: Intel
-  version: 1.1.0
-  replaces: openvino-operator.v1.0.0
+  version: 1.2.0
+  replaces: openvino-operator.v1.1.0

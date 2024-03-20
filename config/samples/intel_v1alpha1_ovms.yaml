@@ -1,7 +1,7 @@
 apiVersion: intel.com/v1alpha1
 kind: ModelServer
 metadata:
-  name: ovms-sample-test-invalid
+  name: ovms-sample
 spec:
   image_name: openvino/model_server:latest
   deployment_parameters:
@@ -15,14 +15,13 @@ spec:
         cpu: "1"
         memory: "400Mi"
   models_settings:
-    model_config: "invalid value"
     single_model_mode: true
     config_configmap_name: ""
     config_path: ""
     model_name: "resnet"
     model_path: "gs://<bucket_name>/<model_dir>"
     nireq: 0
-    plugin_config: '{"CPU_THROUGHPUT_STREAMS":"1"}'
+    plugin_config: '{"PERFORMANCE_HINT":"LATENCY"}'
     batch_size: ""
     shape: ""
     model_version_policy: "{\"latest\": {\"num_versions\":1 }}"
