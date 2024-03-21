@@ -1,13 +1,14 @@
 # Developer guide
 
 ## Prerequisites
-- docker
+- Docker
 - opm https://github.com/operator-framework/operator-registry/releases
 - operator-sdk https://github.com/operator-framework/operator-sdk/releases
-- golang 1.19
+- olm https://github.com/operator-framework/operator-lifecycle-manager/releases
+- golang 1.21
 - make
 - kubectl
-- ubuntu20 or redhat8 OS
+- Ubuntu 20.04/Ubuntu 22.04 or RedHat8 OS
 
 ## Building  the operator
 ```
