@@ -1,4 +1,4 @@
-# Operator instalation
+# Operator installation
 
 *Note:* Operator, starting from version 1.0 includes non-compatible changes in the CRD records of `ModelServer` and `Notebook`.
 It is recommended to remove all those custom records before upgrading the operator from v0.2 to v1.0. 
