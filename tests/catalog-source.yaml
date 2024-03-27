@@ -4,5 +4,7 @@ metadata:
   name: my-test-catalog
   namespace: olm
 spec:
+  grpcPodConfig:
+    securityContextConfig: restricted
   sourceType: grpc
   image: catalog:latest

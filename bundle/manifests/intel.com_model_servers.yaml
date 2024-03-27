@@ -41,7 +41,7 @@ spec:
             metadata:
               type: object
             spec:
-              description: Spec defines the desired state of Ovms
+              description: Spec defines the desired state of ModelServer
               type: object
               required:
                 - image_name
@@ -50,7 +50,7 @@ spec:
                   description: Model Server docker image to be used
                   type: string
                   default: >-
-                    registry.connect.redhat.com/intel/openvino-model-server@sha256:c98cefa0ecad370de312a4a5fdcbc4e20ec2902e1e72bff28b812a4fcb4e5da6
+                    registry.connect.redhat.com/intel/openvino-model-server@sha256:b8721a65da98bd9b354680ecb2dca8a4d60a1097babe9822ab264f8e951190f7
                 deployment_parameters:
                   description: Cluster deployment parameters to be applied to the Model Server
                   type: object
@@ -143,7 +143,7 @@ spec:
                     single_model_mode:
                       description: >-
                         Select this option for serving a single model.
-                        For multi model and DAG deployments, a configuration file `config.json` should be added to a config_map resource
+                        For multi model, MediaPipe and DAG deployments, a configuration file `config.json` and other configuration artifacts should be added to a config_map resource
                       type: boolean
                       default: true
                     config_configmap_name:
@@ -162,7 +162,7 @@ spec:
                       description: Resets models shape (model must support reshaping). If set, batch_size parameter is ignored
                       type: string
                     batch_size:
-                      description: Resets models batchsize, int value or auto. This parameter will be ignored if shape is set
+                      description: Resets models batch size, int value or auto. This parameter will be ignored if shape is set
                       type: string
                     target_device:
                       description: Target device to run the inference
@@ -281,8 +281,8 @@ spec:
                 monitoring:
                   type: object
                   description: >-
-                    Configuration of service and model monitoring. This works only for single model mode. For serving multiple models, metrics are enabled via configuration file.
-                    Learn more about metrics: https://docs.openvino.ai/latest/ovms_docs_metrics.html#metrics
+                    Configuration of service and model monitoring. This works only for single model mode.
+                    Learn more about metrics: https://docs.openvino.ai/2024/ovms_docs_metrics.html
                   properties:
                     metrics_enable:
                       type: boolean
@@ -291,11 +291,11 @@ spec:
                       type: string
                       description: >-
                         Comma-separated list of metrics to be enabled. Full list of available metrics can be found on:
-                        https://docs.openvino.ai/latest/ovms_docs_metrics.html#available-metrics-families
+                        https://docs.openvino.ai/2024/ovms_docs_metrics.html
                       default: ""
               x-kubernetes-preserve-unknown-fields: true
             status:
-              description: Status defines the observed state of Ovms
+              description: Status defines the observed state of ModelServer
               type: object
               x-kubernetes-preserve-unknown-fields: true
       subresources:

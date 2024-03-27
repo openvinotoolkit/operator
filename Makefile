@@ -102,11 +102,11 @@ ifeq ($(TARGET_PLATFORM), openshift)
 else
 	echo "Building kubernetes bundle"
 ifeq ($(ADD_NOTEBOOK_K8S), 1)
-	sed -i "s|registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:12f0c23da8a11e77c4aa58bd38143ab34858405c66936296aaebf21b4e61fd92|gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+	sed -i "s|registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:12f0c23da8a11e77c4aa58bd38143ab34858405c66936296aaebf21b4e61fd92|gcr.io/kubebuilder/kube-rbac-proxy:v0.15.0|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 	sed -i "s|registry.connect.redhat.com/intel/ovms-operator@sha256:d4c8a211f276a8e666917498149aaf8f19c30695552057a509205480ef15e911|$(OPERATOR_IMAGE):$(IMAGE_TAG)|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 	docker build -t $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -f bundle/Dockerfile bundle
 	sed -i "s|$(OPERATOR_IMAGE):$(IMAGE_TAG)|registry.connect.redhat.com/intel/ovms-operator@sha256:d4c8a211f276a8e666917498149aaf8f19c30695552057a509205480ef15e911|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
-	sed -i "s|gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0|registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:12f0c23da8a11e77c4aa58bd38143ab34858405c66936296aaebf21b4e61fd92|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
+	sed -i "s|gcr.io/kubebuilder/kube-rbac-proxy:v0.15.0|registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:da5714b93ac39277affdc10c3ba142d8c032ed0ddb2ba61c04cbddac710464c4|" bundle/manifests/openvino-operator.clusterserviceversion.yaml
 else
 	sed -i "s|quay.io/openvino/ovms-operator:1.1.0|$(OPERATOR_IMAGE):$(IMAGE_TAG)|" bundle_k8s/manifests/openvino-operator.clusterserviceversion.yaml
 	docker build -t $(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -f bundle_k8s/Dockerfile bundle_k8s
@@ -129,7 +129,7 @@ ifeq ($(TARGET_PLATFORM), openshift)
     fi
 	docker tag $(CATALOG_REPOSITORY):$(IMAGE_TAG) $(CATALOG_REPOSITORY):$(BRANCH)-latest 
 else
-	sudo opm index add --bundles quay.io/operatorhubio/ovms-operator:v0.1.0,quay.io/operatorhubio/ovms-operator:v0.2.0,quay.io/operatorhubio/ovms-operator:v1.0.0,$(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG)
+	sudo opm index add --bundles quay.io/operatorhubio/ovms-operator:v0.1.0,quay.io/operatorhubio/ovms-operator:v0.2.0,quay.io/operatorhubio/ovms-operator:v1.0.0,quay.io/operatorhubio/ovms-operator:v1.1.0,$(BUNDLE_REPOSITORY)-k8s:$(IMAGE_TAG) -c docker --tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG)
 	docker tag $(CATALOG_REPOSITORY)-k8s:$(IMAGE_TAG) $(CATALOG_REPOSITORY)-k8s:$(BRANCH)-latest 	
 endif
 
@@ -168,7 +168,7 @@ ifeq ($(TARGET_PLATFORM), openshift)
 else
 	kubectl delete --ignore-not-found=true ns operator
 	kubectl get ns olm ; if [ $$? -eq 0 ]; then operator-sdk olm uninstall ; fi
-	operator-sdk olm install --version v0.22.0 --timeout 10m0s
+	operator-sdk olm install --version v0.27.0 --timeout 10m0s
 endif
 
 deploy_catalog:

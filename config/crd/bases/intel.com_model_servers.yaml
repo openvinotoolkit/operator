@@ -170,7 +170,7 @@ spec:
                     plugin_config:
                       description: A dictionary of plugin configuration keys and their values
                       type: string
-                      default: '{"CPU_THROUGHPUT_STREAMS":"1"}'
+                      default: '{"PERFORMANCE_HINT":"LATENCY"}'
                     model_version_policy:
                       description: Model version policy
                       type: string

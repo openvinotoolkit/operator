@@ -15,7 +15,7 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "image_name": "openvino/model_server:2022.1",
+            "image_name": "openvino/model_server:2024.0",
             "deployment_parameters": {
               "replicas": 1
             },
@@ -67,9 +67,9 @@ metadata:
     containerImage: quay.io/openvino/ovms-operator:1.1.0
     capabilities: Basic Install
     categories: "AI/Machine Learning"
-    operators.operatorframework.io/builder: operator-sdk-v1.19.1+git
+    operators.operatorframework.io/builder: operator-sdk-v1.34.1+git
     operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
-  name: openvino-operator.v1.1.0
+  name: openvino-operator.v1.2.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -93,7 +93,7 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:io.kubernetes:ConfigMap'
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:false'
-          - description: Path to the configuration file. Set if it is differenet from the default /config/config.json mounted from the config_map resource
+          - description: Path to the configuration file. Set if it is different from the default /config/config.json mounted from the config_map resource
             displayName: Config path
             path: models_settings.config_path
             x-descriptors:
@@ -105,7 +105,7 @@ spec:
             path: models_settings.model_name
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
-          - description: Path to the model repository. The content should include the numberical subfolders with the versions. Use formats like /opt/ml/models/model, gs://bucket/models/model, s3://bucket/models/model or azure://bucket/models/model
+          - description: Path to the model repository. The content should include the numerical subfolders with the versions. Use formats like /opt/ml/models/model, gs://bucket/models/model, s3://bucket/models/model or azure://bucket/models/model
             displayName: Model path
             path: models_settings.model_path
             x-descriptors:
@@ -133,7 +133,7 @@ spec:
               - 'urn:alm:descriptor:com.tectonic.ui:fieldDependency:models_settings.single_model_mode:true'
           - description: >-
               Target device to be used to execute the inference or the plugin name for handling multiple devices.
-              It could be format like `CPU`, `GPU`, `HDDL`, `AUTO`, `MULTI:CPU,GPU`.
+              It could be format like `CPU`, `GPU`, `AUTO`, `MULTI:CPU,GPU`.
             displayName: Target device
             path: models_settings.target_device
             x-descriptors:
@@ -314,7 +314,7 @@ spec:
     Model Server configuration parameters is explained [here](https://github.com/openvinotoolkit/operator/blob/main/docs/modelserver_params.md).
     ## Using the cluster
     OpenVINO Model Server can be consumed as a `Service`. It is called like with `ModelServer` resource with `-ovms` suffix.
-    The suffix is ommited when `ovms` phrase is included in the name.
+    The suffix is omitted when `ovms` phrase is included in the name.
     The service exposes gRPC and REST API interfaces to run inference requests.
     ```
     kubectl get pods
@@ -427,7 +427,7 @@ spec:
                 - --upstream=http://127.0.0.1:8080/
                 - --logtostderr=true
                 - --v=10
-                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.8.0
+                image: gcr.io/kubebuilder/kube-rbac-proxy:v0.15.0
                 name: kube-rbac-proxy
                 ports:
                 - containerPort: 8443
@@ -522,5 +522,5 @@ spec:
   maturity: alpha
   provider:
     name: Intel
-  version: 1.1.0
-  replaces: openvino-operator.v1.0.0
+  version: 1.2.0
+  replaces: openvino-operator.v1.1.0
