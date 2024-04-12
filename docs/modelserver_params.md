@@ -5,6 +5,7 @@
 |image_name| model server docker image. The default is the latest public docker image |
 |deployment_parameters.replicas| number if model server replicas to be used. In case if enabled autoscaling, it defines the initial number of replicas|
 |deployment_parameters.openshift_service_mesh| When the value is `true`, it adds the annotations enabling the models server deployment for [OpenShift Service Mesh](https://docs.openshift.com/container-platform/4.10/service_mesh/v2x/ossm-about.html)|
+|extra_envs_secret| Secret name including extra environment variabled to be applied in the deployed pods `oc create secret generic env_secret --from-file envfile.txt`|
 |service_parameters.grpc_port| gRPC service port; the default value is 8080|
 |service_parameters.rest_port| REST API service port; the default value is 8081|
 |service_parameters.service_type| [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types); the default value is ClusterIP|

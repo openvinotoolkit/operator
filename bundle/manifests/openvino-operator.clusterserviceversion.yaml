@@ -305,6 +305,16 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:updateStrategy'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
+          - description: >-
+              Secret name including extra environment variabled to be applied in the deployed pods `oc create secret generic env_secret --from-file envfile.txt`
+            displayName: Extra environment variabled form a secret
+            path: deployment_parameters.extra_envs_secret
+          - description: >-
+              ConfigMap name including extra environment variabled to be applied in the deployed pods `oc create configmap env_configmap --from-file envfile.txt`
+            displayName: Extra environment variabled form a configmap
+            path: deployment_parameters.extra_envs_configmap
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes:Secret'
           - description: Number of gRPC servers. Default 1. Increase for multi client, high throughput scenarios
             displayName: GRPC workers
             path: server_settings.grpc_workers

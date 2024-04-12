@@ -18,6 +18,8 @@ image_name: openvino/model_server:latest
 deployment_parameters:
   replicas: 1
   openshift_service_mesh: false
+  extra_envs_secret: ""
+  extra_envs_configmap: ""
 service_parameters:
     grpc_port: 8080
     rest_port: 8081
