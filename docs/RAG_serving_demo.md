@@ -137,7 +137,7 @@ Wait a few moments and rerun the query:
 ```
 pushd $(pwd)
 cd model_server/demos/python_demos/llm_text_generation
-python3 client_stream.py --url ovms-rag:8080 --prompt "What are the features of OpenVINO Model Server?"
+python3 client_stream.py --url ovms-rag:8080 --prompt "What are the features of Gaudi3?"
 popd
 ```
 
