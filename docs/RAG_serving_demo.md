@@ -107,12 +107,6 @@ Confirm if the RAG servable is ready for processing. Below is a command to be ex
 ```
 curl http://ovms-rag:8081/v2/models/python_model/ready
 ```
-Send a prompt with a query:
-```
-curl -X POST http://ovms-rag:8081/v2/models/python_model/infer
--H 'Content-Type: application/json'
--d '{"inputs" : [ {"name" : "pre_prompt", "shape" : [ 1 ], "datatype"  : "BYTES", "data" : ["Sumarize what is AIPC."]} ]}
-```
 
 The query can be also executed via a gRPC client with steaming capabilities. That way you can read the text as it gets generated.
 
@@ -131,8 +125,8 @@ Just the `docs.txt` needs to be updated. The RAG servable has an extra thread ch
 ```
 pushd $(pwd)
 cd model_server/demos/python_demos/rag_chatbot/servable_stream
-echo "https://raw.githubusercontent.com/openvinotoolkit/model_server/main/docs/features.md" > docs.txt
-oc delete create configmap rag-demo && \
+echo "https://gist.githubusercontent.com/dtrawins/2956a7a77aa6732b52b8ae6eab0be205/raw/e05f2ab8fea9c8631ac5f20b8dd640074ae429c7/genai.txt" > docs.txt
+oc delete configmap rag-demo && \
 oc create configmap rag-demo --from-file=config.json=config.json --from-file=graph.pbtxt=graph.pbtxt --from-file=model.py=model.py \
 --from-file=config.py=config.py --from-file=ov_embedding_model.py=ov_embedding_model.py \
 --from-file=ov_llm_model.py=ov_llm_model.py --from-file=docs.txt=docs.txt
@@ -141,9 +135,10 @@ popd
 
 Wait a few moments and rerun the query:
 ```
-curl -X POST http://ovms-dag:8081/v2/models/python_model/infer
--H 'Content-Type: application/json'
--d '{"inputs" : [ {"name" : "pre_prompt", "shape" : [ 1 ], "datatype"  : "BYTES", "data" : ["What are the features on OpenVINO Model Server?"]} ]}
+pushd $(pwd)
+cd model_server/demos/python_demos/llm_text_generation
+python3 client_stream.py --url ovms-rag:8080 --prompt "What are the features of OpenVINO Model Server?"
+popd
 ```
 
 
@@ -152,9 +147,9 @@ curl -X POST http://ovms-dag:8081/v2/models/python_model/infer
 The same demo can be adjusted to run the inference on GPU cards. It would require the following changes:
 - installing Intel Device Plugin
 - adding to the ModelServer resource requirements
-- changing in the model.py the device parameter from CPU to GPU
+- added extra environment variable DEVICE=gpu
 
 ## Deploying on Persistent Volume Claim
 
-The demo can be used also with the cluster storage and PVC in the cluster. In such scenario the model can be storged in the same location with the servable configuration files. That way model downloading Hugging Face hub is needed. Locally storted model can be in compressed IR format. It speed up the model loading time.
+The demo can be used also with the cluster storage and PVC in the cluster. In such scenario the model can be storged in the same location with the servable configuration files. That way model downloading Hugging Face hub is needed. Locally storted model can be in compressed IR format. It speeds up the model loading time.
 
