@@ -57,7 +57,7 @@ openvino-operator-controller-manager-548888ddc7-jq4mh   2/2     Running   0     
 
 ### Step 3: Provide a model in PV/PVC
 
-As an end-to-end example, this guide uses `PV/PVC` to store the AI model, and user can also store their model by using [Cloud Storage](using_cloud_storage.md). Before the storage of AI model, please refer to [Model Repository](models_repository.md) to know how to organize components of the model. 
+As an end-to-end example, this guide uses `PV/PVC` to store the AI model, and user can also store their model by using [Cloud Storage](https://github.com/openvinotoolkit/model_server/blob/main/docs/using_cloud_storage.md). Before the storage of AI model, please refer to [Model Repository](https://github.com/openvinotoolkit/model_server/blob/main/docs/models_repository.md) to know how to organize components of the model. 
 
 - 1. Pulling an object detection model from TensorFlow Hub:
 
@@ -81,9 +81,9 @@ models
 
 Sub-folder `1` indicates the version of the model. If you want to upgrade the model, other versions can be added in separate subfolders (2,3...). 
 For more information about the directory structure and how to deploy multiple models at a time, check out the following sections:
-- [Preparing models](models_repository.md)
-- [Serving models](starting_server.md)
-- [Serving multiple model versions](model_version_policy.md) 
+- [Preparing models](https://github.com/openvinotoolkit/model_server/blob/main/docs/models_repository.md)
+- [Serving models](https://github.com/openvinotoolkit/model_server/blob/main/docs/starting_server.md)
+- [Serving multiple model versions](https://github.com/openvinotoolkit/model_server/blob/main/docs/model_version_policy.md) 
 
 - 2. Create the PV/PVC to mount the model directory
 
@@ -205,7 +205,7 @@ kubernetes                 ClusterIP   10.80.0.1      <none>        443/TCP     
 model-server-sample-ovms   ClusterIP   10.82.176.69   <none>        9000/TCP,8000/TCP   11m
 ```
 
-> **Note**: - This guide use PV/PVC to store the model, therefore, `models_repository.models_volume_claim` is set to Persistent Volume Claim `my-models-pvc` created above, and `models_settings` is set to `/models/model` which is mounted by Persistent Volume. Please refer to [Model Server Parameters](parameters.md) for more detail.
+> **Note**: - This guide use PV/PVC to store the model, therefore, `models_repository.models_volume_claim` is set to Persistent Volume Claim `my-models-pvc` created above, and `models_settings` is set to `/models/model` which is mounted by Persistent Volume. Please refer to [Model Server Parameters](https://github.com/openvinotoolkit/model_server/blob/main/docs/parameters.md) for more detail.
 
 ### Step 5: Verify OpenVINO Model Serving by Running Inference
 
@@ -292,7 +292,7 @@ Showing as previous instruction, User can find output file named `output.jpg` co
 
 ![Inference results](cloud_native_quickstart_result.jpeg)
 
-> **Note**: Similar steps can be performed with other model formats. Check the [ONNX use case example](../demos/using_onnx_model/python/README.md), 
-[TensorFlow classification model demo](../demos/image_classification_using_tf_model/python/README.md ) or [PaddlePaddle model demo](../demos/segmentation_using_paddlepaddle_model/python/README.md).
+> **Note**: Similar steps can be performed with other model formats. Check the [ONNX use case example](https://github.com/openvinotoolkit/model_server/blob/main/demos/using_onnx_model/python/README.md), 
+[TensorFlow classification model demo](https://github.com/openvinotoolkit/model_server/blob/main/demos/image_classification_using_tf_model/python/README.md) or [PaddlePaddle model demo](https://github.com/openvinotoolkit/model_server/blob/main/demos/segmentation_using_paddlepaddle_model/python/README.md).
 
-Congratulations, you have completed the Cloud Native QuickStart guide. Try other Model Server [demos](../demos/README.md) or explore more [features](features.md) to create your application.
+Congratulations, you have completed the Cloud Native QuickStart guide. Try other Model Server [demos](https://github.com/openvinotoolkit/model_server/blob/main/demos/README.md) or explore more [features](https://github.com/openvinotoolkit/model_server/blob/main/docs/features.md) to create your application.
