@@ -8,20 +8,20 @@ Here are the steps we are going to follow:
 - optionally adding Hugging Face token to a secret, it will be attached to the deployed service to pull the models in case they requires authentication
 - deploying the service via the operator and ModelServer custom resource
 - running the client to query the document
-- online updates of the documents and reruning the client query
+- online updates of the documents and rerunning the client query
 
 
 ## Building the container image of the model server
 
 The public image of Model Server is enabled for python execution but it has a minimal list of python dependencies. Depending on the use cases, a custom dependencies might need to be included in the image. Follow the instructions from https://github.com/openvinotoolkit/model_server/tree/main/demos/python_demos/rag_chatbot
 
-```
+```bash
 git clone https://github.com/openvinotoolkit/model_server.git
 cd model_server
 # for ubi base image
 make python_image BASE_OS=redhat OVMS_CPP_DOCKER_IMAGE=registry.connect.redhat.com/intel/openvino-model-server OVMS_CPP_IMAGE_TAG=2024.1-gpu 
 # or for ubuntu22 base image
-make python_image BASE_OS=redhat OVMS_CPP_DOCKER_IMAGE=openvino/model_server OVMS_CPP_IMAGE_TAG=2024.1-gpu
+make python_image BASE_OS=ubuntu OVMS_CPP_DOCKER_IMAGE=openvino/model_server OVMS_CPP_IMAGE_TAG=2024.1-gpu
 ```
 Push the build image to your image registry.
 
@@ -52,11 +52,11 @@ spec:
 ```
 It will trigger the build based on provided above Dockerfile and the based image. That image will be automatically pushed to the local cluster container registry in the OpenShift.
 
-## Adding the RAG servable configuration to a configmap
+## Adding the RAG servable configuration to a ConfigMap
 
-The Model Server configuration including servable configuration needs to be attached to deployed pods. In this demo they will be passed via a configmap which can stored arbitrary files. The operator automatically mounts the contnent of a configmap to the serving pod.
+The Model Server configuration including servable configuration needs to be attached to deployed pods. In this demo they will be passed via a ConfigMap which can store arbitrary files. The operator automatically mounts the content of a ConfigMap to the serving pod.
 
-```
+```bash
 pushd $(pwd)
 cd model_server/demos/python_demos/rag_chatbot/servable_stream
 echo "https://gist.githubusercontent.com/ryanloney/42b8ebe29f95ebd4382ee0b2bb50bea2/raw/cfbb679fefb6babec675c7806254a5fff29a5e6b/aipc.txt" > docs.txt
