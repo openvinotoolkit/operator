@@ -36,13 +36,13 @@ RUN GOOS=linux GOARCH=$TARGETARCH make build
 RUN GOOS=linux GOARCH=$TARGETARCH make test-unit
 
 # Final image.
-FROM registry.access.redhat.com/ubi8/ubi-minimal:8.8
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.9
 ### Required OpenShift Labels 
 LABEL name="OpenVINO toolkit operator" \
       maintainer="dariusz.trawinski@intel.com" \
       vendor="Intel Corporation" \
-      version="1.1.0" \
-      release="1.1" \
+      version="1.2.0" \
+      release="1.2" \
       summary="OpenVINO(TM) Toolkit Operator" \
       description="An Operator for managing OpenVINO Toolkit in OpenShift and Kubernetes"
 
