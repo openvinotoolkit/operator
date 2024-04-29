@@ -142,6 +142,7 @@ spec:
       ref: main
     contextDir: demos/python_demos/rag_chatbot
 ```
+
 Launch the pod:
 ```bash
 oc run gradio --image image-registry.openshift-image-registry.svc:5000/<your project name>/rag-gradio --port 9000 --command -- python app.py --ovms_url ovms-rag:8080 --web_url 0.0.0.0:7860
@@ -194,6 +195,7 @@ The same demo can be adjusted to run the inference on GPU cards. It would requir
 - installing [Intel Device Plugin for Kubernetes](https://github.com/intel/intel-device-plugins-for-kubernetes)
 - adding to the ModelServer resource requirements
 - adding extra environment variable DEVICE=gpu
+  
 ```
 deployment_parameters:
   resources:
@@ -201,6 +203,7 @@ deployment_parameters:
       xpu_device: gpu.intel.com/i915
       xpu_device_quantity: "1"
 ```
+
 - added extra environment variable `DEVICE=gpu` to the configmap `rag-env`.
 
 ## Deploying on Persistent Volume Claim
@@ -209,6 +212,7 @@ The demo can be used also with the cluster storage and PVC in the cluster. In su
 
 In such scenario, copy the content of `servable_stream` from the [RAG demo](https://github.com/openvinotoolkit/model_server/tree/main/demos/python_demos/rag_chatbot) to the volume claim togather with the downloaded and compressed models in IR format.
 It can be then mounted to the model server containers using the parameter with dropped `config_configmap_name`:
+
 ```
 models_repository:
   models_volume_claim: <pvc name>
