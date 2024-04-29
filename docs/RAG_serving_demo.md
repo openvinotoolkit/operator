@@ -203,7 +203,6 @@ deployment_parameters:
       xpu_device: gpu.intel.com/i915
       xpu_device_quantity: "1"
 ```
-
 - added extra environment variable `DEVICE=gpu` to the configmap `rag-env`.
 
 ## Deploying on Persistent Volume Claim
