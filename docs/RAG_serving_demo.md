@@ -25,7 +25,7 @@ make python_image BASE_OS=redhat OVMS_CPP_DOCKER_IMAGE=openvino/model_server OVM
 ```
 Push the build image to your image registry.
 
-In case of OpenShift, this build operation can be automated using a BuildConfig resource.
+In case of OpenShift, this build operation can be automated using a BuildConfig resource. After creating an ImageStream called `ovms`, create build config with the below spec:
 
 ```
 spec:
@@ -50,7 +50,7 @@ spec:
       ref: main
     contextDir: demos/python_demos
 ```
-It will trigger the build based on provided above Dockerfile and the based image. That image will be automatically pushed to the local cluster container registry in the OpenShift.
+After triggering the build for that configuration, an image will be automatically pushed to the local cluster container registry in the OpenShift.
 
 ## Adding the RAG servable configuration to a configmap
 
@@ -59,7 +59,7 @@ The Model Server configuration including servable configuration needs to be atta
 ```
 pushd $(pwd)
 cd model_server/demos/python_demos/rag_chatbot/servable_stream
-echo "https://gist.githubusercontent.com/ryanloney/42b8ebe29f95ebd4382ee0b2bb50bea2/raw/cfbb679fefb6babec675c7806254a5fff29a5e6b/aipc.txt" > docs.txt
+echo https://gist.githubusercontent.com/ryanloney/42b8ebe29f95ebd4382ee0b2bb50bea2/raw/cfbb679fefb6babec675c7806254a5fff29a5e6b/aipc.txt > docs.txt
 oc create configmap rag-demo --from-file=config.json=config.json --from-file=graph.pbtxt=graph.pbtxt --from-file=model.py=model.py \
 --from-file=config.py=config.py --from-file=ov_embedding_model.py=ov_embedding_model.py \
 --from-file=ov_llm_model.py=ov_llm_model.py --from-file=docs.txt=docs.txt
@@ -78,13 +78,13 @@ oc create configmap rag-env --from-literal=SELECTED_MODEL=tiny-llama-2-chat-7b
 
 Now we can deploy the Model Server by applying the custom resource:
 ```
-kubectl apply -f - <<EOF
+oc apply -f - <<EOF
 apiVersion: intel.com/v1alpha1
 kind: ModelServer
 metadata:
   name: ovms-rag
 spec:
-  image_name: registry.toolbox.iotg.sclab.intel.com/cpp/model_server-gpu:py
+  image_name: image-registry.openshift-image-registry.svc:5000/<your project name>/ovms:py
   deployment_parameters:
     replicas: 1
     extra_envs_secret: "rag-env"
@@ -118,6 +118,53 @@ python3 client_stream.py --url ovms-rag:8080 --prompt "Sumarize what is AIPC."
 popd
 ```
 
+Alternatively, deploy a service based on `gradio` component, which provide easy to use GUI interface.
+In Openshift you can build the image with gradio client using the following BuildConfig spec. It assumes the image stream name `rag-gradio`:
+```
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'rag-gradio:latest'
+  resources: {}
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile.gradio
+  postCommit: {}
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/openvinotoolkit/model_server'
+      ref: main
+    contextDir: demos/python_demos/rag_chatbot
+```
+Launch the pod:
+```
+oc run gradio --image image-registry.openshift-image-registry.svc:5000/<your project name>/rag-gradio --port 9000 --command -- python app.py --ovms_url ovms-rag:8080 --web_url 0.0.0.0:7860
+```
+oc apply -f - <<EOF
+kind: Service
+apiVersion: v1
+metadata:
+  name: rag-gradio
+spec:
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 7860
+  type: ClusterIP
+  selector:
+    run: gradio
+EOF
+```
+The created service can be not exposed via Routes resources to connect to gradio interface from the browser:
+
+![gradio](./rag-gradio.png)
+
 ## Updating the documents
 Sometimes you might want to change the scope of the RAG analysis and change the documents. It can be done without reloading of the model and restarting the service.
 Just the `docs.txt` needs to be updated. The RAG servable has an extra thread checking regularly if the file is modified. In such case documentes are downloaded and indexed again. 
@@ -125,7 +172,7 @@ Just the `docs.txt` needs to be updated. The RAG servable has an extra thread ch
 ```
 pushd $(pwd)
 cd model_server/demos/python_demos/rag_chatbot/servable_stream
-echo "https://gist.githubusercontent.com/dtrawins/2956a7a77aa6732b52b8ae6eab0be205/raw/e05f2ab8fea9c8631ac5f20b8dd640074ae429c7/genai.txt" > docs.txt
+echo https://gist.githubusercontent.com/dtrawins/2956a7a77aa6732b52b8ae6eab0be205/raw/e05f2ab8fea9c8631ac5f20b8dd640074ae429c7/genai.txt > docs.txt
 oc delete configmap rag-demo && \
 oc create configmap rag-demo --from-file=config.json=config.json --from-file=graph.pbtxt=graph.pbtxt --from-file=model.py=model.py \
 --from-file=config.py=config.py --from-file=ov_embedding_model.py=ov_embedding_model.py \
@@ -141,15 +188,32 @@ python3 client_stream.py --url ovms-rag:8080 --prompt "What are the features of 
 popd
 ```
 
-
 ## Deploying on GPU
 
 The same demo can be adjusted to run the inference on GPU cards. It would require the following changes:
-- installing Intel Device Plugin
+- installing [Intel Device Plugin for Kubernetes](https://github.com/intel/intel-device-plugins-for-kubernetes)
 - adding to the ModelServer resource requirements
-- added extra environment variable DEVICE=gpu
+```
+deployment_parameters:
+  resources:
+    limits:
+      xpu_device: gpu.intel.com/i915
+      xpu_device_quantity: "1"
+```
+- added extra environment variable `DEVICE=gpu` to the configmap `rag-env`.
 
 ## Deploying on Persistent Volume Claim
 
-The demo can be used also with the cluster storage and PVC in the cluster. In such scenario the model can be storged in the same location with the servable configuration files. That way model downloading Hugging Face hub is needed. Locally storted model can be in compressed IR format. It speeds up the model loading time.
+The demo can be used also with the cluster storage and PVC in the cluster. In such scenario the model can be storged in the same location with the servable configuration files. That way model downloading Hugging Face hub is needed. Locally stored model can be in compressed IR format. It speeds up the model loading time.
+
+In such scenario, copy the content of `servable_stream` from the [RAG demo](https://github.com/openvinotoolkit/model_server/tree/main/demos/python_demos/rag_chatbot) to the volume claim togather with the downloaded and compressed models in IR format.
+It can be then mounted to the model server containers using the parameter with dropped `config_configmap_name`:
+```
+models_repository:
+  models_volume_claim: <pvc name>
+models_settings:
+  config_path: /models/<path in pvc>/config.json
+```
+
+
 
