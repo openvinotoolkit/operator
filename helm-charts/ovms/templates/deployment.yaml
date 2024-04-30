@@ -124,6 +124,17 @@ spec:
               name: {{ template "ovms.fullname" . }}-azure-secret
               key: connection_string
         {{- end }}
+        {{- if or .Values.deployment_parameters.extra_envs_secret .Values.deployment_parameters.extra_envs_configmap}}
+        envFrom:
+        {{- if .Values.deployment_parameters.extra_envs_secret }}
+          - secretRef:
+              name: {{ .Values.deployment_parameters.extra_envs_secret }}
+        {{- end }}
+        {{- if .Values.deployment_parameters.extra_envs_configmap }}
+          - configMapRef:
+              name: {{ .Values.deployment_parameters.extra_envs_configmap }}
+        {{- end }}
+        {{- end }}
         args: [
         {{- if eq .Values.models_settings.single_model_mode false }}
           {{- if .Values.models_settings.config_path}}

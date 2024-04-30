@@ -114,6 +114,12 @@ spec:
                             xpu_device_quantity:
                               type: string
                               default: "1"
+                    extra_envs_secret:
+                      type: string
+                      description: Secret name including extra environment variables to be applied in the deployed pods
+                    extra_envs_configmap:
+                      type: string
+                      description: ConfigMap name including extra environment variables to be applied in the deployed pods
                 service_parameters:
                   type: object
                   description: Fill service settings
