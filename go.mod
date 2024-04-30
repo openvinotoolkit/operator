@@ -186,5 +186,3 @@ require (
 	oras.land/oras-go v1.2.4 // indirect
 	rsc.io/letsencrypt v0.0.3 // indirect
 )
-
-// replace github.com/docker/distribution => github.com/docker/distribution v0.0.0-20191216044856-a8371794149d
