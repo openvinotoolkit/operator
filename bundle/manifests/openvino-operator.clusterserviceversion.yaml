@@ -16,7 +16,7 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "image_name": "registry.connect.redhat.com/intel/openvino-model-server@sha256:b8721a65da98bd9b354680ecb2dca8a4d60a1097babe9822ab264f8e951190f7",
+            "image_name": "registry.connect.redhat.com/intel/openvino-model-server@sha256:0817c19cfaf2eef85e98b1d1f43f14ad3eacd873b36e7ee3740810ae3b5f60d0",
             "deployment_parameters": {
               "replicas": 1
             },
@@ -68,10 +68,10 @@ metadata:
           "apiVersion": "intel.com/v1alpha1",
           "kind": "Notebook",
           "metadata": {
-            "name": "v2024"
+            "name": "v2024.1"
           },
           "spec": {
-            "git_ref": "main",
+            "git_ref": "2024.1",
             "auto_update_image": false
           }
         }
@@ -536,7 +536,7 @@ spec:
                   - --metrics-bind-address=127.0.0.1:8080
                   - --leader-elect
                   - --leader-election-id=ovms-operator
-                image: registry.connect.redhat.com/intel/ovms-operator@sha256:d4c8a211f276a8e666917498149aaf8f19c30695552057a509205480ef15e911
+                image: registry.connect.redhat.com/intel/ovms-operator@sha256:9049f5d4e3c764fdca057b60e41ea62c3ca49207433f593668091850d27977d4
                 livenessProbe:
                   httpGet:
                     path: /healthz

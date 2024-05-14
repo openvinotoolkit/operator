@@ -15,7 +15,7 @@ metadata:
             "name": "model-server-sample"
           },
           "spec": {
-            "image_name": "openvino/model_server:2024.0",
+            "image_name": "openvino/model_server:2024.1",
             "deployment_parameters": {
               "replicas": 1
             },
@@ -286,6 +286,18 @@ spec:
             x-descriptors:
               - 'urn:alm:descriptor:com.tectonic.ui:updateStrategy'
               - 'urn:alm:descriptor:com.tectonic.ui:advanced'
+          - description: >-
+              Secret name including extra environment variables to be applied in the deployed pods `oc create secret generic env_secret --from-file envfile.txt`
+            displayName: Extra environment variables form a secret
+            path: deployment_parameters.extra_envs_secret
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes:Secret'
+          - description: >-
+              ConfigMap name including extra environment variables to be applied in the deployed pods `oc create configmap env_configmap --from-file envfile.txt`
+            displayName: Extra environment variables form a configmap
+            path: deployment_parameters.extra_envs_configmap
+            x-descriptors:
+              - 'urn:alm:descriptor:io.kubernetes:ConfigMap'
           - description: Number of gRPC servers. Default 1. Increase for multi client, high throughput scenarios
             displayName: GRPC workers
             path: server_settings.grpc_workers

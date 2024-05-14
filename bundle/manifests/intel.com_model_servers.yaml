@@ -50,7 +50,7 @@ spec:
                   description: Model Server docker image to be used
                   type: string
                   default: >-
-                    registry.connect.redhat.com/intel/openvino-model-server@sha256:b8721a65da98bd9b354680ecb2dca8a4d60a1097babe9822ab264f8e951190f7
+                    registry.connect.redhat.com/intel/openvino-model-server@sha256:0817c19cfaf2eef85e98b1d1f43f14ad3eacd873b36e7ee3740810ae3b5f60d0
                 deployment_parameters:
                   description: Cluster deployment parameters to be applied to the Model Server
                   type: object

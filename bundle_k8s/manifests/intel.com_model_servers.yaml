@@ -50,7 +50,7 @@ spec:
                   description: Model Server docker image to be used
                   type: string
                   default: >-
-                    openvino/model_server:2024.0
+                    openvino/model_server:2024.1
                 deployment_parameters:
                   description: Cluster deployment parameters to be applied to the Model Server
                   type: object
@@ -114,6 +114,12 @@ spec:
                             xpu_device_quantity:
                               type: string
                               default: "1"
+                    extra_envs_secret:
+                      type: string
+                      description: Secret name including extra environment variables to be applied in the deployed pods
+                    extra_envs_configmap:
+                      type: string
+                      description: ConfigMap name including extra environment variables to be applied in the deployed pods
                 service_parameters:
                   type: object
                   description: Fill service settings
