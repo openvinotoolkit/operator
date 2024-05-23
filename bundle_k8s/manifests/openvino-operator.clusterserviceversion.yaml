@@ -64,7 +64,7 @@ metadata:
           }
         }
       ]
-    containerImage: quay.io/openvino/ovms-operator:1.1.0
+    containerImage: quay.io/openvino/ovms-operator:1.2.0
     capabilities: Basic Install
     categories: "AI/Machine Learning"
     operators.operatorframework.io/builder: operator-sdk-v1.34.1+git
@@ -451,7 +451,7 @@ spec:
                   - --leader-elect
                   - --leader-election-id=ovms-operator
                   - --watches-file=watches_k8s.yaml
-                image: quay.io/openvino/ovms-operator:1.1.0
+                image: quay.io/openvino/ovms-operator:1.2.0
                 livenessProbe:
                   httpGet:
                     path: /healthz
