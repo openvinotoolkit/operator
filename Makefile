@@ -235,7 +235,7 @@ style:
 lint:
 	docker run --rm -v $$(pwd):/app -w /app -e https_proxy=$(https_proxy) golangci/golangci-lint:v1.56.1 golangci-lint run --skip-dirs ../go/pkg/mod -v --timeout 4m0s
 
-VIRTUALENV_EXE := python3 -m virtualenv -p python3
+VIRTUALENV_EXE := python3 -m venv
 VIRTUALENV_DIR := .venv
 ACTIVATE="$(VIRTUALENV_DIR)/bin/activate"
 
