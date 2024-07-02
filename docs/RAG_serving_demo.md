@@ -1,14 +1,13 @@
 # Retrieval Augmented Generation with OpenVINO Model Server demo
 
-This demo shows how to deploy in Kubernetes or OpenShift a service based on OpenVINO Model Server for generative use cases. OpenVINO Model Server can be used to expose `chat/completions` OpenAI API which is the key building block of a RAG application. 
-
+This demo shows how to deploy in Kubernetes a service based on OpenVINO Model Server for generative use cases. OpenVINO Model Server can be used to expose `chat/completions` OpenAI API which is the key building block of a RAG application. 
 
 
 Here are the steps we are going to follow:
 - downloading LLM model from Hugging Faces and quantization for better execution efficiency
-- uploading the model to Persistent Volume Claim
+- uploading the model to the Persistent Volume Claim
 - deploying the service via the operator and ModelServer custom resource
-- running the RAG application with the OpenVINO Model Server as the endpoint for text generation
+- running text generation client and the RAG application with the OpenVINO Model Server as the endpoint for text generation
 
 
 ## Downloading LLM model from Hugging Faces and quantization for better execution efficiency
@@ -89,7 +88,7 @@ Meta-Llama-3-8B-Instruct
 ```
 ## Uploading the model to Persistent Volume Claim
 
-The model content is expected to be stored in the PVC in the cluster. It will be accessible in the model server instances for quick initialization. That way replicas don't need to download the model from Internet and rerun the quantization or compression.
+The model content is expected to be stored in the PVC in the cluster. It will be accessible in the model server instances for quick initialization. That way the model server replicas don't need to download the model from Internet and rerun the quantization or compression during every start up.
 
 In this demo there will be created hostPath PersistentVolume. In production use cases it should be replaced with difference storage class like NFS or Amazon Elastic Block Store.
 
@@ -113,7 +112,7 @@ EOF
 ```
 
 Create PersistentVolumeClaim
-
+```bash
 kubectl apply -f - <<EOF
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -129,7 +128,7 @@ spec:
 EOF
 ```
 
-Copy the model to the volume
+Copy the model to the volume.
 
 ```bash
 cp -R Meta-Llama-3-8B-Instruct /opt/data/
@@ -138,6 +137,7 @@ cp -R Meta-Llama-3-8B-Instruct /opt/data/
 ## Deploying the service via the operator and ModelServer custom resource
 
 The first step will be to add the model server config to the configmap.
+It is followed by create the ModelServer resource. It is using the created configmap and the PVC.
 
 ```bash
 cat <<EOF > config.json
@@ -232,12 +232,16 @@ curl -s http://ovms-llm:8081/v3/chat/completions \
 
 ## Running the RAG application with the OpenVINO Model Server as the endpoint for text generation
 
-Deployed above model server with OpenAI API is a fundamental part of the RAG pipeline. 
+Deployed above model server with OpenAI API is a fundamental part of the RAG chain. 
 It can be employed by just pointing the RAG chain to the correct URL representing OpenVINO Model Server endpoint.
 
-Start the jupyther lab via a command:
-
+Start the jupyter notebook via a command:
+```bash
+ jupyter-lab
+```
+Open and console in your browser.
 Import the notebook [rag_demo.ipynb](https://github.com/openvinotoolkit/model_server/blob/main/demos/continuous_batching/rag/rag_demo.ipynb) and 
 and [requirements.txt](https://github.com/openvinotoolkit/model_server/blob/main/demos/continuous_batching/rag/requirements.txt)
 
 In the notebook script just adjust `openai_api_base` parameter to the exposed or internal IP or DNS name, used port and followed by `v3`.
+For example `http://ovms-llm:8081/v3` or `http://10.233.23.238:30023/v3`.
