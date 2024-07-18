@@ -293,6 +293,6 @@ Showing as previous instruction, User can find output file named `output.jpg` co
 ![Inference results](cloud_native_quickstart_result.jpeg)
 
 > **Note**: Similar steps can be performed with other model formats. Check the [ONNX use case example](https://github.com/openvinotoolkit/model_server/blob/main/demos/using_onnx_model/python/README.md), 
-[TensorFlow classification model demo](https://github.com/openvinotoolkit/model_server/blob/main/demos/image_classification_using_tf_model/python/README.md) or [PaddlePaddle model demo](https://github.com/openvinotoolkit/model_server/blob/main/demos/segmentation_using_paddlepaddle_model/python/README.md).
+[TensorFlow classification model demo](https://github.com/openvinotoolkit/model_server/blob/main/demos/image_classification_using_tf_model/python/README.md) or [PaddlePaddle model demo](https://github.com/openvinotoolkit/model_server/blob/main/demos/classification_using_paddlepaddle_model/python/README.md).
 
 Congratulations, you have completed the Cloud Native QuickStart guide. Try other Model Server [demos](https://github.com/openvinotoolkit/model_server/blob/main/demos/README.md) or explore more [features](https://github.com/openvinotoolkit/model_server/blob/main/docs/features.md) to create your application.
