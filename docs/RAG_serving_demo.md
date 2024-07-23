@@ -1,6 +1,6 @@
 # Retrieval Augmented Generation with OpenVINO Model Server demo
 
-This demo shows how to deploy in Kubernetes a service based on OpenVINO Model Server for generative use cases. OpenVINO Model Server can be used to expose `chat/completions` OpenAI API which is the key building block of a RAG application. 
+This demo shows how to deploy a service based on OpenVINO Model Server in Kubernetes for generative use cases. OpenVINO Model Server can be used to expose `chat/completions` OpenAI API which is the key building block of a RAG application. 
 
 
 Here are the steps we are going to follow:
