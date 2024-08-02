@@ -343,7 +343,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 		}
 
 		err = r.updateResourceStatus(ctx, o, status)
-		time.Sleep(time.Second)  // wait 1s to reduce conflicts with concurent updates
+		time.Sleep(time.Second)  // wait 1s to reduce conflicts with concurrent updates
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 	}
 
@@ -463,7 +463,7 @@ func (r HelmOperatorReconciler) Reconcile(ctx context.Context, request reconcile
 			}
 		}
 
-		time.Sleep(time.Second)  // wait 1s to reduce conflicts with concurent updates
+		time.Sleep(time.Second)  // wait 1s to reduce conflicts with concurrent updates
 		return reconcile.Result{RequeueAfter: r.ReconcilePeriod}, err
 	}
 

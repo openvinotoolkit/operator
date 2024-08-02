@@ -121,7 +121,7 @@ func TestSupportsOwnerReference(t *testing.T) {
 			result: false,
 		},
 		{
-			name:       "Returns true for owner and dependant are both ClusterScoped.",
+			name:       "Returns true for owner and dependent are both ClusterScoped.",
 			restMapper: restMapper,
 			owner: &unstructured.Unstructured{
 				Object: map[string]interface{}{
@@ -146,7 +146,7 @@ func TestSupportsOwnerReference(t *testing.T) {
 			result: true,
 		},
 		{
-			name:       "Returns true when owner and dependant are Namespaced with in same namespace.",
+			name:       "Returns true when owner and dependent are Namespaced with in same namespace.",
 			restMapper: restMapper,
 			owner: &unstructured.Unstructured{
 				Object: map[string]interface{}{
@@ -171,7 +171,7 @@ func TestSupportsOwnerReference(t *testing.T) {
 			result: true,
 		},
 		{
-			name:       "Returns false when owner,and dependant are Namespaced, with different namespaces.",
+			name:       "Returns false when owner,and dependent are Namespaced, with different namespaces.",
 			restMapper: restMapper,
 			owner: &unstructured.Unstructured{
 				Object: map[string]interface{}{
@@ -221,7 +221,7 @@ func TestSupportsOwnerReference(t *testing.T) {
 			result: false,
 		},
 		{
-			name:       "Returns false for invalid dependant Kind.",
+			name:       "Returns false for invalid dependent Kind.",
 			restMapper: restMapper,
 			owner: &unstructured.Unstructured{
 				Object: map[string]interface{}{
