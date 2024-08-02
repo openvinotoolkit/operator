@@ -16,7 +16,7 @@
 
 SHELL = /bin/bash
 # The operator image name to be used. By default it point to internal repo. 
-# Can be swaped with the public operator for building the final bundle image
+# Can be swapped with the public operator for building the final bundle image
 OPERATOR_IMAGE ?= registry.toolbox.iotg.sclab.intel.com/cpp/openvino-operator
 
 BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
@@ -49,7 +49,7 @@ ifneq ($(PLATFORM_KUBECONFIG), )
 export KUBECONFIG=$(PLATFORM_KUBECONFIG)
 endif
 
-# TAG by default includes the git commit. It can be set manualy to any user friendly name like release name. 
+# TAG by default includes the git commit. It can be set manually to any user friendly name like release name. 
 # the catalog imamge includes also the tag in a format <branch>-latest
 IMAGE_TAG ?= $(shell git rev-parse --short HEAD)
 

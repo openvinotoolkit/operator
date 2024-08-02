@@ -19,7 +19,7 @@ There are many methods to install a Kubernetes Cluster, such as `kind`, `minikub
 
 This Kubernetes operator named [OpenVINO Toolkit Operator](https://operatorhub.io/operator/ovms-operator) manages OpenVINO components in Kubernetes, and currently available components are ModelServer. Please follow instructions:
 
-- 1. Install Operator Lifecycle Manager (OLM) on your cluser:
+- 1. Install Operator Lifecycle Manager (OLM) on your cluster:
 
 ```bash
 $ curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.27.0/install.sh | bash -s v0.27.0

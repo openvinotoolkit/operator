@@ -148,8 +148,8 @@ func (s *HelmAppStatus) RemoveCondition(conditionType HelmAppConditionType) *Hel
 	return s
 }
 
-// SetScaling sets the status atributes related to horizontal and vertical 
-// scaling. They can be used by HPA and VPA opertors
+// SetScaling sets the status attributes related to horizontal and vertical 
+// scaling. They can be used by HPA and VPA operators
 func (s *HelmAppStatus) SetScaling(replicas int, releaseName string) *HelmAppStatus {
 	s.LabelSelector = "release=" + releaseName
 	s.Replicas = replicas
