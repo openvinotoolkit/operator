@@ -97,7 +97,7 @@ spec:
     path: /metrics
 ```
 
-When the metrics are available via Prometheus, you need to make them accessible by the Horizonal Pod Autoscaler. In order to do that, let's deploy Prometheus Adapter. 
+When the metrics are available via Prometheus, you need to make them accessible by the Horizontal Pod Autoscaler. In order to do that, let's deploy Prometheus Adapter. 
 
 ## Deploy Prometheus Adapter
 

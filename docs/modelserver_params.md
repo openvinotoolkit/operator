@@ -5,12 +5,12 @@
 |image_name| model server docker image. The default is the latest public docker image |
 |deployment_parameters.replicas| number if model server replicas to be used. In case if enabled autoscaling, it defines the initial number of replicas|
 |deployment_parameters.openshift_service_mesh| When the value is `true`, it adds the annotations enabling the models server deployment for [OpenShift Service Mesh](https://docs.openshift.com/container-platform/4.10/service_mesh/v2x/ossm-about.html)|
-|deployment_parameters.extra_envs_secret| Secret name including extra environment variabled to be applied in the deployed pods `oc create secret generic env_secret --from-file envfile.txt`|
-|deployment_parameters.extra_envs_configmap| Configmap name including extra environment variabled to be applied in the deployed pods `oc create configmap env_configmap --from-literal=ENVNAME=VALUE`|
+|deployment_parameters.extra_envs_secret| Secret name including extra environment variables to be applied in the deployed pods `oc create secret generic env_secret --from-file envfile.txt`|
+|deployment_parameters.extra_envs_configmap| Configmap name including extra environment variables to be applied in the deployed pods `oc create configmap env_configmap --from-literal=ENVNAME=VALUE`|
 |service_parameters.grpc_port| gRPC service port; the default value is 8080|
 |service_parameters.rest_port| REST API service port; the default value is 8081|
 |service_parameters.service_type| [service type](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types); the default value is ClusterIP|
-|models_settings.single_model_mode| set `true` if one one model should be deployed; value `false` indicate that config.json file should be used to configure mulitple models |
+|models_settings.single_model_mode| set `true` if one one model should be deployed; value `false` indicate that config.json file should be used to configure multiple models |
 |models_settings.config_configmap_name| Config map hosting the config.json file|
 |models_settings.config_path| Path to the config file in case it was mounted in the container via a persistent volume claim |
 |models_settings.model_name| Model name to be used on the client side in the remote calls |
