@@ -68,10 +68,10 @@ metadata:
           "apiVersion": "intel.com/v1alpha1",
           "kind": "Notebook",
           "metadata": {
-            "name": "v2024.1"
+            "name": "latest"
           },
           "spec": {
-            "git_ref": "2024.1",
+            "git_ref": "latest",
             "auto_update_image": false
           }
         }
