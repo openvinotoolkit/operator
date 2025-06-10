@@ -113,7 +113,7 @@ func (m manager) SetValue(key string, value string) bool {
 	_, ok := m.values[key].(string)
 	if ok {
 		m.values[key] = value
-	} 
+	}
 	return ok
 }
 
@@ -457,7 +457,7 @@ func (m manager) CleanupRelease(ctx context.Context, manifest string) (bool, err
 	if err != nil {
 		return false, fmt.Errorf("failed to build resources from manifests: %w", err)
 	}
-	if resources == nil || len(resources) <= 0 {
+	if len(resources) <= 0 {
 		return true, nil
 	}
 	for _, resource := range resources {
