@@ -42,6 +42,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 	crthandler "sigs.k8s.io/controller-runtime/pkg/handler"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
@@ -49,10 +50,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/source"
 	"sigs.k8s.io/yaml"
 
-	libhandler "github.com/operator-framework/operator-lib/handler"
-	"github.com/operator-framework/operator-lib/predicate"
 	"github.com/openvinotoolkit/operator/pkg/helm/release"
 	"github.com/openvinotoolkit/operator/pkg/util/k8sutil"
+	libhandler "github.com/operator-framework/operator-lib/handler"
+	"github.com/operator-framework/operator-lib/predicate"
 )
 
 var log = logf.Log.WithName("helm.controller")
@@ -94,7 +95,7 @@ func Add(mgr manager.Manager, options WatchOptions) error {
 
 	o := &unstructured.Unstructured{}
 	o.SetGroupVersionKind(options.GVK)
-	if err := c.Watch(source.Kind(mgr.GetCache(), o), &libhandler.InstrumentedEnqueueRequestForObject{}); err != nil {
+	if err := c.Watch(source.Kind(mgr.GetCache(), client.Object(o), &libhandler.InstrumentedEnqueueRequestForObject[client.Object]{})); err != nil {
 		return err
 	}
 
@@ -149,14 +150,22 @@ func watchDependentResources(mgr manager.Manager, r *HelmOperatorReconciler, c c
 				}
 
 				if useOwnerRef { // Setup watch using owner references.
-					err = c.Watch(source.Kind(mgr.GetCache(), unstructuredObj), crthandler.EnqueueRequestForOwner(mgr.GetScheme(), mgr.GetRESTMapper(), owner),
-						predicate.DependentPredicate{})
+					err = c.Watch(
+						source.Kind(
+							mgr.GetCache(),
+							client.Object(unstructuredObj),
+							crthandler.TypedEnqueueRequestForOwner[client.Object](mgr.GetScheme(), mgr.GetRESTMapper(), owner, crthandler.OnlyControllerOwner()),
+							predicate.DependentPredicate{}))
 					if err != nil {
 						return err
 					}
 				} else { // Setup watch using annotations.
-					err = c.Watch(source.Kind(mgr.GetCache(), unstructuredObj), &libhandler.EnqueueRequestForAnnotation{Type: gvkDependent.GroupKind()},
-						predicate.DependentPredicate{})
+					err = c.Watch(
+						source.Kind(
+							mgr.GetCache(),
+							client.Object(unstructuredObj),
+							&libhandler.EnqueueRequestForAnnotation[client.Object]{Type: gvkDependent.GroupKind()},
+							predicate.DependentPredicate{}))
 					if err != nil {
 						return err
 					}
