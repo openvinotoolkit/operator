@@ -43,7 +43,6 @@ import (
 	"github.com/spf13/cobra"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	apimachruntime "k8s.io/apimachinery/pkg/runtime"
-	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/cache"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
@@ -109,13 +108,7 @@ func run(cmd *cobra.Command, f *flags.Flags) {
 		options manager.Options
 		err     error
 	)
-	if f.ManagerConfigPath != "" {
-		cfgLoader := ctrl.ConfigFile().AtPath(f.ManagerConfigPath) // nolint:staticcheck
-		if options, err = options.AndFrom(cfgLoader); err != nil { // nolint:staticcheck
-			log.Error(err, "Unable to load the manager config file")
-			os.Exit(1)
-		}
-	}
+
 	exitIfUnsupported(options)
 
 	cfg, err := config.GetConfig()
