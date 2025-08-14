@@ -150,7 +150,7 @@ require (
 	github.com/containerd/platforms v0.2.1 // indirect
 	github.com/distribution/distribution/v3 v3.0.0-20230611135314-6a57630cf401 // indirect
 	github.com/distribution/reference v0.6.0 // indirect
-	github.com/docker/docker v27.3.1+incompatible // indirect
+	github.com/docker/docker v28.0.0+incompatible // indirect
 	github.com/emicklei/go-restful/v3 v3.11.2 // indirect
 	github.com/evanphx/json-patch/v5 v5.9.11 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
