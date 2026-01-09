@@ -1,5 +1,13 @@
 # Openshift and Kubernetes operator
 
+
+This operator is now deprecated. The recommended methods for deploying OpenVINO Model Server in Kubernetes are currently:
+- [KServer operator](https://kserve.github.io/website/) - check [more details about deployment](https://github.com/openvinotoolkit/model_server/blob/main/docs/deploying_server_kubernetes.md)
+- [OPEA Enterprise](https://github.com/opea-project/Enterprise-Inference)- check [more details about deployment](https://github.com/opea-project/Enterprise-Inference/blob/main/docs/ovms-model-deploy-guide.md)
+
+
+---
+
 The Operator installs and manages [OpenVINO model servers](https://github.com/openvinotoolkit/model_server) in an OpenShift cluster and upstream Kubernetes. It enables inference execution at scale and exposes AI models via gRPC and REST API interfaces.
 The operator is using a [model server helm chart](helm-charts/ovms/) which can be also used directly.
 
